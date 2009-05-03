@@ -1,0 +1,13 @@
+module BraveZealot
+
+# The move class encapsulates the idea and data necessary
+# to change the speed and angle of a tank
+class Move
+  attr_accessor :speed, :angvel
+
+  def initialize(speed, angvel)
+    @speed = speed;
+    @angvel = angvel;
+  end
+
+end
