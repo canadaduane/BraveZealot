@@ -1,1 +1,8 @@
-work in progress
+== BraveZealot ==
+An intelligent bzflag robot.
+
+Authors: Michael Ries, Duane Johnson
+
+== Required Gems ==
+- capistrano
+- eventmachine
