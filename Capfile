@@ -15,7 +15,7 @@ end
 desc "Closes SSH tunnel(s) to the remote bzflag server"
 task :stop_tunnel, :hosts => "localhost" do
   puts "Closing SSH tunnel(s) to port #{bzfs_port}"
-  system("ps auxww|grep ssh|grep #{bzfs_port}|cut -b 10-17|xargs kill")
+  system("ps auxww|grep ssh|grep #{bzfs_port}|awk '{print $2}'|xargs kill")
 end
 
 
