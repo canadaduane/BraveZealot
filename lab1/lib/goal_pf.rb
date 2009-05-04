@@ -5,13 +5,14 @@ module BraveZealot
   class GoalPf
 
     # where is the center of the potential field?
-    attr_accessor :origin_x, :origin_y, :factor
+    attr_accessor :origin_x, :origin_y, :factor, :radius
 
     # 
-    def initialize(x,y,factor)
+    def initialize(x,y,factor,radius)
       @origin_x = x
       @origin_y = y
       @factor = factor
+      @radius = radius
     end
 
     # suggest a move
@@ -24,30 +25,30 @@ module BraveZealot
       if ( ang_g < 0 ) then
         ang_g = ang_g + Math::PI*2
       end
-      print "current angle is #{current_angle}\n"
-      print "the goal angle is #{ang_g}\n";
+      #print "current angle is #{current_angle}\n"
+      #print "the goal angle is #{ang_g}\n";
       
-      a = (current_angle + 2*Math::PI) - ang_g
-      if ( a > Math::PI ) then
-        a = (2*Math::PI) - a
+      a = ang_g-current_angle
+      #print "we need to move through #{a} radians\n"
+      if ( a.abs() > Math::PI ) then
+        a = -1*((2*Math::PI) - a)
+        #print "how about we go the other way through #{a} radians?\n"
       end
-      print "angle we need to move through = #{a}\n"
 
-      #and the final factor in our speed is based on how far off our desired angle we are
-      distance = distance*((Math::PI - a.abs()).abs() / Math::PI ) #we should never be turning more than pi
-      print "distance after angle factor = #{distance}\n"
-      
       #this will need to be a more dynamic calculation but hopefully it gives us a good first try
-      a = a*@factor
-      print "angle after factor = #{a}\n"
       distance = distance*@factor
-      print "distance after factor = #{distance}\n"
-    
+      #print "distance after factor = #{distance}\n"
+
       #we assume we will be updating every .1 seconds, so lets set speed and angvel to reach the desired destination in .5 seconds
-      speed = distance/0.5
-      angvel = a/0.5
+      speed = distance*2
+      angvel = a*2
       m = Move.new(speed, angvel)
 
+      #and the final factor in our speed is based on how far off our desired angle we are
+      speed = m.speed()*((Math::PI - a.abs()).abs() / Math::PI ) #we should never be turning more than pi
+      #print "speed after angle factor = #{speed}\n"
+      
+      m = Move.new(speed, angvel)
       return m
     end
 
