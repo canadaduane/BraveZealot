@@ -1,5 +1,7 @@
 module BraveZealot
 
-class Tank
+  class Tank
+
+  end
 
 end
