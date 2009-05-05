@@ -9,7 +9,12 @@ class Agent < GenericAgent
     speed(0, 0.5) { |r, succ| puts "Speed 0.5" if succ }
     speed(0, 0) { |r, succ| puts "Speed 0" if succ }
     shoot(0)
-    teams { |r, ts| p ts }
+    obstacles do |r, obs|
+      obs.each do |o|
+        p o
+      end
+    end
+    
     angvel(0, 0.1)
     puts "Done first messages"
   end

@@ -8,9 +8,15 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
   
   class Failure < Exception; end
   
+  class Coord < Struct.new(:x, :y)
+    def inspect
+      "(#{x}, #{y})"
+    end
+  end
+  
   Team      = Struct.new(:color, :players)
-  Obstacle  = Struct.new(:x1, :y1, :x2, :y2)
-  Base      = Struct.new(:color, :x1, :y1, :x2, :y2)
+  Obstacle  = Struct.new(:coords)
+  Base      = Struct.new(:color, :coords)
   Flag      = Struct.new(:color, :possession, :x, :y)
   Shot      = Struct.new(:x, :y, :vx, :vy)
   MyTank    = Struct.new(:index, :callsign, :status, :shots_available, :time_to_reload, :flag, :x, :y, :angle, :vx, :vy, :angvel)
@@ -102,10 +108,12 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
         @response.complete!
       when /^team (\w+) (\d+)$/
         @response.add Team.new($1, $2.to_i)
-      when /^obstacle ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add Obstacle.new($1.to_f, $2.to_f, $3.to_f, $4.to_f)
-      when /^base (\w+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add Base.new($1, $2.to_f, $3.to_f, $4.to_f, $5.to_f)
+      when /^obstacle (.*)$/
+        coords = $1.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
+        @response.add Obstacle.new(coords)
+      when /^base (\w+) (.*)$/
+        coords = $2.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
+        @response.add Base.new($1, coords)
       when /^flag (\w+) (\w+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
         @response.add Flag.new($1, $2, $3.to_f, $4.to_f)
       when /^shot ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
