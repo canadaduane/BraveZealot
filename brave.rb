@@ -10,8 +10,16 @@ class Agent < GenericAgent
     speed(0, 0) { |r, succ| puts "Speed 0" if succ }
     shoot(0)
     obstacles do |r, obs|
+      puts "Obstacles:"
       obs.each do |o|
         p o
+      end
+    end
+    
+    bases do |r, bs|
+      puts "Bases:"
+      bs.each do |b|
+        p b
       end
     end
     

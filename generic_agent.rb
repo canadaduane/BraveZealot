@@ -32,7 +32,7 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
       @time, @command, @index, @args = time, command, index, args
       @value = nil
       @complete = false
-      @debug = false
+      @debug = true
     end
     
     def complete!
@@ -81,12 +81,17 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
     end
   end
   
+  def unbind
+    # If the agent is disconnected, shut down
+    EventMachine::stop_event_loop
+  end
+  
   protected
-  def receive_data(data)
-    puts "RECV: #{data}" if @debug
-    @last_msg = data
+  def receive_line(line)
+    # puts "RECV: #{line}"
+    @last_msg = line
     
-    for line in data.strip.lines
+    # for line in data.strip.lines
       case line
       when /^bzrobots [\d\.]+$/:
         say "agent 1"
@@ -112,8 +117,9 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
         coords = $1.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
         @response.add Obstacle.new(coords)
       when /^base (\w+) (.*)$/
+        color = $1
         coords = $2.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
-        @response.add Base.new($1, coords)
+        @response.add Base.new(color, coords)
       when /^flag (\w+) (\w+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
         @response.add Flag.new($1, $2, $3.to_f, $4.to_f)
       when /^shot ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
@@ -134,16 +140,12 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
         cmd = "on_#{@response.command}"
         send(cmd, @response, @response.value) if respond_to?(cmd)
       end
-    end
+    # end
   end
   
   def say(text)
-    puts "SEND: #{text}" if @debug
+    # puts "SEND: #{text}"
     send_data(text.strip + "\n")
   end
   
-  def unbind
-    # If the agent is disconnected, shut down
-    EventMachine::stop_event_loop
-  end
 end
