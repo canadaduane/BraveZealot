@@ -91,56 +91,54 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
     # puts "RECV: #{line}"
     @last_msg = line
     
-    # for line in data.strip.lines
-      case line
-      when /^bzrobots [\d\.]+$/:
-        say "agent 1"
-        start
-      when /^ack ([\d\.]+)( \w+)?( \d+)?(.*)$/
-        time, cmd, index, args = $1, $2, $3, $4
-        time  &&= time.strip
-        cmd   &&= cmd.strip
-        index &&= index.strip
-        args  &&= args.strip.scan(/([^\s]+)+/).flatten
-        # puts "time: #{time.inspect}, cmd: #{cmd.inspect}, index: #{index.inspect}, args: #{args.inspect}"
-        @response = Response.new(time, cmd, index, args)
-      when /^error(.*)$/
-        # Ignore errors for now
-      when /^begin\s*$/
-        # Ignore
-      when /^(ok|fail)(.*)$/
-        @response.value = ($1 == "ok" ? true : false)
-        @response.complete!
-      when /^team (\w+) (\d+)$/
-        @response.add Team.new($1, $2.to_i)
-      when /^obstacle (.*)$/
-        coords = $1.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
-        @response.add Obstacle.new(coords)
-      when /^base (\w+) (.*)$/
-        color = $1
-        coords = $2.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
-        @response.add Base.new(color, coords)
-      when /^flag (\w+) (\w+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add Flag.new($1, $2, $3.to_f, $4.to_f)
-      when /^shot ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add Shot.new($1.to_f, $2.to_f, $3.to_f, $4.to_f)
-      when /^mytank (\d+) (\w+) (alive|dead|\w+) (\d+) ([\d\.\-\+]+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add MyTank.new($1.to_i, $2, $3, $4.to_i, $5.to_f, $6, $7.to_f, $8.to_f, $9.to_f, $10.to_f, $11.to_f, $12.to_f)
-      when /^othertank (\w+) (\w+) (alive|dead|\w+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
-        @response.add OtherTank.new($1, $2, $3, $4, $5.to_f, $6.to_f, $7.to_f)
-      when /^end\s*$/
-        @response.complete!
-      end
-    
-      if @response && @response.complete?
-        # Call the specific reaction to this particular command
-        reaction = @message_queue.shift
-        reaction.call(@response, @response.value) if reaction
-        # Call the global response method for this kind of command
-        cmd = "on_#{@response.command}"
-        send(cmd, @response, @response.value) if respond_to?(cmd)
-      end
-    # end
+    case line
+    when /^bzrobots [\d\.]+$/:
+      say "agent 1"
+      start
+    when /^ack ([\d\.]+)( \w+)?( \d+)?(.*)$/
+      time, cmd, index, args = $1, $2, $3, $4
+      time  &&= time.strip
+      cmd   &&= cmd.strip
+      index &&= index.strip
+      args  &&= args.strip.scan(/([^\s]+)+/).flatten
+      # puts "time: #{time.inspect}, cmd: #{cmd.inspect}, index: #{index.inspect}, args: #{args.inspect}"
+      @response = Response.new(time, cmd, index, args)
+    when /^error(.*)$/
+      # Ignore errors for now
+    when /^begin\s*$/
+      # Ignore
+    when /^(ok|fail)(.*)$/
+      @response.value = ($1 == "ok" ? true : false)
+      @response.complete!
+    when /^team (\w+) (\d+)$/
+      @response.add Team.new($1, $2.to_i)
+    when /^obstacle (.*)$/
+      coords = $1.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
+      @response.add Obstacle.new(coords)
+    when /^base (\w+) (.*)$/
+      color = $1
+      coords = $2.scan(/[\d\.\-\+]+/).enum_slice(2).map{ |x, y| Coord.new(x, y) }
+      @response.add Base.new(color, coords)
+    when /^flag (\w+) (\w+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
+      @response.add Flag.new($1, $2, $3.to_f, $4.to_f)
+    when /^shot ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
+      @response.add Shot.new($1.to_f, $2.to_f, $3.to_f, $4.to_f)
+    when /^mytank (\d+) (\w+) (alive|dead|\w+) (\d+) ([\d\.\-\+]+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
+      @response.add MyTank.new($1.to_i, $2, $3, $4.to_i, $5.to_f, $6, $7.to_f, $8.to_f, $9.to_f, $10.to_f, $11.to_f, $12.to_f)
+    when /^othertank (\w+) (\w+) (alive|dead|\w+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/
+      @response.add OtherTank.new($1, $2, $3, $4, $5.to_f, $6.to_f, $7.to_f)
+    when /^end\s*$/
+      @response.complete!
+    end
+  
+    if @response && @response.complete?
+      # Call the specific reaction to this particular command
+      reaction = @message_queue.shift
+      reaction.call(@response, @response.value) if reaction
+      # Call the global response method for this kind of command
+      cmd = "on_#{@response.command}"
+      send(cmd, @response, @response.value) if respond_to?(cmd)
+    end
   end
   
   def say(text)
