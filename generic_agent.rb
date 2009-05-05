@@ -2,7 +2,6 @@ require 'rubygems'
 require 'eventmachine'
 
 class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
-  attr_accessor :debug
   attr_reader :last_msg
   attr_reader :message_queue
   
@@ -23,7 +22,7 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
   OtherTank = Struct.new(:callsign, :color, :status, :flag, :x, :y, :angle)
   Constant  = Struct.new(:name, :value)
   
-  # Contains the response for a given command.  The +value+ can be a boolean, a float, or any of the Structs defined above.
+  # Contains the response for a given command.  The +value+ can be a boolean or any of the Structs defined above.
   class Response
     attr_accessor :value
     attr_accessor :time, :command, :index, :args
@@ -32,7 +31,6 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
       @time, @command, @index, @args = time, command, index, args
       @value = nil
       @complete = false
-      @debug = true
     end
     
     def complete!
@@ -41,6 +39,40 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
     
     def complete?
       @complete
+    end
+    
+    def success?
+      @value == true
+    end
+    
+    def array?
+      @value.is_a? Array
+    end
+    
+    def expect_array_of!(klass)
+      if array? and (@value.empty? or @value.first.is_a?(klass))
+        return
+      else
+        raise TypeError, "expecting [#{klass}]"
+      end
+    end
+    
+    # Use a little type checking when we access expected response objects.  For example,
+    # if we ask for response.obstacles but @value contains a list of Team objects, we should
+    # raise a TypeError.
+    { :teams      => Team,
+      :obstacles  => Obstacle,
+      :bases      => Base,
+      :flags      => Flag,
+      :shots      => Shot,
+      :mytanks    => MyTank,
+      :othertanks => OtherTank,
+      :constants  => Constant }.
+    each do |method, klass|
+      define_method(method) do
+        expect_array_of! klass
+        @value
+      end
     end
     
     def add(item)
@@ -83,6 +115,7 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
   
   def unbind
     # If the agent is disconnected, shut down
+    puts "Agent disconnected (possibly caused by a Ruby exception?)"
     EventMachine::stop_event_loop
   end
   
@@ -134,10 +167,10 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
     if @response && @response.complete?
       # Call the specific reaction to this particular command
       reaction = @message_queue.shift
-      reaction.call(@response, @response.value) if reaction
+      reaction.call(@response) if reaction
       # Call the global response method for this kind of command
       cmd = "on_#{@response.command}"
-      send(cmd, @response, @response.value) if respond_to?(cmd)
+      send(cmd, @response) if respond_to?(cmd)
     end
   end
   

@@ -5,20 +5,20 @@ require 'generic_agent'
 
 class Agent < GenericAgent
   def start
-    shoot(0) { |r, succ| puts "Ok 1" if succ }
-    speed(0, 0.5) { |r, succ| puts "Speed 0.5" if succ }
-    speed(0, 0) { |r, succ| puts "Speed 0" if succ }
+    shoot(0)      { |r| print "shoot(0) "; puts( r.success? ? "Ok" : "Fail #{r.inspect}") }
+    speed(0, 0.5) { |r| print "speed(0, 0.5) "; puts( r.success? ? "Ok" : "Fail #{r.inspect}") }
+    speed(0, 0)   { |r| print "speed(0, 0) "; puts( r.success? ? "Ok" : "Fail #{r.inspect}") }
     shoot(0)
-    obstacles do |r, obs|
+    obstacles do |r|
       puts "Obstacles:"
-      obs.each do |o|
+      r.obstacles.each do |o|
         p o
       end
     end
     
-    bases do |r, bs|
+    bases do |r|
       puts "Bases:"
-      bs.each do |b|
+      r.bases.each do |b|
         p b
       end
     end
@@ -27,8 +27,8 @@ class Agent < GenericAgent
     puts "Done first messages"
   end
   
-  def on_shoot(response, success)
-    if success
+  def on_shoot(r)
+    if r.success?
       puts "Successfully lobbed"
     else
       puts "Unable to shoot"
