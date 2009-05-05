@@ -4,39 +4,22 @@ require 'eventmachine'
 require 'generic_agent'
 
 class Agent < GenericAgent
-  def first_message
-    say "teams"
-    say "angvel 0 0.1"
-    say "shoot 0"
-    say "speed 0 0.4"
+  def start
+    shoot(0) { |r, succ| puts "Ok 1" if succ }
+    speed(0, 0.5) { |r, succ| puts "Speed 0.5" if succ }
+    speed(0, 0) { |r, succ| puts "Speed 0" if succ }
+    shoot(0)
+    teams { |r, ts| p ts }
+    angvel(0, 0.1)
+    puts "Done first messages"
   end
   
   def on_shoot(response, success)
     if success
       puts "Successfully lobbed"
     else
-      raise Failure, "unable to shoot"
+      puts "Unable to shoot"
     end
-  end
-  
-  def on_speed(response, success)
-    if success
-      puts "Successfully changed speed"
-    else
-      raise Failure, "unable to change speed"
-    end
-  end
-
-  def on_angvel(response, success)
-    if success
-      puts "Successfully changed angular velocity"
-    else
-      raise Failure, "unable to change angular velocity"
-    end
-  end
-  
-  def on_teams(response, teams)
-    puts "Teams: #{teams.inspect}"
   end
 end
 

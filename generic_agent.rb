@@ -4,6 +4,7 @@ require 'eventmachine'
 class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
   attr_accessor :debug
   attr_reader :last_msg
+  attr_reader :message_queue
   
   class Failure < Exception; end
   
@@ -43,10 +44,35 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
   end
   
   def initialize
+    @message_queue = []
     super
   end
   
-  def first_message
+  def start
+  end
+  
+  { :shoot      => ["index"],
+    :speed      => ["index", "speed"],
+    :angvel     => ["index", "angvel"],
+    :accelx     => ["index", "accel"],
+    :accely     => ["index", "accel"],
+    :teams      => [],
+    :obstacles  => [],
+    :bases      => [],
+    :flags      => [],
+    :shots      => [],
+    :mytanks    => [],
+    :othertanks => [],
+    :constants  => [] }.
+  each do |method, args|
+    # Create each of the above methods as verbs in our tank vocabularly.  Each method expects
+    # the arguments specified in the array above, and an optional reaction block.
+    define_method(method) do |*ss, &reaction|
+      raise ArgumentError, "Expects #{args.empty? ? 'nothing' : args.inspect} as args" unless ss.size == args.size
+      words = ([method] + ss).map{ |w| w.to_s }
+      say words.join(" ")
+      @message_queue << reaction
+    end
   end
   
   protected
@@ -58,7 +84,7 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
       case line
       when /^bzrobots [\d\.]+$/:
         say "agent 1"
-        first_message
+        start
       when /^ack ([\d\.]+)( \w+)?( \d+)?(.*)$/
         time, cmd, index, args = $1, $2, $3, $4
         time  &&= time.strip
@@ -93,7 +119,12 @@ class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
       end
     
       if @response && @response.complete?
-        send("on_#{@response.command}", @response, @response.value)
+        # Call the specific reaction to this particular command
+        reaction = @message_queue.shift
+        reaction.call(@response, @response.value) if reaction
+        # Call the global response method for this kind of command
+        cmd = "on_#{@response.command}"
+        send(cmd, @response, @response.value) if respond_to?(cmd)
       end
     end
   end
