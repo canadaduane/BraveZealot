@@ -1,11 +1,9 @@
 require 'rubygems'
 require 'eventmachine'
 
-class GenericAgent < EventMachine::Protocols::LineAndTextProtocol
+class Communicator < EventMachine::Protocols::LineAndTextProtocol
   attr_reader :last_msg
   attr_reader :message_queue
-  
-  class Failure < Exception; end
   
   class Coord < Struct.new(:x, :y)
     def inspect

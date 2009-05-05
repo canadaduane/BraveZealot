@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'eventmachine'
 
-require 'generic_agent'
+require 'communicator'
 
-class Agent < GenericAgent
+class TestComm < Communicator
   def start
     shoot(0)      { |r| print "shoot(0) "; puts( r.success? ? "Ok" : "Fail #{r.inspect}") }
     speed(0, 0.5) { |r| print "speed(0, 0.5) "; puts( r.success? ? "Ok" : "Fail #{r.inspect}") }
@@ -37,8 +37,8 @@ class Agent < GenericAgent
 end
 
 EventMachine.run do
-  agent = EventMachine::connect('127.0.0.1', 5000, Agent)
+  comm = EventMachine::connect('127.0.0.1', 5000, TestComm)
   timer = EventMachine::PeriodicTimer.new(5) do
-     puts "the time is #{Time.now}. Agent's last message: #{agent.last_msg}"
+     puts "the time is #{Time.now}. Last message: #{comm.last_msg}"
    end
 end
