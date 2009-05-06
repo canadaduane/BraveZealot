@@ -1,3 +1,4 @@
+require_relative 'move.rb'
 module BraveZealot
 
   # A PotentialField Goal is a goal which suggests movements by calculating a
@@ -7,7 +8,7 @@ module BraveZealot
     # where is the center of the potential field?
     attr_accessor :origin_x, :origin_y, :factor, :radius
 
-    # 
+    # save the settings 
     def initialize(x,y,factor,radius)
       @origin_x = x
       @origin_y = y

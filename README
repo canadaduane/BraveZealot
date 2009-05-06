@@ -6,4 +6,4 @@ Authors: Michael Ries, Duane Johnson
 == Required Gems ==
 - capistrano
 - eventmachine
-
+- Shoulda

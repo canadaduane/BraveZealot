@@ -1,3 +1,4 @@
+require_relative 'move.rb'
 module BraveZealot
 
   # A Goal suggests actions for a Tank
