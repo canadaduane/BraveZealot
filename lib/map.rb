@@ -5,10 +5,9 @@ require_relative 'pf_rand.rb'
 require_relative 'pf_tan.rb'
 module BraveZealot
   Coord = Struct.new(:x,:y)
-  Flag = Struct.new(:coord, :team)
 
   class Map
-    attr_accessor :size, :obstacles, :flags, :tanks, :team, :fields
+    attr_accessor :size, :obstacles, :flags, :tanks, :team
     def initialize(team, size)
       @team = team
       @size = size.to_i
@@ -18,9 +17,6 @@ module BraveZealot
 
     def addObstacle(coordinates)
       @obstacles.push(Obstacle.new(coordinates))
-    end
-    def addField(f)
-      @fields << f
     end
     def addFlag(f)
       @flags << f

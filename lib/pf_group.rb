@@ -21,18 +21,18 @@ module BraveZealot
     def addMapFields(map)
       max = map.size / 2
       # Add repulsion fields at corners of map
-      addField(PfRep.new(-max, -max, max/3, 0, 0.2))
-      addField(PfRep.new(-max, max, max/3, 0, 0.2))
-      addField(PfRep.new(max, -max, max/3, 0, 0.2))
-      addField(PfRep.new(max, max, max/3, 0, 0.2))
-      addField(PfRep.new(-max,0,max/3,0,0.2))
-      addField(PfRep.new(0,max,max/3,0,0.2))
-      addField(PfRep.new(max,0,max/3,0,0.2))
-      addField(PfRep.new(0,-max,max/3,0,0.2))
+      addField(PfRep.new(-max, -max, max/3, 0, 0.06))
+      addField(PfRep.new(-max, max, max/3, 0, 0.06))
+      addField(PfRep.new(max, -max, max/3, 0, 0.06))
+      addField(PfRep.new(max, max, max/3, 0, 0.06))
+      addField(PfRep.new(-max,0,max/3,0,0.06))
+      addField(PfRep.new(0,max,max/3,0,0.06))
+      addField(PfRep.new(max,0,max/3,0,0.06))
+      addField(PfRep.new(0,-max,max/3,0,0.06))
 
       # Next we add attraction fields for the goals
       map.flags.each do |f|
-        addField(Pf.new(f.coord.x, f.coord.y, map.size, 0, 0.2))
+        addField(Pf.new(f.x, f.y, map.size, 0, 0.2))
       end
 
       # Next we add repulsion fields on all the vertices of all the obstacles
