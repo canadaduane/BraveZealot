@@ -91,7 +91,7 @@ module BraveZealot
           return_goal = PfGroup.new
           return_goal.add_obstacles(@obstacles)
           return_goal.add_goal(@our_base.center.x, @our_base.center.y, @world_size)
-          @tanks.each do |t|
+          @tanks.values.each do |t|
             t.goal = return_goal
           end
         end
@@ -100,8 +100,9 @@ module BraveZealot
     end
     
     def flag_possession?
-      @tanks.any? do |t|
-        t.tank.flag != "-" &&
+      @tanks.values.any? do |t|
+        puts "t.tank.flag = #{t.tank.flag}"
+        t.tank.flag != "none" &&
         t.tank.flag != @team_color
       end
     end

@@ -46,6 +46,7 @@ module BraveZealot
           mode = :move
           EventMachine::PeriodicTimer.new(0.2) do
             refresh(0.2)
+            shoot()
             
             case mode
             when :accel_once then
@@ -81,6 +82,7 @@ module BraveZealot
     def start
       EventMachine::PeriodicTimer.new(0.1) do
         refresh(0.1) do
+          shoot()
           if @goal
             puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             
