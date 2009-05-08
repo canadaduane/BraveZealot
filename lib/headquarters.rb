@@ -12,7 +12,6 @@ module BraveZealot
         :hit => []
       }
       @tanks = {}                 # Current BraveZealot::Tank objects
-      @previous_tank_data = {}    # Communicator::Tank data from previous iteration
       @world_time = 0.0           # Last communicated world time
       @last_message_time = 0.0    # Last time we received a message (in Time.now units)
       @last_mytanks_time = 0.0    # Last time we received a mytanks message
@@ -64,7 +63,7 @@ module BraveZealot
                   when 'smart' then BraveZealot::SmartTank.new(self, t)
                   end
                 tank.goal = initial_goal
-                
+                @tanks[tank.index] = tank
               end
             end
             
@@ -127,7 +126,6 @@ module BraveZealot
       @last_mytanks_time = r.time
       r.mytanks.each do |t|
         if @tanks[t.index]
-          @previous_tank_data[t.index] = @tanks[t.index].tank
           @tanks[t.index].tank = t
         end
       end

@@ -81,7 +81,8 @@ module BraveZealot
       EventMachine::PeriodicTimer.new(0.1) do
         refresh(0.1) do
           if @goal
-            # puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
+            puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
+            
             move = @goal.suggestMove(@tank.x, @tank.y, angle)
             puts "Move: #{move.inspect}"
             speed move.speed
