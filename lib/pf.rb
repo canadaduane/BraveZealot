@@ -3,32 +3,48 @@ module BraveZealot
 
   # A PotentialField Goal is a goal which suggests movements by calculating a
   # potential field.  This pf is a simple attraction/rejection field.
-  class GoalPf
+  class Pf
 
     # where is the center of the potential field?
-    attr_accessor :origin_x, :origin_y, :factor, :radius
+    attr_accessor :origin_x, :origin_y, :spread, :radius, :alpha
 
     # save the settings 
-    def initialize(x,y,factor,radius)
+    def initialize(x,y,spread,radius, alpha)
       @origin_x = x
       @origin_y = y
-      @factor = factor
+      @spread = spread
       @radius = radius
+      @alpha = alpha
     end
 
-    # suggest a move
-    def suggestMove(current_x, current_y, current_angle)
+    # suggest a distance and angle
+    def suggestDelta(current_x, current_y)
       x_dis = @origin_x - current_x
       y_dis = @origin_y - current_y
       distance = Math.sqrt((x_dis)**2 + (y_dis)**2)
 
       ang_g = Math.atan2(y_dis,x_dis)    
-      if ( ang_g < 0 ) then
-        ang_g = ang_g + Math::PI*2
+      #if ( ang_g < 0 ) then
+      #  ang_g = ang_g + Math::PI*2
+      #end
+      
+      if ( distance < @radius ) then
+        return [0,0]
+      elsif ( distance < (@spread + @radius)) then
+        return [@alpha*(distance-@radius)*Math.cos(ang_g), @alpha*(distance-@radius)*Math.sin(ang_g)]
+      else
+        return [@alpha*@spread*Math.cos(ang_g), @alpha*@spread*Math.sin(ang_g)]
       end
+    end
+
+    # suggest a move
+    def suggestMove(current_x, current_y, current_angle)
+      dx,dy = suggestDelta(current_x,current_y)
       #print "current angle is #{current_angle}\n"
       #print "the goal angle is #{ang_g}\n";
-      
+      ang_g = Math.atan2(dy,dx)
+      distance = Math.sqrt(dx**2 + dy**2)
+
       a = ang_g-current_angle
       #print "we need to move through #{a} radians\n"
       if ( a.abs() > Math::PI ) then

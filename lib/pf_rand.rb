@@ -2,7 +2,7 @@ require_relative 'move.rb'
 module BraveZealot
 
   # A PotentialField Goal with a randmon potential field
-  class GoalPfRand
+  class PfRand
 
     # where is the center of the potential field?
     attr_accessor :factor
@@ -10,6 +10,10 @@ module BraveZealot
     # save the settings 
     def initialize(factor)
       @factor = factor
+    end
+
+    def suggestDelta(current_x, current_y)
+      return []
     end
 
     # suggest a move - Totally random

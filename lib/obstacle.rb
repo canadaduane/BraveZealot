@@ -1,4 +1,3 @@
-require_relative 'map.rb'
 module BraveZealot
   class Obstacle
     attr_accessor :coordinates
@@ -32,7 +31,7 @@ module BraveZealot
         end
         x = x/@coordinates.size
         y = y/@coordinates.size
-        @center = Coordinate.new(x,y)
+        @center = Coord.new(x,y)
       end
       @center
     end
