@@ -27,7 +27,7 @@ module BraveZealot
       attr_accessor :time, :command, :index, :args
     
       def initialize(time, command, index, args)
-        @time, @command, @index, @args = time, command, index, args
+        @time, @command, @index, @args = time.to_f, command, index.to_i, args
         @value = nil
         @complete = false
       end
@@ -169,15 +169,18 @@ module BraveZealot
       end
   
       if @response && @response.complete?
-        # Call the specific reaction to this particular command
-        reaction = @message_queue.shift
-        reaction.call(@response) if reaction
+        # Call the catch-all global response method
+        send("on_any", @response) if respond_to?("on_any")
         # Call the global response method for this kind of command
         cmd = "on_#{@response.command}"
         send(cmd, @response) if respond_to?(cmd)
+        # Call the specific reaction to this particular command
+        reaction = @message_queue.shift
+        reaction.call(@response) if reaction
       end
     rescue Exception => e
       puts e
+      puts e.backtrace.join("\n")
       raise e
     end
   
