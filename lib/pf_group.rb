@@ -90,7 +90,7 @@ module BraveZealot
       end
 
       #this will need to be a more dynamic calculation but hopefully it gives us a good first try
-      distance = distance*@factor
+      # distance = distance*@factor
       #print "distance after factor = #{distance}\n"
 
       #we assume we will be updating every .1 seconds, so lets set speed and angvel to reach the desired destination in .5 seconds

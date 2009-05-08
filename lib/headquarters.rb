@@ -5,6 +5,7 @@ bzrequire 'lib/map'
 module BraveZealot
   class Headquarters < Communicator
     attr_reader :mytanks_time
+    attr_reader :map
     
     def start
       @bindings = {
@@ -39,29 +40,29 @@ module BraveZealot
                 @map.addFlag(f)
               end
               
-              # group = PfGroup.new
-              # group.addMapFields(@map)
-          
               File.open("map.gpi", "w") do |f|
                 f.write @map.to_gnuplot
               end
             end
+            
+            
+            # Initialize each of our tanks
+            mytanks do |r|
+              r.mytanks.each do |t|
+                case $options.brain
+                when 'dummy' then
+                  @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
+                when 'smart' then
+                  @tanks[t.index] = BraveZealot::SmartTank.new(self, t)
+                end
+              end
+            end
+            
           end
         end
       end
       
       
-      # Initialize each of our tanks
-      mytanks do |r|
-        r.mytanks.each do |t|
-          case $options.brain
-          when 'dummy' then
-            @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
-          when 'smart' then
-            @tanks[t.index] = BraveZealot::SmartTank.new(self, t)
-          end
-        end
-      end
     end
     
     def timer(slice)

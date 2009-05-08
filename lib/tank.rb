@@ -77,6 +77,16 @@ module BraveZealot
   class SmartTank < Tank
     
     def start
+      group = PfGroup.new
+      group.addMapFields(@hq.map)
+      
+      EventMachine::PeriodicTimer.new(0.2) do
+        refresh(0.2)
+        puts "x: #{x}, y: #{@tank.y}, angle: #{angle}"
+        move = group.suggestMove(x, @tank.y, angle)
+        speed move.speed
+        angvel move.angvel
+      end
     end
     
   end
