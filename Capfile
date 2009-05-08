@@ -4,31 +4,13 @@
 # gem install mattmatt-cap-ext-parallelize -s http://gems.github.com
 # require 'cap_ext_parallelize'
 
+set :callsign, "brave"
 set :team, "green"
 set :players, "2"
 set :machine, "fungi"
 set :bzfs_port, "5154"
 set :bzrc_port, "5000"
-
-# desc "Go"
-# task :go, :hosts => "#{machine}.cs.byu.edu" do
-#   stop_tunnel
-#   stop_robot
-#   stop_server
-#   
-#   begin
-#     parallelize do |session|
-#       session.run { start_server }
-#       session.run { start_robot  }
-#       session.run { start_tunnel_delayed }
-#     end
-#   rescue SignalException => e
-#     puts "bzrobots shutdown"
-#     stop_server
-#     stop_robot
-#     stop_tunnel
-#   end
-# end
+set :world, nil
 
 
 desc "Starts the bzfs server on the remote CS department host"
@@ -39,7 +21,8 @@ task :start_server, :hosts => "#{machine}.cs.byu.edu" do
           "-set _inertiaAngular 1 " +
           "-set _tankAngVel 0.5 " +
           "-set _rejoinTime 0 " +
-          "-set _grabOwnFlag 0"
+          "-set _grabOwnFlag 0 "
+    cmd += "-world #{world}" if world
     stream cmd, :pty => true
   rescue SignalException => e
     puts "shutdown bzflag server"
@@ -75,7 +58,7 @@ desc "Start the bzrobots server/client"
 task :start_robot, :hosts => "#{machine}.cs.byu.edu" do
   puts "Starting bzrobots server/client"
   begin
-    run "~cs470s/bzflag/src/bzrobots/bzrobots -team #{team} -solo #{players} -p #{bzrc_port}"
+    run "~cs470s/bzflag/src/bzrobots/bzrobots -team #{team} -solo #{players} -p #{bzrc_port} #{callsign}@localhost"
   rescue SignalException => e
     puts "shutdown bzrobots"
     stop_robot
