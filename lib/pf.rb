@@ -40,6 +40,12 @@ module BraveZealot
         dx = @alpha*@spread*Math.cos(ang_g)
         dy = @alpha*@spread*Math.sin(ang_g)
       end
+      
+      if distance < 40 then
+        dx = dx
+        dy = dy
+      end
+
       if dx > Pf::MAX then
         dx = Pf::MAX
       elsif dx < -Pf::MAX then

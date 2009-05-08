@@ -119,7 +119,7 @@ module BraveZealot
       end
 
       #and the final factor in our speed is based on how far off our desired angle we are
-      speed = m.speed()*((Math::PI - a.abs()).abs() / Math::PI ) #we should never be turning more than pi
+      speed = m.speed()*((((Math::PI - a.abs()).abs())) / Math::PI ) #we should never be turning more than pi
       #print "speed=#{speed} angvel=#{angvel}\n"
       
       m = Move.new(speed, angvel)
