@@ -91,16 +91,16 @@ module BraveZealot
       ang_g = Math.atan2(dy,dx)
       distance = Math.sqrt(dx**2 + dy**2)
 
-      if ang_g < 0 then
-        ang_g += Math::PI*2
-      end
-
       #print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"
 
       a = ang_g-current_angle
       #print "we need to move through #{a} radians\n"
       if ( a.abs() > Math::PI ) then
-        a = -1*((2*Math::PI) - a)
+        if ( a < 0 ) then
+          a += 2*Math::PI
+        else
+          a -= 2*Math::PI
+        end
         #print "how about we go the other way through #{a} radians?\n"
       end
 
