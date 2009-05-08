@@ -22,14 +22,14 @@ module BraveZealot
     def addMapFields(map)
       max = map.size / 2
       # Add repulsion fields at corners of map
-      addField(PfRep.new(-max, -max, max/3, 0, 0.06))
-      addField(PfRep.new(-max, max, max/3, 0, 0.06))
-      addField(PfRep.new(max, -max, max/3, 0, 0.06))
-      addField(PfRep.new(max, max, max/3, 0, 0.06))
-      addField(PfRep.new(-max,0,max/3,0,0.06))
-      addField(PfRep.new(0,max,max/3,0,0.06))
-      addField(PfRep.new(max,0,max/3,0,0.06))
-      addField(PfRep.new(0,-max,max/3,0,0.06))
+      #addField(PfRep.new(-max, -max, max/3, 0, 0.06))
+      #addField(PfRep.new(-max, max, max/3, 0, 0.06))
+      #addField(PfRep.new(max, -max, max/3, 0, 0.06))
+      #addField(PfRep.new(max, max, max/3, 0, 0.06))
+      #addField(PfRep.new(-max,0,max/3,0,0.06))
+      #addField(PfRep.new(0,max,max/3,0,0.06))
+      #addField(PfRep.new(max,0,max/3,0,0.06))
+      #addField(PfRep.new(0,-max,max/3,0,0.06))
 
       # Next we add attraction fields for the goals
       map.flags.each do |f|
@@ -38,16 +38,16 @@ module BraveZealot
 
       # Next we add repulsion fields on all the vertices of all the obstacles
       map.obstacles.each do |o|
-        o.coordinates.each do |c|
-          addField(PfRep.new(c.x,c.y, o.side_length/2, 0, 1))
-        end
+        #o.coordinates.each do |c|
+        #  addField(PfRep.new(c.x,c.y, o.side_length/2, 0, 1))
+        #end
         #also add a tangential field at the center of each object
         addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
-        addField(PfRep.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 1))
+        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
       end
 
       # Add a random background noise field
-      addField(PfRand.new(0.5))
+      addField(PfRand.new(0.15))
       
     end
     
@@ -82,6 +82,12 @@ module BraveZealot
       ang_g = Math.atan2(dy,dx)
       distance = Math.sqrt(dx**2 + dy**2)
 
+      if ang_g < 0 then
+        ang_g += Math::PI*2
+      end
+
+      #print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"
+
       a = ang_g-current_angle
       #print "we need to move through #{a} radians\n"
       if ( a.abs() > Math::PI ) then
@@ -105,7 +111,7 @@ module BraveZealot
 
       #and the final factor in our speed is based on how far off our desired angle we are
       speed = m.speed()*((Math::PI - a.abs()).abs() / Math::PI ) #we should never be turning more than pi
-      #print "speed after angle factor = #{speed}\n"
+      #print "speed=#{speed} angvel=#{angvel}\n"
       
       m = Move.new(speed, angvel)
       return m

@@ -38,10 +38,7 @@ module BraveZealot
 
     def side_length
       if ( @side_length.nil? )
-        c1 = @coordinates[0]
-        c2 = @coordinates[1]
-
-        @side_length = Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2)
+        @side_length = @coordinates.zip(@coordinates[1..-1] + [@coordinates[0]]).map{ |c1,c2| Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2) }.max
       end
       @side_length
     end
