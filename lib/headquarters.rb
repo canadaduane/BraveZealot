@@ -17,10 +17,40 @@ module BraveZealot
       @last_mytanks_time = 0.0    # Last time we received a mytanks message
       
       constants do |r|
-        p r
+        r.constants.each do |c|
+          case c.name
+          when 'team'      then @team = c.value
+          when 'worldsize' then @world_size = c.value.to_f
+          end
+        end
+        puts "Team: #{@team}"
+        puts "World size: #{@world_size}"
+        
+        @map = BraveZealot::Map.new(@team, @world_size)
+        
+        obstacles do |r|
+          r.obstacles.each do |o|
+            @map.addObstacle(o.coords)
+          end
+          
+          flags do |r|
+            r.flags.each do |f|
+              # if f.color != @team
+                @map.addFlag(f)
+              # end
+              
+              # group = PfGroup.new
+              # group.addMapFields(@map)
+          
+              File.open("map.gpi", "w") do |f|
+                f.write @map.to_gnuplot
+              end
+            end
+          end
+        end
       end
       
-      # @map = BraveZealot::Map.new()
+      
       # 
       # # Initialize each of our tanks
       # mytanks do |r|

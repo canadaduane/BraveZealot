@@ -6,7 +6,13 @@ module BraveZealot
     attr_reader :last_msg
     attr_reader :message_queue
   
-    class Coord < Struct.new(:x, :y)
+    class Coord
+      attr_accessor :x, :y
+      def initialize(x, y)
+        @x = x.to_f
+        @y = y.to_f
+      end
+      
       def inspect
         "(#{x}, #{y})"
       end
@@ -164,6 +170,8 @@ module BraveZealot
         @response.add MyTank.new($1.to_i, $2, $3, $4.to_i, $5.to_f, $6, $7.to_f, $8.to_f, $9.to_f, $10.to_f, $11.to_f, $12.to_f)
       when /^othertank (\w+) (\w+) (alive|dead|\w+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/ then
         @response.add OtherTank.new($1, $2, $3, $4, $5.to_f, $6.to_f, $7.to_f)
+      when /^constant (\w+) (.+)$/ then
+        @response.add Constant.new($1, $2)
       when /^end\s*$/ then
         @response.complete!
       end
