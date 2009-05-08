@@ -78,11 +78,12 @@ module BraveZealot
   class SmartTank < Tank
     
     def start
-      EventMachine::PeriodicTimer.new(0.08) do
-        refresh(0.08) do
+      EventMachine::PeriodicTimer.new(0.1) do
+        refresh(0.1) do
           if @goal
             # puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             move = @goal.suggestMove(@tank.x, @tank.y, angle)
+            puts "Move: #{move.inspect}"
             speed move.speed
             angvel move.angvel
           end
