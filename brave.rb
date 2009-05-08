@@ -33,10 +33,5 @@ end
 opts.parse!(ARGV)
 
 EventMachine.run do
-  comm  = EventMachine::connect($options.server, $options.port, BraveZealot::Headquarters)
-  timer = EventMachine::PeriodicTimer.new(0.01){ comm.timer(0.01) }
-  
-  # timer = EventMachine::PeriodicTimer.new(5) do
-  #    puts "#{Time.now} -- Last message: #{comm.last_msg}"
-  # end
+  EventMachine::connect($options.server, $options.port, BraveZealot::Headquarters)
 end

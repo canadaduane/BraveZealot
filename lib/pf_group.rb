@@ -11,14 +11,15 @@ module BraveZealot
 
     attr_accessor :fields
 
-    def initialize()
+    def initialize(random_background = true)
       @fields = []
+      addField(PfRand.new(0.15)) if random_background
     end
 
     def addField(f)
       @fields << f
     end
- 
+    
     def addMapFields(map)
       max = map.size / 2
       # Add repulsion fields at corners of map
@@ -38,9 +39,6 @@ module BraveZealot
 
       # Next we add repulsion fields on all the vertices of all the obstacles
       map.obstacles.each do |o|
-        #o.coordinates.each do |c|
-        #  addField(PfRep.new(c.x,c.y, o.side_length/2, 0, 1))
-        #end
         #also add a tangential field at the center of each object
         addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
         addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
@@ -49,6 +47,17 @@ module BraveZealot
       # Add a random background noise field
       addField(PfRand.new(0.15))
       
+    end
+    
+    def add_goal(x, y, size)
+      addField(Pf.new(x, y, size, 0, 0.2))
+    end
+    
+    def add_obstacles(obstacles)
+      obstacles.each do |o|
+        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
+        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
+      end
     end
     
     # suggest a distance and angle

@@ -3,6 +3,7 @@ module BraveZealot
   class Tank
     # tank :: BraveZealot::Communicator::Tank -> Data object
     attr_accessor :tank
+    attr_accessor :goal
     
     # Expects a Communicator::Tank struct for init
     def initialize(hq, tank)
@@ -77,15 +78,15 @@ module BraveZealot
   class SmartTank < Tank
     
     def start
-      group = PfGroup.new
-      group.addMapFields(@hq.map)
-      
-      EventMachine::PeriodicTimer.new(0.09) do
-        refresh(0.09) do ||
-          puts "x: #{x}, y: #{@tank.y}, angle: #{angle}"
-          move = group.suggestMove(x, @tank.y, angle)
-          speed move.speed
-          angvel move.angvel
+      EventMachine::PeriodicTimer.new(0.1) do
+        refresh(0.1) do
+          if @goal
+            # puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
+            move = @goal.suggestMove(@tank.x, @tank.y, angle)
+            puts "Move: #{move.inspect}"
+            speed move.speed
+            angvel move.angvel
+          end
         end
       end
     end

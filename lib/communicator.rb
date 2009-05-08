@@ -1,32 +1,21 @@
 require 'rubygems'
 require 'eventmachine'
 
+bzrequire 'lib/coord'
+bzrequire 'lib/team'
+bzrequire 'lib/obstacle'
+bzrequire 'lib/base'
+bzrequire 'lib/flag'
+bzrequire 'lib/shot'
+bzrequire 'lib/my_tank'
+bzrequire 'lib/other_tank'
+bzrequire 'lib/constant'
+
 module BraveZealot
   class Communicator < EventMachine::Protocols::LineAndTextProtocol
     attr_reader :last_msg
     attr_reader :message_queue
-  
-    class Coord
-      attr_accessor :x, :y
-      def initialize(x, y)
-        @x = x.to_f
-        @y = y.to_f
-      end
-      
-      def inspect
-        "(#{x}, #{y})"
-      end
-    end
-  
-    Team      = Struct.new(:color, :players)
-    Obstacle  = Struct.new(:coords)
-    Base      = Struct.new(:color, :coords)
-    Flag      = Struct.new(:color, :possession, :x, :y)
-    Shot      = Struct.new(:x, :y, :vx, :vy)
-    MyTank    = Struct.new(:index, :callsign, :status, :shots_available, :time_to_reload, :flag, :x, :y, :angle, :vx, :vy, :angvel)
-    OtherTank = Struct.new(:callsign, :color, :status, :flag, :x, :y, :angle)
-    Constant  = Struct.new(:name, :value)
-  
+    
     # Contains the response for a given command.  The +value+ can be a boolean or any of the Structs defined above.
     class Response
       attr_accessor :value
@@ -93,10 +82,6 @@ module BraveZealot
   
     def start
       puts "communicator started (you should subclass this)"
-    end
-    
-    def timer(slice)
-      puts "timer called (slice: #{slice})"
     end
   
     { :shoot      => ["index"],
