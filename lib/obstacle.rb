@@ -35,5 +35,15 @@ module BraveZealot
       end
       @center
     end
+
+    def side_length
+      if ( @side_length.nil? )
+        c1 = @coordinates[0]
+        c2 = @coordinates[1]
+
+        @side_length = Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2)
+      end
+      @side_length
+    end
   end
 end

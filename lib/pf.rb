@@ -6,6 +6,8 @@ module BraveZealot
   # potential field.  This pf is a simple attraction/rejection field.
   class Pf
 
+    MAX = 10
+
     # where is the center of the potential field?
     attr_accessor :origin_x, :origin_y, :spread, :radius, :alpha
 
@@ -32,10 +34,23 @@ module BraveZealot
       if ( distance < @radius ) then
         return [0,0]
       elsif ( distance < (@spread + @radius)) then
-        return [@alpha*(distance-@radius)*Math.cos(ang_g), @alpha*(distance-@radius)*Math.sin(ang_g)]
+        dx = @alpha*(distance-@radius)*Math.cos(ang_g)
+        dy = @alpha*(distance-@radius)*Math.sin(ang_g)
       else
-        return [@alpha*@spread*Math.cos(ang_g), @alpha*@spread*Math.sin(ang_g)]
+        dx = @alpha*@spread*Math.cos(ang_g)
+        dy = @alpha*@spread*Math.sin(ang_g)
       end
+      if dx > Pf::MAX then
+        dx = Pf::MAX
+      elsif dx < -Pf::MAX then
+        dx = -Pf::MAX
+      end
+      if dy > Pf::MAX then
+        dy = Pf::MAX
+      elsif dy < -Pf::MAX
+        dy = -Pf::MAX
+      end
+      [dx, dy]
     end
 
     # suggest a move

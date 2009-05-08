@@ -1,3 +1,7 @@
+require_relative 'pf.rb'
+require_relative 'pf_rand.rb'
+require_relative 'pf_tan.rb'
+require_relative 'pf_rep.rb'
 module BraveZealot
 
   # An Aggregate Goal is made up of sub goals which are averaged together to
@@ -13,31 +17,36 @@ module BraveZealot
     def addField(f)
       @fields << f
     end
-
+ 
     def addMapFields(map)
       max = map.size / 2
       # Add repulsion fields at corners of map
-      #addField(Pf.new(-max, -max, -1, 0))
-      #addField(Pf.new(-max, max, -1, 0))
-      #addField(Pf.new(max, -max, -1, 0))
-      #addfield(Pf.new(max, max, -1 0))      
+      addField(PfRep.new(-max, -max, max/3, 0, 0.06))
+      addField(PfRep.new(-max, max, max/3, 0, 0.06))
+      addField(PfRep.new(max, -max, max/3, 0, 0.06))
+      addField(PfRep.new(max, max, max/3, 0, 0.06))
+      addField(PfRep.new(-max,0,max/3,0,0.06))
+      addField(PfRep.new(0,max,max/3,0,0.06))
+      addField(PfRep.new(max,0,max/3,0,0.06))
+      addField(PfRep.new(0,-max,max/3,0,0.06))
 
       # Next we add attraction fields for the goals
       map.flags.each do |f|
-        addField(Pf.new(f.coord.x, f.coord.y, map.size, 0, 0.3))
+        addField(Pf.new(f.x, f.y, map.size, 0, 0.2))
       end
 
       # Next we add repulsion fields on all the vertices of all the obstacles
       map.obstacles.each do |o|
         o.coordinates.each do |c|
-          addField(Pf.new(c.x,c.y, 10, 0, -0.08))
+          addField(PfRep.new(c.x,c.y, o.side_length/2, 0, 1))
         end
         #also add a tangential field at the center of each object
-      #  addField(o.center.x, o.center.y, 1, 0)
+        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
+        addField(PfRep.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 1))
       end
 
       # Add a random background noise field
-      #addField(PfRand.new(0.1))
+      addField(PfRand.new(0.5))
       
     end
     
@@ -50,6 +59,17 @@ module BraveZealot
         dx += fdx
         dy += fdy
       end
+       if dx > Pf::MAX then
+        dx = Pf::MAX
+      elsif dx < -Pf::MAX then
+        dx = -Pf::MAX
+      end
+      if dy > Pf::MAX then
+        dy = Pf::MAX
+      elsif dy < -Pf::MAX
+        dy = -Pf::MAX
+      end
+      
       return dx, dy
     end
 
