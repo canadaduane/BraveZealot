@@ -2,24 +2,24 @@ require_relative 'map.rb'
 module BraveZealot
   class Obstacle
     attr_accessor :coordinates
-    def initialize(str)
-      obs = str.scan(/-?\d+\.\d+/)
-      coords = []
-      last = nil
-      obs.each_index do |i|
-        c = obs[i]
-        if ( last.nil? == false ) then
-          if ( i % 2 == 1 ) then
-            coords.push(Coordinate.new(last,c.to_f))
-          end
-        end
-        last = c.to_f
-      end
+    def initialize(coords)
       @coordinates = coords
     end
 
     def to_gnuplot
-      
+      str = ""
+      first = nil
+      last = nil
+      @coordinates.each do |c|
+        if ( first.nil? ) then
+          first = c
+        else
+          str += "set arrow from #{last.x}, #{last.y} to #{c.x}, #{c.y} nohead lt 3\n"
+        end
+        last = c
+      end
+      str += "set arrow from #{last.x}, #{last.y} to #{first.x}, #{first.y} nohead lt 3\n"
+      str
     end
 
     def center
