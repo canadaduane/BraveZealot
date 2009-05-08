@@ -5,8 +5,6 @@ bzrequire 'lib/pf_rand.rb'
 bzrequire 'lib/pf_tan.rb'
 
 module BraveZealot
-  Coord = Struct.new(:x,:y)
-
   class Map
     attr_accessor :size, :obstacles, :flags, :tanks, :team
     def initialize(team, size)

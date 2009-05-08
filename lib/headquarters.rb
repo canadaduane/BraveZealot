@@ -16,27 +16,35 @@ module BraveZealot
       @world_time = 0.0           # Last communicated world time
       @last_message_time = 0.0    # Last time we received a message (in Time.now units)
       @last_mytanks_time = 0.0    # Last time we received a mytanks message
+      @obstacles = []
       
       constants do |r|
         r.constants.each do |c|
           case c.name
-          when 'team'      then @team = c.value
+          when 'team'      then @team_color = c.value
           when 'worldsize' then @world_size = c.value.to_f
           end
         end
-        puts "Team: #{@team}"
+        puts "Team: #{@team_color}"
         puts "World size: #{@world_size}"
         
-        @map = BraveZealot::Map.new(@team, @world_size)
+        @map = BraveZealot::Map.new(@team_color, @world_size)
         
         obstacles do |r|
+          @obstacles = r.obstacles
+          
           r.obstacles.each do |o|
             @map.addObstacle(o.coords)
           end
           
+          # Set up our initial potential field
+          initial_goal = PfGroup.new
+          initial_goal.add_obstacles(@obstacles)
+          
           flags do |r|
             r.flags.each do |f|
-              if f.color != @team
+              if f.color != @team_color
+                initial_goal.add_goal(f.x, f.y, @world_size)
                 @map.addFlag(f)
               end
               
@@ -47,14 +55,16 @@ module BraveZealot
             
             
             # Initialize each of our tanks
+            # initial_goal.addMapFields(@hq.map)
             mytanks do |r|
               r.mytanks.each do |t|
-                case $options.brain
-                when 'dummy' then
-                  @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
-                when 'smart' then
-                  @tanks[t.index] = BraveZealot::SmartTank.new(self, t)
-                end
+                tank =
+                  case $options.brain
+                  when 'dummy' then BraveZealot::DummyTank.new(self, t)
+                  when 'smart' then BraveZealot::SmartTank.new(self, t)
+                  end
+                tank.goal = initial_goal
+                
               end
             end
             
@@ -62,16 +72,19 @@ module BraveZealot
         end
       end
       
+      # EventMachine::TimerInterval.new(0.5) do
+      #   if flag_possession?
+      #     
+      #   end
+      # end
       
     end
     
-    def timer(slice)
-      # refresh_mytanks(0.1) do
-      #   @tanks.each do |index, tank|
-      #     if tank.vx != @previous_tank_data[index].vx ||
-      #        tank.vy != @previous_tank_data[index].vy
-      #   end
-      # end
+    def flag_possession?
+      @tanks.any? do |t|
+        t.flag != "-" &&
+        t.flag != @team_color
+      end
     end
     
     # Note: current_time may be non-continuous because @world_time is updated sporadically
