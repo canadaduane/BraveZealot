@@ -10,5 +10,16 @@ module BraveZealot
     def addObstacles(str)
       
     end
+
+    def to_gnuplot
+      
+    end
+  end
+  class Coordinate
+    attr_accessor :x, :y
+    def initialize(x,y)
+      @x = x
+      @y = y
+    end
   end
 end
