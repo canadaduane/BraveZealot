@@ -35,9 +35,9 @@ module BraveZealot
           
           flags do |r|
             r.flags.each do |f|
-              # if f.color != @team
+              if f.color != @team
                 @map.addFlag(f)
-              # end
+              end
               
               # group = PfGroup.new
               # group.addMapFields(@map)
@@ -51,14 +51,16 @@ module BraveZealot
       end
       
       
-      # 
-      # # Initialize each of our tanks
-      # mytanks do |r|
-      #   r.mytanks.each do |t|
-      #     @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
-      #   end
-      #   puts
-      # end
+      # Initialize each of our tanks
+      mytanks do |r|
+        r.mytanks.each do |t|
+          if ARGV[0] == "dummy"
+            @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
+          else
+            @tanks[t.index] = BraveZealot::SmartTank.new(self, t)
+          end
+        end
+      end
     end
     
     def timer(slice)

@@ -1,7 +1,8 @@
-require_relative 'pf.rb'
-require_relative 'pf_rand.rb'
-require_relative 'pf_tan.rb'
-require_relative 'pf_rep.rb'
+bzrequire 'lib/pf.rb'
+bzrequire 'lib/pf_rand.rb'
+bzrequire 'lib/pf_tan.rb'
+bzrequire 'lib/pf_rep.rb'
+
 module BraveZealot
 
   # An Aggregate Goal is made up of sub goals which are averaged together to

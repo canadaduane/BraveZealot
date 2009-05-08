@@ -1,4 +1,5 @@
-require_relative('pf.rb')
+bzrequire('lib/pf.rb')
+
 module BraveZealot
   class PfRep < Pf
     # suggest a distance and angle

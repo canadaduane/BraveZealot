@@ -74,4 +74,10 @@ module BraveZealot
     
   end
 
+  class SmartTank < Tank
+    
+    def start
+    end
+    
+  end
 end
