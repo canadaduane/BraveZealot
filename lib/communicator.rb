@@ -180,6 +180,7 @@ module BraveZealot
       end
     rescue Exception => e
       puts e
+      puts e.backtrace.join("\n")
       raise e
     end
   

@@ -11,7 +11,7 @@ module BraveZealot
     end
     
     def refresh(freshness, &block)
-      @hq.refresh_mytanks(&block)
+      @hq.refresh_mytanks(freshness, &block)
     end
     
     def sleep(time, &block)
@@ -20,6 +20,10 @@ module BraveZealot
     
     def bind(*args, &block)
       hq.bind(*args, &block)
+    end
+    
+    def angvel(value = nil, &block)
+      value.nil? ? @tank.send(:angvel) : @hq.send(:angvel, @tank.index, value, &block)
     end
     
     def method_missing(m, *args, &block)
@@ -34,31 +38,33 @@ module BraveZealot
   end
   
   class DummyTank < Tank
+    
     def start
-      speed(1.0)
-      bind(:hit) do
-        speed(-0.05)
-        start_angle = angle
-        turn60 = Proc.new do
-          refresh(0.2) do
-            angvel(1.0) do
-              sleep(0.1) do
-                if abs(start_angle - angle) < 60
-                  # Keep turning
-                  turn60.call
-                else
-                  # We've turned enough, now go straight
-                  angvel(0.0)
-                  speed(1.0)
+      speed(1.0) do
+        sleep(1.0) do
+          mode = :move
+          EventMachine::PeriodicTimer.new(0.2) do
+            refresh(0.2)
+            
+            case mode
+            when :move then
+              curr_speed = Math.sqrt(vx**2 + vy**2)
+              # Check if we've hit something
+              mode = :turn if curr_speed < 0.95
+            when :turn then
+              # Turn and then go straight again
+              angvel(1.0) do
+                sleep(0.5) do
+                  mode = :move
                 end
               end
-            end
-          end
-        end
-        
-        turn60.call
-      end
-    end
+            end # case
+            
+          end # PeriodicTimer
+        end # sleep
+      end # speed
+    end # start
+    
   end
 
 end

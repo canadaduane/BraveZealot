@@ -24,7 +24,7 @@ module BraveZealot
       end
     end
     
-    def timer
+    def timer(slice)
       # refresh_mytanks(0.1) do
       #   @tanks.each do |index, tank|
       #     if tank.vx != @previous_tank_data[index].vx ||
@@ -43,6 +43,7 @@ module BraveZealot
     def on_any(r)
       @last_message_time = Time.now
       @world_time = r.time
+      p r; puts
     end
     
     # Tanks will call 'bind' to notify headquarters that it wants info whenever
@@ -62,17 +63,19 @@ module BraveZealot
       if (current_time - @last_mytanks_time) > freshness
         # Note: Because global callbacks occur before local, on_mytanks will
         # have a chance to update all tank data before the following block.call
-        mytanks { |r| block.call }
+        mytanks { |r| block.call if block }
       else
-        block.call
+        block.call if block
       end
     end
     
     def on_mytanks(r)
       @last_mytanks_time = r.time
       r.mytanks.each do |t|
-        @previous_tank_data[t.index] = @tanks[t.index].tank
-        @tanks[t.index].tank = t
+        if @tanks[t.index]
+          @previous_tank_data[t.index] = @tanks[t.index].tank
+          @tanks[t.index].tank = t
+        end
       end
     end
   end
