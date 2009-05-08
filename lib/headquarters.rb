@@ -54,9 +54,10 @@ module BraveZealot
       # Initialize each of our tanks
       mytanks do |r|
         r.mytanks.each do |t|
-          if ARGV[0] == "dummy"
+          case $options.brain
+          when 'dummy' then
             @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
-          else
+          when 'smart' then
             @tanks[t.index] = BraveZealot::SmartTank.new(self, t)
           end
         end
