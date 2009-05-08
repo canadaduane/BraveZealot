@@ -101,8 +101,8 @@ module BraveZealot
     
     def flag_possession?
       @tanks.any? do |t|
-        t.flag != "-" &&
-        t.flag != @team_color
+        t.tank.flag != "-" &&
+        t.tank.flag != @team_color
       end
     end
     
