@@ -16,6 +16,8 @@ module BraveZealot
       @last_message_time = 0.0    # Last time we received a message (in Time.now units)
       @last_mytanks_time = 0.0    # Last time we received a mytanks message
       @obstacles = []
+      @our_base = nil
+      @enemy_bases = []
       
       constants do |r|
         r.constants.each do |c|
@@ -28,6 +30,19 @@ module BraveZealot
         puts "World size: #{@world_size}"
         
         @map = BraveZealot::Map.new(@team_color, @world_size)
+        
+        # Get base information and set @our_base
+        bases do |r|
+          r.bases.each do |b|
+            if b.color == @team_color
+              @our_base = b
+            else
+              @enemy_bases << b
+            end
+          end
+          puts "Our Base: #{@our_base.inspect}"
+          puts "Enemy Bases: #{@enemy_bases.inspect}"
+        end
         
         obstacles do |r|
           @obstacles = r.obstacles
@@ -71,11 +86,16 @@ module BraveZealot
         end
       end
       
-      # EventMachine::TimerInterval.new(0.5) do
-      #   if flag_possession?
-      #     
-      #   end
-      # end
+      EventMachine::PeriodicTimer.new(0.5) do
+        if flag_possession?
+          return_goal = PfGroup.new
+          return_goal.add_obstacles(@obstacles)
+          return_goal.add_goal(@our_base.center.x, @our_base.center.y, @world_size)
+          @tanks.each do |t|
+            t.goal = return_goal
+          end
+        end
+      end
       
     end
     

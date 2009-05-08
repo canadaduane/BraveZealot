@@ -48,10 +48,11 @@ module BraveZealot
             refresh(0.2)
             
             case mode
-            when :accel then
+            when :accel_once then
               sleep(1.5) do
                 mode = :move
               end
+              mode = :accel
             when :move then
               curr_speed = Math.sqrt(vx**2 + vy**2)
               # Check if we've hit something
@@ -63,7 +64,7 @@ module BraveZealot
                 sleep(2.0) do
                   speed 1.0
                   angvel(0.0)
-                  mode = :accel
+                  mode = :accel_once
                 end
               end
             end # case
