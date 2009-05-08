@@ -1,8 +1,9 @@
-require_relative 'obstacle.rb'
-require_relative 'pf_group.rb'
-require_relative 'pf.rb'
-require_relative 'pf_rand.rb'
-require_relative 'pf_tan.rb'
+bzrequire 'lib/obstacle.rb'
+bzrequire 'lib/pf_group.rb'
+bzrequire 'lib/pf.rb'
+bzrequire 'lib/pf_rand.rb'
+bzrequire 'lib/pf_tan.rb'
+
 module BraveZealot
   Coord = Struct.new(:x,:y)
   Flag = Struct.new(:coord, :team)

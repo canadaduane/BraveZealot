@@ -47,15 +47,22 @@ module BraveZealot
             refresh(0.2)
             
             case mode
+            when :accel then
+              sleep(1.5) do
+                mode = :move
+              end
             when :move then
               curr_speed = Math.sqrt(vx**2 + vy**2)
               # Check if we've hit something
-              mode = :turn if curr_speed < 0.95
+              mode = :turn if curr_speed < 24.5
             when :turn then
               # Turn and then go straight again
               angvel(1.0) do
-                sleep(0.5) do
-                  mode = :move
+                speed(-0.1)
+                sleep(2.0) do
+                  speed 1.0
+                  angvel(0.0)
+                  mode = :accel
                 end
               end
             end # case

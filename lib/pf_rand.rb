@@ -1,4 +1,5 @@
-require_relative 'move.rb'
+bzrequire 'lib/move.rb'
+
 module BraveZealot
 
   # A PotentialField Goal with a randmon potential field

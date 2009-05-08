@@ -1,5 +1,6 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/tank'
+bzrequire 'lib/map'
 
 module BraveZealot
   class Headquarters < Communicator
@@ -15,13 +16,19 @@ module BraveZealot
       @last_message_time = 0.0    # Last time we received a message (in Time.now units)
       @last_mytanks_time = 0.0    # Last time we received a mytanks message
       
-      # Initialize each of our tanks
-      mytanks do |r|
-        r.mytanks.each do |t|
-          @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
-        end
-        puts
+      constants do |r|
+        p r
       end
+      
+      # @map = BraveZealot::Map.new()
+      # 
+      # # Initialize each of our tanks
+      # mytanks do |r|
+      #   r.mytanks.each do |t|
+      #     @tanks[t.index] = BraveZealot::DummyTank.new(self, t)
+      #   end
+      #   puts
+      # end
     end
     
     def timer(slice)
