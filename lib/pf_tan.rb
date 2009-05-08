@@ -24,17 +24,27 @@ module BraveZealot
       distance = Math.sqrt((x_dis)**2 + (y_dis)**2)
 
       ang_g = (Math.atan2(y_dis,x_dis) - (Math::PI/2))
-      #if ( ang_g < 0 ) then
-      #  ang_g = ang_g + Math::PI*2
-      #end
-      
+
       if ( distance < @radius ) then
         return [0,0]
       elsif ( distance < (@spread + @radius)) then
-        return [@alpha*(distance-@radius)*Math.cos(ang_g), @alpha*(distance-@radius)*Math.sin(ang_g)]
+        dx = -@alpha*(@spread+@radius-distance)*Math.cos(ang_g)
+        dy = -@alpha*(@spread+@radius-distance)*Math.sin(ang_g)
       else
-        return [@alpha*@spread*Math.cos(ang_g), @alpha*@spread*Math.sin(ang_g)]
+        return [0,0]
       end
+
+      if dx > Pf::MAX then
+        dx = Pf::MAX
+      elsif dx < -Pf::MAX then
+        dx = -Pf::MAX
+      end
+      if dy > Pf::MAX then
+        dy = Pf::MAX
+      elsif dy < -Pf::MAX
+        dy = -Pf::MAX
+      end
+      [dx, dy]
     end
 
     # suggest a move

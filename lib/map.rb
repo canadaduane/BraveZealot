@@ -43,10 +43,10 @@ module BraveZealot
       pf_group.addMapFields(self)
 
       str += "plot '-' with vectors head\n"
-      21.times do |i|
-        x = ( (@size/20)*i - hs )
-        21.times do |j|
-          y = ( (@size/20)*j - hs )
+      41.times do |i|
+        x = ( (@size/40)*i - hs )
+        41.times do |j|
+          y = ( (@size/40)*j - hs )
           #puts "computing dx,dy for #{x},#{y}\n"
           dx,dy = pf_group.suggestDelta(x,y)
           str += "#{x} #{y} #{dx} #{dy}\n"

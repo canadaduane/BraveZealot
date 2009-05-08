@@ -13,7 +13,7 @@ module BraveZealot
     end
 
     def suggestDelta(current_x, current_y)
-      return []
+      return [((rand()*2)-1)*@factor, ((rand()*2)-1)*@factor]
     end
 
     # suggest a move - Totally random
