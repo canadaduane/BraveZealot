@@ -77,22 +77,22 @@ module BraveZealot
     # suggest a move
     def suggestMove(current_x, current_y, current_angle)
       dx,dy = suggestDelta(current_x,current_y)
-      #print "current angle is #{current_angle}\n"
+      print "current angle is #{current_angle}\n"
       #print "the goal angle is #{ang_g}\n";
       ang_g = Math.atan2(dy,dx)
       distance = Math.sqrt(dx**2 + dy**2)
 
-      if ang_g < 0 then
-        ang_g += Math::PI*2
-      end
-
-      #print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"
+      print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"
 
       a = ang_g-current_angle
-      #print "we need to move through #{a} radians\n"
+      print "we need to move through #{a} radians\n"
       if ( a.abs() > Math::PI ) then
-        a = -1*((2*Math::PI) - a)
-        #print "how about we go the other way through #{a} radians?\n"
+        if ( a < 0 ) then
+          a += 2*Math::PI
+        else
+          a -= 2*Math::PI
+        end
+        print "how about we go the other way through #{a} radians?\n"
       end
 
       #this will need to be a more dynamic calculation but hopefully it gives us a good first try

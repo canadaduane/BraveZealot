@@ -80,8 +80,8 @@ module BraveZealot
       group = PfGroup.new
       group.addMapFields(@hq.map)
       
-      EventMachine::PeriodicTimer.new(0.08) do
-        refresh(0.08) do ||
+      EventMachine::PeriodicTimer.new(0.09) do
+        refresh(0.09) do ||
           puts "x: #{x}, y: #{@tank.y}, angle: #{angle}"
           move = group.suggestMove(x, @tank.y, angle)
           speed move.speed
