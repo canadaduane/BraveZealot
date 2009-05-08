@@ -9,7 +9,7 @@ set :team, "green"
 set :players, "2"
 set :machine, "fungi"
 set :bzfs_port, "5154"
-set :bzrc_port, "5000"
+set :port, "5000"
 set :world, nil
 
 
@@ -39,18 +39,18 @@ end
 desc "Initiates a local SSH tunnel with port-forwarding to the remote bzflag server"
 task :start_tunnel, :hosts => "localhost" do
   stop_tunnel
-  puts "Opening SSH tunnel on port #{bzrc_port}"
-  system("ssh -f -N -L #{bzrc_port}:#{machine}:#{bzrc_port} #{user}@#{machine}.cs.byu.edu")
+  puts "Opening SSH tunnel on port #{port}"
+  system("ssh -f -N -L #{port}:#{machine}:#{port} #{user}@#{machine}.cs.byu.edu")
 end
 
 task :start_tunnel_delayed, :hosts => "localhost" do
-  puts "In 10 seconds, opening SSH tunnel on port #{bzrc_port}"
-  system("sleep 10; ssh -f -N -L #{bzrc_port}:#{machine}:#{bzrc_port} #{user}@#{machine}.cs.byu.edu")
+  puts "In 10 seconds, opening SSH tunnel on port #{port}"
+  system("sleep 10; ssh -f -N -L #{port}:#{machine}:#{port} #{user}@#{machine}.cs.byu.edu")
 end
 
 desc "Closes SSH tunnel(s) to the remote bzflag server"
 task :stop_tunnel, :hosts => "localhost" do
-  system("ps auxww|grep ssh|grep #{bzrc_port}|awk '{print $2}'|xargs kill")
+  system("ps auxww|grep ssh|grep #{port}|awk '{print $2}'|xargs kill")
 end
 
 
@@ -58,7 +58,7 @@ desc "Start the bzrobots server/client"
 task :start_robot, :hosts => "#{machine}.cs.byu.edu" do
   puts "Starting bzrobots server/client"
   begin
-    run "~cs470s/bzflag/src/bzrobots/bzrobots -team #{team} -solo #{players} -p #{bzrc_port} #{callsign}@localhost"
+    run "~cs470s/bzflag/src/bzrobots/bzrobots -team #{team} -solo #{players} -p #{port} #{callsign}@localhost"
   rescue SignalException => e
     puts "shutdown bzrobots"
     stop_robot
