@@ -79,11 +79,12 @@ module BraveZealot
   end
 
   class SmartTank < Tank
+    REFRESH_RATE = 0.05
     
     def start
-      EventMachine::PeriodicTimer.new(0.1) do
-        refresh(0.1) do
-          shoot()
+      EventMachine::PeriodicTimer.new(SmartTank::REFRESH_RATE) do
+        refresh(SmartTank::REFRESH_RATE) do
+          #shoot() #shooting mostly ends up killing ourselves, so lets avoid that
           if @goal
             #puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             

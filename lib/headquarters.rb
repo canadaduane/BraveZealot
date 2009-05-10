@@ -93,21 +93,23 @@ module BraveZealot
         end
       end
       
-      EventMachine::PeriodicTimer.new(0.5) do
-        if flag_possession?
-          @tanks.values.each do |t|
-            if t.mode != Command::GO_HOME then
-              puts "changing tank to goal GO_HOME"
-              t.goal = @command.create_home_base_goal
-              t.mode = Command::GO_HOME
+      if $options.brain == 'smart' then
+        EventMachine::PeriodicTimer.new(0.5) do
+          if flag_possession?
+            @tanks.values.each do |t|
+              if t.mode != Command::GO_HOME then
+                puts "changing tank to goal GO_HOME"
+                t.goal = @command.create_home_base_goal
+                t.mode = Command::GO_HOME
+              end
             end
-          end
-        else
-          @tanks.values.each do |t|
-            if t.mode != Command::GO_TO_FLAG then
-              puts "changing tank to goal GO_TO_FLAG"
-              t.goal = @command.create_flag_goal
-              t.mode = Command::GO_TO_FLAG
+          else
+            @tanks.values.each do |t|
+              #if t.mode != Command::GO_TO_FLAG then
+                puts "changing tank to goal GO_TO_FLAG"
+                t.goal = @command.create_flag_goal
+                t.mode = Command::GO_TO_FLAG
+              #end
             end
           end
         end

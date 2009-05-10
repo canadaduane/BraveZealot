@@ -10,10 +10,12 @@ module BraveZealot
     def create_flag_goal
       flag_goal = PfGroup.new
       flag_goal.add_obstacles(@hq.get_obstacles)
+      flag_goal.add_rand(0.2)
       @hq.flags do |r|
         r.flags.each do |f|
           if ( f.color != @hq.team_color ) then
             flag_goal.add_goal(f.x, f.y,@hq.map.size)
+            break
           end
         end
       end
