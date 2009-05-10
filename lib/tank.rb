@@ -4,6 +4,7 @@ module BraveZealot
     # tank :: BraveZealot::Communicator::Tank -> Data object
     attr_accessor :tank
     attr_accessor :goal
+    attr_accessor :mode
     
     # Expects a Communicator::Tank struct for init
     def initialize(hq, tank)
@@ -84,10 +85,10 @@ module BraveZealot
         refresh(0.1) do
           shoot()
           if @goal
-            puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
+            #puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             
             move = @goal.suggestMove(@tank.x, @tank.y, angle)
-            puts "Move: #{move.inspect}"
+            #puts "Move: #{move.inspect}"
             speed move.speed
             angvel move.angvel
           end
