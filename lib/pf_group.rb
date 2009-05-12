@@ -13,7 +13,7 @@ module BraveZealot
 
     def initialize(random_background = true)
       @fields = []
-      add_field(PfRand.new(0.15)) if random_background
+      add_rand(0.15) if random_background
     end
 
     def add_field(f)

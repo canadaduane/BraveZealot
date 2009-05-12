@@ -3,39 +3,26 @@ bzrequire 'lib/pf_group.rb'
 bzrequire 'lib/pf.rb'
 bzrequire 'lib/pf_rand.rb'
 bzrequire 'lib/pf_tan.rb'
+bzrequire 'lib/indent'
 
 module BraveZealot
-  class Map
-    attr_accessor :size, :obstacles, :flags, :tanks, :team
-    def initialize(team, size)
-      @team = team
-      @size = size.to_i
-      @obstacles = []
-      @flags = []
-    end
-
-    def add_obstacle(coordinates)
-      @obstacles.push(Obstacle.new(coordinates))
-    end
-    def add_flag(f)
-      @flags << f
-    end
-
+  class Map < Struct.new(:team, :size, :obstacles, :flags, :tanks)
     def to_gnuplot(pf)
-      str = "#set up our map first\n"
-      hs = @size/2
-      str += "set xrange [-#{hs}: #{hs}]\n"
-      str += "set yrange [-#{hs}: #{hs}]\n"
-      str += "unset key\n"
-      str += "set size square\n"
-      str += "# Draw Obstacles:\n" 
-      str += "unset arrow\n"
+      hs = self.size / 2
+      str = unindent(<<-GNUPLOT)
+        # Set up our map first:
+        set xrange [-#{hs}: #{hs}]
+        set yrange [-#{hs}: #{hs}]
+        unset key
+        set size square
+        
+        # Draw Obstacles:
+        unset arrow
+      GNUPLOT
       @obstacles.each do |o|
         str += o.to_gnuplot
       end
       
-      
-
       str += "plot '-' with vectors head\n"
       41.times do |i|
         x = ( (@size/40)*i - hs )
