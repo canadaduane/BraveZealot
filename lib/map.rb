@@ -19,15 +19,15 @@ module BraveZealot
         # Draw Obstacles:
         unset arrow
       GNUPLOT
-      @obstacles.each do |o|
+      self.obstacles.each do |o|
         str += o.to_gnuplot
       end
       
       str += "plot '-' with vectors head\n"
       41.times do |i|
-        x = ( (@size/40)*i - hs )
+        x = ( (self.size / 40)*i - hs )
         41.times do |j|
-          y = ( (@size/40)*j - hs )
+          y = ( (self.size / 40)*j - hs )
           #puts "computing dx,dy for #{x},#{y}\n"
           dx,dy = pf.suggest_delta(x,y)
           str += "#{x} #{y} #{dx} #{dy}\n"

@@ -1,11 +1,7 @@
-require 'rubygems'
-require 'eventmachine'
 require 'ostruct'
 require 'optparse'
 
-def bzrequire(relative_feature)
-  require File.expand_path(File.join(File.dirname(__FILE__), relative_feature))
-end
+# Use reasonable defaults and parse shell args for specific options
 
 $options = OpenStruct.new(:server => '127.0.0.1', :port => 5000, :brain => 'smart')
 
@@ -30,6 +26,12 @@ end
 
 opts.parse!(ARGV)
 
+
+# Our main program begins here:
+
+require 'rubygems'
+require 'eventmachine'
+require(File.join(File.dirname(__FILE__), "bzrequire"))
 bzrequire 'lib/headquarters'
 
 EventMachine.run do
