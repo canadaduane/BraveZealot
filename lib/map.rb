@@ -6,7 +6,18 @@ bzrequire 'lib/pf_tan.rb'
 bzrequire 'lib/indent'
 
 module BraveZealot
-  class Map < Struct.new(:team, :size, :obstacles, :flags, :tanks)
+  class Map
+    attr_accessor :size, :bases, :obstacles, :flags
+    
+    def initialize(size)
+      raise ArgumentError, "World size cannot be nil or zero" if size.nil? or size == 0
+      @size = size
+      @bases = []
+      @obstacles = []
+      @flags = []
+    end
+    
+    
     def to_gnuplot(pf)
       hs = self.size / 2
       str = unindent(<<-GNUPLOT)

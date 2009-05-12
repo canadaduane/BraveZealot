@@ -2,9 +2,10 @@ module BraveZealot
 
   class Tank
     # tank :: BraveZealot::Communicator::Tank -> Data object
-    attr_accessor :tank
-    attr_accessor :goal
-    attr_accessor :mode
+    # goal :: PfGroup -> Potential field guidance to goal
+    # mode :: Symbol  -> :capture_flag, :home
+    
+    attr_accessor :tank, :goal, :mode
     
     # Expects a Communicator::Tank struct for init
     def initialize(hq, tank)
@@ -13,7 +14,7 @@ module BraveZealot
     end
     
     def refresh(freshness, &block)
-      @hq.refresh_mytanks(freshness, &block)
+      @hq.refresh(:mytanks, freshness, &block)
     end
     
     def sleep(time, &block)
@@ -82,8 +83,8 @@ module BraveZealot
     REFRESH_RATE = 0.05
     
     def start
-      EventMachine::PeriodicTimer.new(SmartTank::REFRESH_RATE) do
-        refresh(SmartTank::REFRESH_RATE) do
+      EventMachine::PeriodicTimer.new(REFRESH_RATE) do
+        refresh(REFRESH_RATE) do
           #shoot() #shooting mostly ends up killing ourselves, so lets avoid that
           if @goal
             #puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"

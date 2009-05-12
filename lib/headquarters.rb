@@ -1,115 +1,76 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/tank'
 bzrequire 'lib/map'
-bzrequire 'lib/command'
 
 module BraveZealot
   class Headquarters < Communicator
-    attr_reader :mytanks_time
-    attr_reader :map
-    attr_reader :team_color
-    attr_reader :our_base
-
+    attr_reader :map, :my_color, :my_base, :mytanks_time
+    
+    class MissingData < Exception; end
+    
     def start
-      @bindings = {
-        :hit => []
-      }
-      @tanks = {}                 # Current BraveZealot::Tank objects
+      @tanks = []                 # Current BraveZealot::Tank objects
       @world_time = 0.0           # Last communicated world time
-      @last_message_time = 0.0    # Last time we received a message (in Time.now units)
-      @last_mytanks_time = 0.0    # Last time we received a mytanks message
-      @obstacles = []
-      @our_base = nil
-      @enemy_bases = []
+      @message_times = {}         # Last time we received a message (in Time.now units)
       
+      # Gather initial world data... which team are we?  how big is the map?
       constants do |r|
+        world_size = nil
         r.constants.each do |c|
           case c.name
-          when 'team'      then @team_color = c.value
-          when 'worldsize' then @world_size = c.value.to_f
+          when 'team'      then @my_color = c.value
+          when 'worldsize' then world_size = c.value.to_f
           end
         end
-        #puts "Team: #{@team_color}"
-        #puts "World size: #{@world_size}"
         
-        @map = BraveZealot::Map.new(@team_color, @world_size)
+        @map = BraveZealot::Map.new(world_size)
         
-        # Get base information and set @our_base
-        bases do |r|
-          r.bases.each do |b|
-            if b.color == @team_color
-              @our_base = b
-            else
-              @enemy_bases << b
-            end
-          end
-          #puts "Our Base: #{@our_base.inspect}"
-          #puts "Enemy Bases: #{@enemy_bases.inspect}"
-        end
-
-        @command = Command.new(self)
+        refresh(:bases)
+        refresh(:obstacles)
+        refresh(:flags)
         
-        obstacles do |r|
-          @obstacles = r.obstacles
-          
-          r.obstacles.each do |o|
-            @map.add_obstacle(o.coords)
-          end
-          
-          flags do |r|
-            r.flags.each do |f|
-              if f.color != @team_color
-                @map.add_flag(f)
-              end
+        #generate potential field plots
+        # flag_goal = @command.create_flag_goal
+        # base_goal = @command.create_home_base_goal
+        # 
+        flag_file = File.new('flag.gpi', 'w')
+        flag_file.write(@map.to_gnuplot(create_flag_goal))
+        flag_file.close
+        # 
+        # base_file = File.new('base.gpi','w')
+        # base_file.write(@map.to_gnuplot(create_home_base_goal))
+        # base_file.close
+      end
+      
+      # Initialize each of our tanks
+      mytanks do |r|
+        r.mytanks.each do |t|
+          tank =
+            case $options.brain
+            when 'dummy' then BraveZealot::DummyTank.new(self, t)
+            when 'smart' then BraveZealot::SmartTank.new(self, t)
             end
-
-            #generate potential field plots
-            flag_goal = @command.create_flag_goal
-            base_goal = @command.create_home_base_goal
-
-            flag_file = File.new('flag.gpi', 'w')
-            flag_file.write(@map.to_gnuplot(flag_goal))
-            flag_file.close
-
-            base_file = File.new('base.gpi','w')
-            base_file.write(@map.to_gnuplot(base_goal))
-            base_file.close
-            
-            # Initialize each of our tanks
-            mytanks do |r|
-              r.mytanks.each do |t|
-                tank =
-                  case $options.brain
-                  when 'dummy' then BraveZealot::DummyTank.new(self, t)
-                  when 'smart' then BraveZealot::SmartTank.new(self, t)
-                  end
-                tank.goal = @command.create_flag_goal
-                tank.mode = Command::GO_TO_FLAG
-                @tanks[tank.index] = tank
-              end
-            end
-            
-          end
+          tank.goal = create_flag_goal
+          tank.mode = :capture_flag
+          @tanks[t.index] = tank
         end
       end
       
-      if $options.brain == 'smart' then
-        EventMachine::PeriodicTimer.new(0.5) do
-          if flag_possession?
-            @tanks.values.each do |t|
-              if t.mode != Command::GO_HOME then
-                puts "changing tank to goal GO_HOME"
-                t.goal = @command.create_home_base_goal
-                t.mode = Command::GO_HOME
-              end
+      EventMachine::PeriodicTimer.new(0.5) do
+        if flag_possession?
+          @tanks.each_with_index do |t, i|
+            if t.mode != :home then
+               puts "changing tank #{i} to goal :home"
+              t.goal = create_home_base_goal
+              t.mode = :home
             end
-          else
-            @tanks.values.each do |t|
-              #if t.mode != Command::GO_TO_FLAG then
-                puts "changing tank to goal GO_TO_FLAG"
-                t.goal = @command.create_flag_goal
-                t.mode = Command::GO_TO_FLAG
-              #end
+          end
+        else
+          @tanks.each_with_index do |t, i|
+            if t.mode != :capture_flag then
+              puts "changing tank #{i} to goal :capture_flag"
+              t.goal = create_flag_goal
+              t.mode = :capture_flag
             end
           end
         end
@@ -117,62 +78,82 @@ module BraveZealot
       
     end
     
+    # Returns true if any of our tanks possesses an enemy flag
     def flag_possession?
-      @tanks.values.any? do |t|
+      @tanks.any? do |t|
         #puts "t.tank.flag = #{t.tank.flag}"
         t.tank.flag != "none" &&
-        t.tank.flag != @team_color
+        t.tank.flag != @my_color
       end
     end
-
-    def get_obstacles
-      @obstacles
+    
+    def create_flag_goal
+      flag_goal = PfGroup.new
+      flag_goal.add_obstacles(@map.obstacles)
+      refresh(:flags, 0.5) do
+        enemy_flags = @map.flags.select{ |f| f.color != @my_color }
+        flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.size) unless enemy_flags.empty?
+      end
+      flag_goal
     end
     
-    # Note: current_time may be non-continuous because @world_time is updated
-    # sporadically.
-    def current_time
-      delta = Time.now - @last_message_time
+    def create_home_base_goal
+      base_goal = PfGroup.new
+      base_goal.add_obstacles(@map.obstacles)
+      base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.size)
+      base_goal
+    end
+    
+    # Note: estimate_world_time may be non-continuous because @world_time is
+    # updated sporadically.
+    def estimate_world_time
+      delta = Time.now - @clock
       @world_time + delta
+    end
+    
+    def message_time(command)
+      @message_times[command.to_sym] || 0.0
     end
     
     # Catch-all callback, called on EVERY message to EVERY tank
     def on_any(r)
-      @last_message_time = Time.now
+      @clock = Time.now
       @world_time = r.time
+      @message_times[r.command.to_sym] = r.time
       #p r; puts
     end
     
-    # Tanks will call 'bind' to notify headquarters that it wants info whenever
-    # a specific event (such as hitting a wall) occurs.
-    def bind(event, &block)
-      if @bindings.keys.include?(event)
-        @bindings[event] << block
-      else
-        raise "Unknown event: #{event}"
-      end
-    end
-    
-    # If our most recent data is older than 'freshness', call mytanks and get
+    # If our most recent data is older than 'freshness', call command and get
     # more current info.  Otherwise, just assume our data is good enough and
     # call the passed-in block.
-    def refresh_mytanks(freshness, &block)
-      if (current_time - @last_mytanks_time) > freshness
-        # Note: Because global callbacks occur before local, on_mytanks will
-        # have a chance to update all tank data before the following block.call
-        mytanks { |r| block.call if block }
+    def refresh(command, freshness = 0.0, &block)
+      if (estimate_world_time - message_time(command)) > freshness
+        # Note: Because global callbacks occur before local, on_* will
+        # have a chance to update data before the following block.call
+        ignore_arg = Proc.new { |r| block.call if block }
+        send(command, &ignore_arg)
       else
         block.call if block
       end
     end
     
     def on_mytanks(r)
-      @last_mytanks_time = r.time
       r.mytanks.each do |t|
-        if @tanks[t.index]
-          @tanks[t.index].tank = t
-        end
+        @tanks[t.index].tank = t if @tanks.size > t.index
       end
+    end
+    
+    def on_flags(r)
+      @map.flags = r.flags
+    end
+    
+    def on_bases(r)
+      @map.bases = r.bases
+      @my_base = @map.bases.find{ |b| b.color = @my_color }
+    end
+    
+    def on_obstacles(r)
+      @map.obstacles = r.obstacles
     end
   end
 end
