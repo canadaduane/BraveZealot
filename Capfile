@@ -9,7 +9,7 @@ set :team, "green"
 set :players, "2"
 set :machine, "fungi"
 set :bzfs_port, "5154"
-set :bzport, "5000"
+set :bzport, "6000"
 set :world, nil
 
 

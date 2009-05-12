@@ -25,36 +25,39 @@ module BraveZealot
         
         @map = BraveZealot::Map.new(world_size)
         
-        refresh(:bases)
-        refresh(:obstacles)
-        refresh(:flags)
-        
-        #generate potential field plots
-        # flag_goal = @command.create_flag_goal
-        # base_goal = @command.create_home_base_goal
-        # 
-        flag_file = File.new('flag.gpi', 'w')
-        flag_file.write(@map.to_gnuplot(create_flag_goal))
-        flag_file.close
-        # 
-        # base_file = File.new('base.gpi','w')
-        # base_file.write(@map.to_gnuplot(create_home_base_goal))
-        # base_file.close
-      end
-      
-      # Initialize each of our tanks
-      mytanks do |r|
-        r.mytanks.each do |t|
-          tank =
-            case $options.brain
-            when 'dummy' then BraveZealot::DummyTank.new(self, t)
-            when 'smart' then BraveZealot::SmartTank.new(self, t)
+        refresh(:bases) do
+          refresh(:obstacles) do
+            refresh(:flags) do
+              # Initialize each of our tanks
+              mytanks do |r|
+                #generate potential field plots
+                # flag_goal = @command.create_flag_goal
+                # base_goal = @command.create_home_base_goal
+                # 
+                flag_file = File.new('flag.gpi', 'w')
+                flag_file.write(@map.to_gnuplot(create_flag_goal))
+                flag_file.close
+                # 
+                # base_file = File.new('base.gpi','w')
+                # base_file.write(@map.to_gnuplot(create_home_base_goal))
+                # base_file.close
+
+                r.mytanks.each do |t|
+                  tank =
+                    case $options.brain
+                    when 'dummy' then BraveZealot::DummyTank.new(self, t)
+                    when 'smart' then BraveZealot::SmartTank.new(self, t)
+                    end
+                  tank.goal = create_flag_goal
+                  tank.mode = :capture_flag
+                  @tanks[t.index] = tank
+                end
+              end
             end
-          tank.goal = create_flag_goal
-          tank.mode = :capture_flag
-          @tanks[t.index] = tank
+          end
         end
       end
+      
       
       EventMachine::PeriodicTimer.new(0.5) do
         if flag_possession?
@@ -89,6 +92,7 @@ module BraveZealot
     
     def create_flag_goal
       flag_goal = PfGroup.new
+      p @map
       flag_goal.add_obstacles(@map.obstacles)
       refresh(:flags, 0.5) do
         enemy_flags = @map.flags.select{ |f| f.color != @my_color }
@@ -148,6 +152,7 @@ module BraveZealot
     end
     
     def on_bases(r)
+      p r
       @map.bases = r.bases
       @my_base = @map.bases.find{ |b| b.color = @my_color }
     end
