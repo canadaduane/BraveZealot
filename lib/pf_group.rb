@@ -13,56 +13,35 @@ module BraveZealot
 
     def initialize(random_background = true)
       @fields = []
-      addField(PfRand.new(0.15)) if random_background
+      add_field(PfRand.new(0.15)) if random_background
     end
 
-    def addField(f)
+    def add_field(f)
       @fields << f
     end
     
-    def addMapFields(map)
-      max = map.size / 2
-
-      # Next we add attraction fields for the goals
-      map.flags.each do |f|
-        addField(Pf.new(f.x, f.y, map.size, 0, 0.2))
-      end
-
-      # Next we add repulsion fields on all the vertices of all the obstacles
-      map.obstacles.each do |o|
-        #also add a tangential field at the center of each object
-        addField(PfTan.new(o.center.x, o.center.y,
-          o.side_length/2, o.side_length/2, 0.5))
-        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
-      end
-
-      # Add a random background noise field
-      addField(PfRand.new(0.15))
-      
-    end
-    
     def add_rand(factor)
-        addField(PfRand.new(factor))
+        add_field(PfRand.new(factor))
     end
 
     def add_goal(x, y, size)
-      addField(Pf.new(x, y, size, 0, 0.2))
+      add_field(Pf.new(x, y, size, 0, 0.2))
     end
     
     def add_obstacles(obstacles)
       obstacles.each do |o|
-        addField(PfTan.new(o.center.x, o.center.y,
+        add_field(PfTan.new(o.center.x, o.center.y,
           o.side_length/2, o.side_length/2, 0.5))
-        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
+        add_field(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
       end
     end
     
     # suggest a distance and angle
-    def suggestDelta(current_x, current_y)
+    def suggest_delta(current_x, current_y)
       dx = 0.0
       dy = 0.0
       @fields.each do |f|
-        fdx, fdy = f.suggestDelta(current_x, current_y)
+        fdx, fdy = f.suggest_delta(current_x, current_y)
         dx += fdx
         dy += fdy
       end
@@ -81,8 +60,8 @@ module BraveZealot
     end
 
     # suggest a move
-    def suggestMove(current_x, current_y, current_angle)
-      dx,dy = suggestDelta(current_x,current_y)
+    def suggest_move(current_x, current_y, current_angle)
+      dx,dy = suggest_delta(current_x,current_y)
       #print "current angle is #{current_angle}\n"
       #print "the goal angle is #{ang_g}\n";
       ang_g = Math.atan2(dy,dx)

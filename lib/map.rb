@@ -14,10 +14,10 @@ module BraveZealot
       @flags = []
     end
 
-    def addObstacle(coordinates)
+    def add_obstacle(coordinates)
       @obstacles.push(Obstacle.new(coordinates))
     end
-    def addFlag(f)
+    def add_flag(f)
       @flags << f
     end
 
@@ -42,7 +42,7 @@ module BraveZealot
         41.times do |j|
           y = ( (@size/40)*j - hs )
           #puts "computing dx,dy for #{x},#{y}\n"
-          dx,dy = pf.suggestDelta(x,y)
+          dx,dy = pf.suggest_delta(x,y)
           str += "#{x} #{y} #{dx} #{dy}\n"
         end
       end

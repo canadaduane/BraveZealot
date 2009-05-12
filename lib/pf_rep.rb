@@ -3,7 +3,7 @@ bzrequire('lib/pf.rb')
 module BraveZealot
   class PfRep < Pf
     # suggest a distance and angle
-    def suggestDelta(current_x, current_y)
+    def suggest_delta(current_x, current_y)
       x_dis = @origin_x - current_x
       y_dis = @origin_y - current_y
       distance = Math.sqrt((x_dis)**2 + (y_dis)**2)

@@ -13,12 +13,12 @@ module BraveZealot
       @factor = factor
     end
 
-    def suggestDelta(current_x, current_y)
+    def suggest_delta(current_x, current_y)
       return [((rand()*2)-1)*@factor, ((rand()*2)-1)*@factor]
     end
 
     # suggest a move - Totally random
-    def suggestMove(current_x, current_y, current_angle)
+    def suggest_move(current_x, current_y, current_angle)
       speed = ( (rand() *2) - 1) * @factor
       angvel = ( (rand() *2) -1)  * @factor
       m = Move.new(speed, angvel)

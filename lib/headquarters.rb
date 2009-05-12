@@ -53,13 +53,13 @@ module BraveZealot
           @obstacles = r.obstacles
           
           r.obstacles.each do |o|
-            @map.addObstacle(o.coords)
+            @map.add_obstacle(o.coords)
           end
           
           flags do |r|
             r.flags.each do |f|
               if f.color != @team_color
-                @map.addFlag(f)
+                @map.add_flag(f)
               end
             end
 

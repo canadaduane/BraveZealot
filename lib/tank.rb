@@ -88,7 +88,7 @@ module BraveZealot
           if @goal
             #puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             
-            move = @goal.suggestMove(@tank.x, @tank.y, angle)
+            move = @goal.suggest_move(@tank.x, @tank.y, angle)
             #puts "Move: #{move.inspect}"
             speed move.speed
             angvel move.angvel
