@@ -7,8 +7,6 @@ def bzrequire(relative_feature)
   require File.expand_path(File.join(File.dirname(__FILE__), relative_feature))
 end
 
-bzrequire 'lib/headquarters'
-
 $options = OpenStruct.new(:server => '127.0.0.1', :port => 5000, :brain => 'smart')
 
 opts = OptionParser.new do |opts|
@@ -25,13 +23,18 @@ opts = OptionParser.new do |opts|
     $options.port = port.to_i
   end
 
-  opts.on("-b", "--brain [NAME]", "Use NAME intelligence program (e.g. 'dummy', 'smart')") do |brain|
+  opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |brain|
     $options.brain = brain
   end
 end
 
 opts.parse!(ARGV)
 
+bzrequire 'lib/headquarters'
+
 EventMachine.run do
-  EventMachine::connect($options.server, $options.port, BraveZealot::Headquarters)
+  EventMachine::connect(
+    $options.server,
+    $options.port,
+    BraveZealot::Headquarters)
 end

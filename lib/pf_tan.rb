@@ -63,11 +63,13 @@ module BraveZealot
         #print "how about we go the other way through #{a} radians?\n"
       end
 
-      #this will need to be a more dynamic calculation but hopefully it gives us a good first try
+      #this will need to be a more dynamic calculation but hopefully it gives
+      # us a good first try
       distance = distance*@factor
       #print "distance after factor = #{distance}\n"
 
-      #we assume we will be updating every .1 seconds, so lets set speed and angvel to reach the desired destination in .5 seconds
+      # We assume we will be updating every .1 seconds, so lets set speed and
+      # angvel to reach the desired destination in .5 seconds
       speed = distance*2
       angvel = a*2
       m = Move.new(speed, angvel)
@@ -77,8 +79,9 @@ module BraveZealot
         angvel = 0
       end
 
-      #and the final factor in our speed is based on how far off our desired angle we are
-      speed = m.speed()*((Math::PI - a.abs()).abs() / Math::PI ) #we should never be turning more than pi
+      # And the final factor in our speed is based on how far off our desired
+      # angle we are (Note: we should never be turning more than pi)
+      speed = m.speed()*((Math::PI - a.abs()).abs() / Math::PI )
       #print "speed after angle factor = #{speed}\n"
       
       m = Move.new(speed, angvel)

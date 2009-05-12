@@ -22,15 +22,6 @@ module BraveZealot
     
     def addMapFields(map)
       max = map.size / 2
-      # Add repulsion fields at corners of map
-      #addField(PfRep.new(-max, -max, max/3, 0, 0.06))
-      #addField(PfRep.new(-max, max, max/3, 0, 0.06))
-      #addField(PfRep.new(max, -max, max/3, 0, 0.06))
-      #addField(PfRep.new(max, max, max/3, 0, 0.06))
-      #addField(PfRep.new(-max,0,max/3,0,0.06))
-      #addField(PfRep.new(0,max,max/3,0,0.06))
-      #addField(PfRep.new(max,0,max/3,0,0.06))
-      #addField(PfRep.new(0,-max,max/3,0,0.06))
 
       # Next we add attraction fields for the goals
       map.flags.each do |f|
@@ -40,7 +31,8 @@ module BraveZealot
       # Next we add repulsion fields on all the vertices of all the obstacles
       map.obstacles.each do |o|
         #also add a tangential field at the center of each object
-        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
+        addField(PfTan.new(o.center.x, o.center.y,
+          o.side_length/2, o.side_length/2, 0.5))
         addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
       end
 
@@ -55,7 +47,8 @@ module BraveZealot
     
     def add_obstacles(obstacles)
       obstacles.each do |o|
-        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
+        addField(PfTan.new(o.center.x, o.center.y,
+          o.side_length/2, o.side_length/2, 0.5))
         addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
       end
     end
@@ -104,11 +97,8 @@ module BraveZealot
         #print "how about we go the other way through #{a} radians?\n"
       end
 
-      #this will need to be a more dynamic calculation but hopefully it gives us a good first try
-      # distance = distance*@factor
-      #print "distance after factor = #{distance}\n"
-
-      #we assume we will be updating every .1 seconds, so lets set speed and angvel to reach the desired destination in .5 seconds
+      # We assume we will be updating every .1 seconds, so lets set speed and
+      # angvel to reach the desired destination in .5 seconds
       speed = distance*2
       angvel = a*2
       m = Move.new(speed, angvel)
@@ -118,9 +108,9 @@ module BraveZealot
         angvel = 0
       end
 
-      #and the final factor in our speed is based on how far off our desired angle we are
-      speed = m.speed()*((((Math::PI - a.abs()).abs())) / Math::PI ) #we should never be turning more than pi
-      #print "speed=#{speed} angvel=#{angvel}\n"
+      # And the final factor in our speed is based on how far off our desired
+      # angle we are (Note: we should never be turning more than pi)
+      speed = m.speed()*((((Math::PI - a.abs()).abs())) / Math::PI )
       
       m = Move.new(speed, angvel)
       return m

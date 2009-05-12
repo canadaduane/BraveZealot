@@ -90,7 +90,10 @@ module BraveZealot
         if flag_possession?
           return_goal = PfGroup.new
           return_goal.add_obstacles(@obstacles)
-          return_goal.add_goal(@our_base.center.x, @our_base.center.y, @world_size)
+          return_goal.add_goal(
+            @our_base.center.x,
+            @our_base.center.y,
+            @world_size)
           @tanks.each do |t|
             t.goal = return_goal
           end
@@ -106,7 +109,8 @@ module BraveZealot
       end
     end
     
-    # Note: current_time may be non-continuous because @world_time is updated sporadically
+    # Note: current_time may be non-continuous because @world_time is updated
+    # sporadically.
     def current_time
       delta = Time.now - @last_message_time
       @world_time + delta

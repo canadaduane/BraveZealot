@@ -15,11 +15,15 @@ module BraveZealot
         if ( first.nil? ) then
           first = c
         else
-          str += "set arrow from #{last.x}, #{last.y} to #{c.x}, #{c.y} nohead lt 3\n"
+          str += "set arrow from " +
+                 "#{last.x}, #{last.y} to " +
+                 "#{c.x}, #{c.y} nohead lt 3\n"
         end
         last = c
       end
-      str += "set arrow from #{last.x}, #{last.y} to #{first.x}, #{first.y} nohead lt 3\n"
+      str += "set arrow from " +
+             "#{last.x}, #{last.y} to " +
+             "#{first.x}, #{first.y} nohead lt 3\n"
       str
     end
 
@@ -40,7 +44,8 @@ module BraveZealot
 
     def side_length
       if ( @side_length.nil? )
-        @side_length = @coords.zip(@coords[1..-1] + [@coords[0]]).map{ |c1,c2| Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2) }.max
+        @side_length = @coords.zip(@coords[1..-1] + [@coords[0]]).
+          map{ |c1,c2| Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2) }.max
       end
       @side_length
     end
