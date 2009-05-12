@@ -6,7 +6,7 @@ module BraveZealot
   # potential field.  This pf is a simple attraction/rejection field.
   class Pf
 
-    MAX = 10
+    MAX = 25
 
     # where is the center of the potential field?
     attr_accessor :origin_x, :origin_y, :spread, :radius, :alpha

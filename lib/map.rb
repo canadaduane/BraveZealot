@@ -21,7 +21,7 @@ module BraveZealot
       @flags << f
     end
 
-    def to_gnuplot
+    def to_gnuplot(pf)
       str = "#set up our map first\n"
       hs = @size/2
       str += "set xrange [-#{hs}: #{hs}]\n"
@@ -34,8 +34,7 @@ module BraveZealot
         str += o.to_gnuplot
       end
       
-      pf_group = PfGroup.new()
-      pf_group.addMapFields(self)
+      
 
       str += "plot '-' with vectors head\n"
       41.times do |i|
@@ -43,7 +42,7 @@ module BraveZealot
         41.times do |j|
           y = ( (@size/40)*j - hs )
           #puts "computing dx,dy for #{x},#{y}\n"
-          dx,dy = pf_group.suggestDelta(x,y)
+          dx,dy = pf.suggestDelta(x,y)
           str += "#{x} #{y} #{dx} #{dy}\n"
         end
       end

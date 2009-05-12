@@ -6,12 +6,12 @@ module BraveZealot
       if @center.nil? then
         x = 0.0
         y = 0.0
-        @coords.each do |c|
+        coords.each do |c|
           x += c.x
           y += c.y
         end
-        x = x/@coords.size
-        y = y/@coords.size
+        x = x/coords.size
+        y = y/coords.size
         @center = Coord.new(x,y)
       end
       @center

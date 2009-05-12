@@ -1,12 +1,15 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/tank'
 bzrequire 'lib/map'
+bzrequire 'lib/command'
 
 module BraveZealot
   class Headquarters < Communicator
     attr_reader :mytanks_time
     attr_reader :map
-    
+    attr_reader :team_color
+    attr_reader :our_base
+
     def start
       @bindings = {
         :hit => []
@@ -26,8 +29,8 @@ module BraveZealot
           when 'worldsize' then @world_size = c.value.to_f
           end
         end
-        puts "Team: #{@team_color}"
-        puts "World size: #{@world_size}"
+        #puts "Team: #{@team_color}"
+        #puts "World size: #{@world_size}"
         
         @map = BraveZealot::Map.new(@team_color, @world_size)
         
@@ -40,9 +43,11 @@ module BraveZealot
               @enemy_bases << b
             end
           end
-          puts "Our Base: #{@our_base.inspect}"
-          puts "Enemy Bases: #{@enemy_bases.inspect}"
+          #puts "Our Base: #{@our_base.inspect}"
+          #puts "Enemy Bases: #{@enemy_bases.inspect}"
         end
+
+        @command = Command.new(self)
         
         obstacles do |r|
           @obstacles = r.obstacles
@@ -51,25 +56,26 @@ module BraveZealot
             @map.addObstacle(o.coords)
           end
           
-          # Set up our initial potential field
-          initial_goal = PfGroup.new
-          initial_goal.add_obstacles(@obstacles)
-          
           flags do |r|
             r.flags.each do |f|
               if f.color != @team_color
-                initial_goal.add_goal(f.x, f.y, @world_size)
                 @map.addFlag(f)
               end
-              
-              File.open("map.gpi", "w") do |f|
-                f.write @map.to_gnuplot
-              end
             end
-            
+
+            #generate potential field plots
+            flag_goal = @command.create_flag_goal
+            base_goal = @command.create_home_base_goal
+
+            flag_file = File.new('flag.gpi', 'w')
+            flag_file.write(@map.to_gnuplot(flag_goal))
+            flag_file.close
+
+            base_file = File.new('base.gpi','w')
+            base_file.write(@map.to_gnuplot(base_goal))
+            base_file.close
             
             # Initialize each of our tanks
-            # initial_goal.addMapFields(@hq.map)
             mytanks do |r|
               r.mytanks.each do |t|
                 tank =
@@ -77,7 +83,8 @@ module BraveZealot
                   when 'dummy' then BraveZealot::DummyTank.new(self, t)
                   when 'smart' then BraveZealot::SmartTank.new(self, t)
                   end
-                tank.goal = initial_goal
+                tank.goal = @command.create_flag_goal
+                tank.mode = Command::GO_TO_FLAG
                 @tanks[tank.index] = tank
               end
             end
@@ -86,16 +93,24 @@ module BraveZealot
         end
       end
       
-      EventMachine::PeriodicTimer.new(0.5) do
-        if flag_possession?
-          return_goal = PfGroup.new
-          return_goal.add_obstacles(@obstacles)
-          return_goal.add_goal(
-            @our_base.center.x,
-            @our_base.center.y,
-            @world_size)
-          @tanks.each do |t|
-            t.goal = return_goal
+      if $options.brain == 'smart' then
+        EventMachine::PeriodicTimer.new(0.5) do
+          if flag_possession?
+            @tanks.values.each do |t|
+              if t.mode != Command::GO_HOME then
+                puts "changing tank to goal GO_HOME"
+                t.goal = @command.create_home_base_goal
+                t.mode = Command::GO_HOME
+              end
+            end
+          else
+            @tanks.values.each do |t|
+              #if t.mode != Command::GO_TO_FLAG then
+                puts "changing tank to goal GO_TO_FLAG"
+                t.goal = @command.create_flag_goal
+                t.mode = Command::GO_TO_FLAG
+              #end
+            end
           end
         end
       end
@@ -103,10 +118,15 @@ module BraveZealot
     end
     
     def flag_possession?
-      @tanks.any? do |t|
-        t.tank.flag != "-" &&
+      @tanks.values.any? do |t|
+        #puts "t.tank.flag = #{t.tank.flag}"
+        t.tank.flag != "none" &&
         t.tank.flag != @team_color
       end
+    end
+
+    def get_obstacles
+      @obstacles
     end
     
     # Note: current_time may be non-continuous because @world_time is updated
@@ -120,7 +140,7 @@ module BraveZealot
     def on_any(r)
       @last_message_time = Time.now
       @world_time = r.time
-      p r; puts
+      #p r; puts
     end
     
     # Tanks will call 'bind' to notify headquarters that it wants info whenever

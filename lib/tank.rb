@@ -4,6 +4,7 @@ module BraveZealot
     # tank :: BraveZealot::Communicator::Tank -> Data object
     attr_accessor :tank
     attr_accessor :goal
+    attr_accessor :mode
     
     # Expects a Communicator::Tank struct for init
     def initialize(hq, tank)
@@ -46,6 +47,7 @@ module BraveZealot
           mode = :move
           EventMachine::PeriodicTimer.new(0.2) do
             refresh(0.2)
+            shoot()
             
             case mode
             when :accel_once then
@@ -77,15 +79,17 @@ module BraveZealot
   end
 
   class SmartTank < Tank
+    REFRESH_RATE = 0.05
     
     def start
-      EventMachine::PeriodicTimer.new(0.1) do
-        refresh(0.1) do
+      EventMachine::PeriodicTimer.new(SmartTank::REFRESH_RATE) do
+        refresh(SmartTank::REFRESH_RATE) do
+          #shoot() #shooting mostly ends up killing ourselves, so lets avoid that
           if @goal
-            puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
+            #puts "x: #{@tank.x}, y: #{@tank.y}, angle: #{angle}"
             
             move = @goal.suggestMove(@tank.x, @tank.y, angle)
-            puts "Move: #{move.inspect}"
+            #puts "Move: #{move.inspect}"
             speed move.speed
             angvel move.angvel
           end

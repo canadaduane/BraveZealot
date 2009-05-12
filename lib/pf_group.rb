@@ -41,6 +41,10 @@ module BraveZealot
       
     end
     
+    def add_rand(factor)
+        addField(PfRand.new(factor))
+    end
+
     def add_goal(x, y, size)
       addField(Pf.new(x, y, size, 0, 0.2))
     end
@@ -99,8 +103,8 @@ module BraveZealot
 
       # We assume we will be updating every .1 seconds, so lets set speed and
       # angvel to reach the desired destination in .5 seconds
-      speed = distance*2
-      angvel = a*2
+      speed = distance/(5*SmartTank::REFRESH_RATE*25)
+      angvel = a/(5*SmartTank::REFRESH_RATE)
       m = Move.new(speed, angvel)
 
       #if we don't need to move, then lets not spin
