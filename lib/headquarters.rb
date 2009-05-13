@@ -13,7 +13,7 @@ module BraveZealot
     class MissingData < Exception; end
     
     def start
-      @tanks = []                 # Current BraveZealot::Tank objects
+      @agents = []                # Current BraveZealot::Agent objects
       @world_time = 0.0           # Last communicated world time
       @message_times = {}         # Last time we received a message (in Time.now units)
       
@@ -54,14 +54,14 @@ module BraveZealot
                 end
 
                 r.mytanks.each do |t|
-                  tank =
+                  agent =
                     case $options.brain
                     when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
                     when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
                     when 'search' then BraveZealot::Agent::Search.new(self, t)
                     end
-                  tank.mode = :locate_flag
-                  @tanks[t.index] = tank
+                  agent.mode = :locate_flag
+                  @agents[t.index] = tank
                 end
               end
             end
@@ -73,7 +73,7 @@ module BraveZealot
         EventMachine::PeriodicTimer.new(0.5) do
           refresh(:flags, 0.2) do
             if flag_possession?
-              @tanks.each_with_index do |t, i|
+              @agents.each_with_index do |t, i|
                 if t.mode != :home
                   puts "changing tank #{i} to goal :home"
                   t.goal = create_home_base_goal
@@ -81,7 +81,7 @@ module BraveZealot
                 end
               end
             else
-              @tanks.each_with_index do |t, i|
+              @agents.each_with_index do |t, i|
                 if enemy_flag_exists?
                   puts "changing tank #{i} to goal :capture_flag"
                   t.goal = create_flag_goal
@@ -106,7 +106,7 @@ module BraveZealot
     
     # Returns true if any of our tanks possesses an enemy flag
     def flag_possession?
-      @tanks.any? do |t|
+      @agents.any? do |t|
         #puts "t.tank.flag = #{t.tank.flag}"
         t.tank.flag != "none" &&
         t.tank.flag != @my_color
@@ -166,7 +166,7 @@ module BraveZealot
     
     def on_mytanks(r)
       r.mytanks.each do |t|
-        @tanks[t.index].tank = t if @tanks.size > t.index
+        @agents[t.index].tank = t if @agents.size > t.index
       end
     end
     

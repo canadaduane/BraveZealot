@@ -38,12 +38,42 @@ module BraveZealot
       str += "e\n"
       str
     end
-
-    def chunk(x,y)
+    
+    # Return the successor chunks of x, y
+    def succ(x, y)
+      [unblocked_chunk(x-1, y-1),
+       unblocked_chunk(x  , y-1),
+       unblocked_chunk(x+1, y-1),
+       unblocked_chunk(x-1, y  ),
+       unblocked_chunk(x  , y  ),
+       unblocked_chunk(x+1, y  ),
+       unblocked_chunk(x-1, y+1),
+       unblocked_chunk(x  , y+1),
+       unblocked_chunk(x+1, y+1)
+      ].compact
+    end
+    
+    # Return unblocked chunk at x, y or nil if it is blocked
+    # or nil if x or y is out of range
+    def unblocked_chunk(x, y)
+      if x >= 0 and x < @chunks_per_side and
+         y >= 0 and y < @chunks_per_side
+        c = chunk(x, y)
+        c unless c.blocked?
+      end
+    end
+    
+    # Return the chunk at x, y (measured in chunk units)
+    def chunk(x, y)
       #puts "getting #{x}, #{y} at #{y*@chunks_per_side+x}"
       @chunks[(y*@chunks_per_side)+x]
     end
-
+    
+    # Return the chunk at x, y (measured in world units)
+    def chunk_at_point(x, y)
+      chunk((x / @chunks_per_side).to_i, (y / @chunks_per_side).to_i)
+    end
+    
     def chunks_per_side
       @chunks_per_side
     end
@@ -51,6 +81,8 @@ module BraveZealot
 
   class Chunk
     attr_reader :center, :corners, :map, :penalty
+    attr_reader :x, :y
+    
     def initialize(map, x_chunk, y_chunk)
       @map = map
       hs = map.size/2
@@ -120,6 +152,15 @@ module BraveZealot
         str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
       end
       str
+    end
+    
+    # Allow Chunk objects to work nicely with Set and Hash
+    def hash
+      @x * @y
+    end
+    
+    def eql?(other)
+      @x == other.x && @y == other.y
     end
   end
 end
