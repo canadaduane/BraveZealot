@@ -35,7 +35,7 @@ def server_running?
 end
 
 def start_server(bzfs)
-  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 >server.log"
+  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 >server.log 2>server.log"
 end
 
 def kill_server!
@@ -47,7 +47,7 @@ def robot_running?
 end
 
 def start_robot(options)
-  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@localhost:#{options.server_port} >robot.log"
+  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@localhost:#{options.server_port} >robot.log 2>robot.log"
 end
 
 def kill_robot!(team)
@@ -80,7 +80,7 @@ $options = OpenStruct.new(
   :datadir       => nil,
   :server        => "127.0.0.1",
   :server_port   => 5154,
-  :robot_port    => 6000,
+  :robot_port    => nil,
   :members       => 2,
   :team          => "green",
   :callsign      => nil,
@@ -157,6 +157,16 @@ if $options.callsign.nil?
   $options.callsign = "brave_" + $options.team
 end
 
+if $options.robot_port.nil?
+  colors = {
+    "green"   => 0,
+    "red"     => 1,
+    "blue"    => 2,
+    "purple"  => 3
+  }
+  $options.robot_port = 6000 + colors[$options.team.downcase]
+end
+
 if $options.show_options or ARGV.empty?
   puts "Using Options:"
   puts $options.instance_variable_get("@table").map{ |k, v| "  #{k}: #{v}" }.join("\n")
@@ -196,7 +206,7 @@ when "server" then
     start_server($options.bzfs)
   end
 when "client" then
-  shell "#{$options.bzflag} -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port}"
+  shell "#{$options.bzflag} -team observer -view stereo -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
 when "team" then
   puts "Waiting for server..."
   waitport($options.server_port)
