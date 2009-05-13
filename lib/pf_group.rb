@@ -34,18 +34,18 @@ module BraveZealot
 
       # Next we add attraction fields for the goals
       map.flags.each do |f|
-        addField(Pf.new(f.x, f.y, map.size, 0, 0.2))
+        addField(Pf.new(f.x, f.y, map.size, 0, 0.1))
       end
 
       # Next we add repulsion fields on all the vertices of all the obstacles
       map.obstacles.each do |o|
         #also add a tangential field at the center of each object
-        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
-        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
+        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.05))
+        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 0.2))
       end
 
       # Add a random background noise field
-      addField(PfRand.new(0.15))
+      addField(PfRand.new(0.01))
       
     end
     
@@ -54,13 +54,13 @@ module BraveZealot
     end
 
     def add_goal(x, y, size)
-      addField(Pf.new(x, y, size, 0, 0.2))
+      addField(Pf.new(x, y, size, 0, 0.1))
     end
     
     def add_obstacles(obstacles)
       obstacles.each do |o|
-        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.5))
-        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 1))
+        addField(PfTan.new(o.center.x, o.center.y, o.side_length/2, o.side_length/2, 0.05))
+        addField(PfRep.new(o.center.x, o.center.y, o.side_length, 0, 0.2))
       end
     end
     
