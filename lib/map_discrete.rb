@@ -2,8 +2,7 @@ bzrequire 'lib/map'
 module BraveZealot
   class MapDiscrete < Map
     CHUNK_SIZE = 20
-    def initialize(team, size)
-      @team = team
+    def initialize(size)
       @size = size.to_i
       @obstacles = []
       @flags = []
@@ -12,6 +11,7 @@ module BraveZealot
       @chunks_per_side = (@size / CHUNK_SIZE).ceil
       (1..@chunks_per_side).each do |y|
         (1..@chunks_per_side).each do |x|
+          #puts "pushing #{@chunks.size} at #{x-1},#{y-1}"
           @chunks.push(Chunk.new(self, x-1, y-1))
         end
       end
@@ -38,13 +38,25 @@ module BraveZealot
       str += "e\n"
       str
     end
+
+    def chunk(x,y)
+      #puts "getting #{x}, #{y} at #{y*@chunks_per_side+x}"
+      @chunks[(y*@chunks_per_side)+x]
+    end
+
+    def chunks_per_side
+      @chunks_per_side
+    end
   end
 
   class Chunk
-    attr_reader :center, :corners, :blocked, :penalty, :map
+    attr_reader :center, :corners, :map, :penalty
     def initialize(map, x_chunk, y_chunk)
       @map = map
       hs = map.size/2
+
+      @x = x_chunk
+      @y = y_chunk
 
       #first we add the four corners
       @corners = []
@@ -55,20 +67,59 @@ module BraveZealot
 
       #next we determine the center of the chunk
       @center = Coord.new((x_chunk*MapDiscrete::CHUNK_SIZE) + (MapDiscrete::CHUNK_SIZE/2) -hs, (y_chunk*MapDiscrete::CHUNK_SIZE) + (MapDiscrete::CHUNK_SIZE/2) -hs)
-
-      #finally we determine if this chunk is blocked and/or has a penalty assigned to it
-      @blocked = false
-      @penalty = 1 #1 means no penalty
     end
 
-     def to_gnuplot
+    def blocked?
+      if @blocked.nil? then
+        @blocked = false
+        @map.obstacles.each do |o|
+          if o.contains_point(@center) then
+            @blocked = true
+            break
+          end
+        end
+      end
+      @blocked
+    end
+
+    def penalty
+      if @penalty.nil? then
+        @penalty = 0
+        if @x == 0 or @x == ((map.chunks_per_side)-1) then
+          @penalty = 1
+        elsif @y == 0 or @y == ((map.chunks_per_side)-1) then
+          @penalty = 1
+        else
+          if map.chunk(@x-1,@y).blocked? then
+            @penalty = 1
+          elsif map.chunk(@x+1,@y).blocked? then
+            @penalty = 1
+          elsif map.chunk(@x,@y-1).blocked? then
+            @penalty = 1
+          elsif map.chunk(@x,@y+1).blocked? then
+            @penalty = 1
+          end
+        end
+      end
+      @penalty
+    end
+
+    def to_gnuplot
       str = ""
       tl = @corners[3]
       tr = @corners[2]
       br = @corners[1]
+      bl = @corners[0]
       #we only need to draw the top and right lines of each sqaure
       str += "set arrow from #{tl.x}, #{tl.y} to #{tr.x}, #{tr.y} nohead lt 7\n"
       str += "set arrow from #{tr.x}, #{tr.y} to #{br.x}, #{br.y} nohead lt 7\n"
+
+      if blocked? then
+        str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
+      elsif penalty.nonzero?
+        str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
+      end
+      str
     end
   end
 end

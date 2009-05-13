@@ -49,5 +49,40 @@ module BraveZealot
       end
       @side_length
     end
+
+    #get a list of the sides of this obstacle represented by vectors
+    def sides
+      if @sides.nil? then
+        @sides = []
+        @coords.each_with_index do |c,i|
+          if @coords[i+1].nil? then
+            @sides[i] = c.vector_to(@coords.first)
+          else
+            @sides[i] = c.vector_to(@coords[i+1])
+          end
+        end
+      end
+      @sides
+    end
+
+    #check if a point existst inside an obstacle
+    def contains_point(p)
+      which_side = nil
+      sides.each do |s|
+        if which_side.nil? then
+          #puts "finding which side of the first line we are on..."
+          which_side = s.cross_product(s.start.vector_to(p))
+          #puts "we are on the #{which_side} side of the line..."
+          which_side = if which_side.zero? then nil else which_side end
+        else 
+          tmp = s.cross_product(s.start.vector_to(p))
+          #puts "we are the #{tmp} side of this line..."
+          if ( (tmp < 0) != (which_side < 0) ) then
+            return false
+          end
+        end
+      end
+      true
+    end
   end
 end

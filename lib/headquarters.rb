@@ -1,6 +1,7 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/tank'
 bzrequire 'lib/map'
+bzrequire 'lib/map_discrete'
 
 module BraveZealot
   class Headquarters < Communicator
@@ -22,33 +23,40 @@ module BraveZealot
           when 'worldsize' then world_size = c.value.to_f
           end
         end
-        
-        @map = BraveZealot::Map.new(world_size)
+        if ( $options.brain == 'search' ) 
+          @map = BraveZealot::MapDiscrete.new(world_size)
+        else
+          @map = BraveZealot::Map.new(world_size)
+        end
         
         refresh(:bases) do
           refresh(:obstacles) do
             refresh(:flags) do
               # Initialize each of our tanks
               mytanks do |r|
-                #generate potential field plots
-                # flag_goal = @command.create_flag_goal
-                # base_goal = @command.create_home_base_goal
-                # 
-                flag_file = File.new('flag.gpi', 'w')
-                flag_file.write(@map.to_gnuplot(create_flag_goal))
-                flag_file.close
-                # 
-                # base_file = File.new('base.gpi','w')
-                # base_file.write(@map.to_gnuplot(create_home_base_goal))
-                # base_file.close
+                case $options.brain
+                when 'smart'
+                  #flag_file = File.new('flag.gpi', 'w')
+                  #flag_file.write(@map.to_gnuplot(create_flag_goal))
+                  #flag_file.close
+                  # 
+                  # base_file = File.new('base.gpi','w')
+                  # base_file.write(@map.to_gnuplot(create_home_base_goal))
+                  # base_file.close
+                when 'search'
+                  search_file = File.new('search.gpi','w')
+                  search_file.write(@map.to_gnuplot)
+                  search_file.close
+                  puts "Done building search.gpi!"
+                end
 
                 r.mytanks.each do |t|
                   tank =
                     case $options.brain
                     when 'dummy' then BraveZealot::DummyTank.new(self, t)
                     when 'smart' then BraveZealot::SmartTank.new(self, t)
+                    when 'search' then BraveZealot::DummyTank.new(self, t)
                     end
-                  # tank.goal = create_flag_goal
                   tank.mode = :locate_flag
                   @tanks[t.index] = tank
                 end
@@ -58,22 +66,24 @@ module BraveZealot
         end
       end
       
-      EventMachine::PeriodicTimer.new(0.5) do
-        refresh(:flags, 0.2) do
-          if flag_possession?
-            @tanks.each_with_index do |t, i|
-              if t.mode != :home
-                puts "changing tank #{i} to goal :home"
-                t.goal = create_home_base_goal
-                t.mode = :home
+      if $options.brain == 'smart' then
+        EventMachine::PeriodicTimer.new(0.5) do
+          refresh(:flags, 0.2) do
+            if flag_possession?
+              @tanks.each_with_index do |t, i|
+                if t.mode != :home
+                  puts "changing tank #{i} to goal :home"
+                  t.goal = create_home_base_goal
+                  t.mode = :home
+                end
               end
-            end
-          else
-            @tanks.each_with_index do |t, i|
-              if t.mode != :capture_flag and enemy_flag_exists?
-                puts "changing tank #{i} to goal :capture_flag"
-                t.goal = create_flag_goal
-                t.mode = :capture_flag
+            else
+              @tanks.each_with_index do |t, i|
+                if enemy_flag_exists?
+                  puts "changing tank #{i} to goal :capture_flag"
+                  t.goal = create_flag_goal
+                  t.mode = :capture_flag
+                end
               end
             end
           end
@@ -105,6 +115,7 @@ module BraveZealot
       flag_goal.add_obstacles(@map.obstacles)
       refresh(:flags, 0.5) do
         enemy_flags = @map.flags.select{ |f| f.color != @my_color }
+        puts "adding flag goal at #{enemy_flags.first.x}, #{enemy_flags.first.y}"
         flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.size) unless enemy_flags.empty?
       end
       flag_goal
@@ -157,6 +168,7 @@ module BraveZealot
     end
     
     def on_flags(r)
+      
       @map.flags = r.flags
     end
     
