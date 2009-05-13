@@ -1,0 +1,233 @@
+#!/usr/bin/env ruby
+
+require 'ostruct'
+require 'optparse'
+
+# You can set up your bzflag commands like this:
+# $ ln -s ~/bzflag/src/bzflag/bzflag     /usr/bin/bzflag
+# $ ln -s ~/bzflag/src/bzfs/bzfs         /usr/bin/bzfs
+# $ ln -s ~/bzflag/src/bzrobots/bzrobots /usr/bin/bzrobots
+
+def follow_link(file)
+  file = File.expand_path(file)
+  while File.symlink?(file)
+    file = File.expand_path(File.readlink(file), File.dirname(file))
+  end
+  file
+end
+
+def waitport(port)
+  begin
+    result = `netstat -an|grep \.#{port}\s`
+  end while result.empty?
+  sleep 0.2
+end
+
+def shell(cmd)
+  fork do
+    puts cmd
+    exec cmd
+  end
+  # system cmd
+end
+
+def server_running?
+  !(`ps auxww|grep bzfs|grep -v grep`).empty?
+end
+
+def start_server(bzfs, world)
+  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 #{world ? "-world " + File.expand_path(world) : ""} >server.log 2>server.log"
+end
+
+def kill_server!
+  `ps auxww|grep bzfs|grep -v grep|awk '{print $2}'|xargs kill`
+end
+
+def robot_running?
+  !(`ps auxww|grep bzrobots|grep -v grep`).empty?
+end
+
+def start_robot(options)
+  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@#{options.server}:#{options.server_port} >robot_#{options.team}.log 2>robot_#{options.team}.log"
+end
+
+def kill_robot!(team)
+  if team == :all
+    `ps auxww|grep bzrobots|grep -v grep|awk '{print $2}'|xargs kill -9`
+  else
+    `ps auxww|grep bzrobots|grep #{team}|grep -v grep|awk '{print $2}'|xargs kill -9`
+  end
+end
+
+def brave_running?
+  !(`ps auxww|grep brave.rb|grep -v grep`).empty?
+end
+
+def kill_brave!(team)
+  if team == :all
+    `ps auxww|grep brave.rb|grep -v grep|awk '{print $2}'|xargs kill`
+  else
+    `ps auxww|grep brave.rb|grep #{team}|grep -v grep|awk '{print $2}'|xargs kill`
+  end
+end
+
+# Use reasonable defaults and parse shell args for specific options
+
+$options = OpenStruct.new(
+  :bzfs          => "bzfs",
+  :bzrobots      => "bzrobots",
+  :bzflag        => "bzflag",
+  :basedir       => ENV["BZFLAG_DIR"],
+  :datadir       => nil,
+  :server        => "127.0.0.1",
+  :server_port   => 5154,
+  :robot_port    => nil,
+  :members       => 2,
+  :team          => "green",
+  :callsign      => nil,
+  :brain         => "smart",
+  :show_options  => false,
+  :force_restart => false,
+  :world         => nil)
+
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: elf [options]"
+
+  opts.separator ""
+  opts.separator "Specific options:"
+  
+  opts.on("", "--bzfs [BZFS]", "Path to bzfs server executable") do |b|
+    $options.bzfs = b
+  end
+
+  opts.on("", "--bzrobots [BZROBOTS]", "Path to bzrobots server executable") do |b|
+    $options.bzrobots = b
+  end
+
+  opts.on("", "--bzflag [BZFLAG]", "Path to bzflag server executable") do |b|
+    $options.bzflag = b
+  end
+
+  opts.on("-w", "--world [FILE]", "Load an alternate world file") do |w|
+    $options.world = w
+  end
+
+  opts.on("-s", "--server [IPADDR]", "Connect to server at IPADDR") do |srv|
+    $options.server = srv
+  end
+
+  opts.on("-p", "--port [NUMBER]", "Connect to port") do |p|
+    $options.server_port = p.to_i
+  end
+
+  opts.on("-r", "--robot-port [NUMBER]", "Connect bzrobots through port") do |p|
+    $options.robot_port = p.to_i
+  end
+
+  opts.on("-m", "--members [NUMBER]", "Number of team members") do |m|
+    $options.members = m.to_i
+  end
+
+  opts.on("-t", "--team [COLOR]", "Team color e.g. red, green") do |t|
+    $options.team = t
+  end
+
+  opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |b|
+    $options.brain = b
+  end
+  
+  opts.on("-o", "--[no-]options", "Show options in standard output") do |o|
+    $options.show_options = o
+  end
+  
+  opts.on("-f", "--[no-]force", "Force restart of server and client") do |f|
+    $options.force_restart = f
+  end
+end
+
+opts.parse!(ARGV)
+
+# Final attempt to get reasonable defaults
+
+if $options.basedir.nil?
+  $options.basedir = File.expand_path(
+    File.join(follow_link(`which #{$options.bzfs}`.chomp), "..", "..", "..")) 
+end
+
+if $options.datadir.nil?
+  $options.datadir = File.join($options.basedir, "data")
+end
+
+if $options.callsign.nil?
+  # Use team color as callsign if omitted
+  $options.callsign = "brave_" + $options.team
+end
+
+if $options.robot_port.nil?
+  colors = {
+    "green"   => 0,
+    "red"     => 1,
+    "blue"    => 2,
+    "purple"  => 3
+  }
+  $options.robot_port = 6000 + colors[$options.team.downcase]
+end
+
+if $options.show_options or ARGV.empty?
+  puts "Using Options:"
+  puts $options.instance_variable_get("@table").map{ |k, v| "  #{k}: #{v}" }.join("\n")
+end
+
+if ARGV.empty?
+  puts "Commands: server, client, team, stop"
+end
+
+# Let's roll!
+
+case ARGV.shift
+when "stop" then
+  if brave_running?
+    puts "Stopping brave.rb..."
+    kill_brave!(:all)
+  end
+  
+  if robot_running?
+    puts "Stopping robots..."
+    kill_robot!(:all)
+  end
+  
+  if server_running?
+    puts "Stopping server..."
+    kill_server!
+  end
+when "server" then
+  if $options.force_restart
+    puts "Stopping server..."
+    kill_server!
+  end
+  if server_running?
+    puts "Server already running."
+  else
+    puts "Starting server..."
+    start_server($options.bzfs, $options.world)
+  end
+when "client" then
+  shell "#{$options.bzflag} -team observer -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
+when "team" then
+  puts "Waiting for server..."
+  waitport($options.server_port)
+  puts "  server up."
+  
+  if $options.force_restart
+    kill_robot!(:all)
+  else
+    kill_robot!($options.team)
+  end
+  start_robot($options)
+  
+  puts "Waiting for bzrobots..."
+  waitport($options.robot_port)
+  puts "  bzrobots up."
+  
+  shell "ruby ./brave.rb -s #{$options.server} -p #{$options.robot_port} -b #{$options.brain} >#{$options.callsign}.log"
+end

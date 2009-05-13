@@ -16,7 +16,8 @@ module BraveZealot
     attr_reader :last_msg
     attr_reader :message_queue
     
-    # Contains the response for a given command.  The +value+ can be a boolean or any of the Structs defined above.
+    # Contains the response for a given command.  The +value+
+    # can be a boolean or any of the Structs defined above.
     class Response
       attr_accessor :value
       attr_accessor :time, :command, :index, :args
@@ -51,9 +52,9 @@ module BraveZealot
         end
       end
     
-      # Use a little type checking when we access expected response objects.  For example,
-      # if we ask for response.obstacles but @value contains a list of Team objects, we should
-      # raise a TypeError.
+      # Use a little type checking when we access expected response objects.
+      # For example, if we ask for response.obstacles but @value contains a
+      # list of Team objects, we should raise a TypeError.
       { :teams      => Team,
         :obstacles  => Obstacle,
         :bases      => Base,
@@ -98,10 +99,14 @@ module BraveZealot
       :othertanks => [],
       :constants  => [] }.
     each do |method, args|
-      # Create each of the above methods as verbs in our tank vocabularly.  Each method expects
-      # the arguments specified in the array above, and an optional reaction block.
+      # Create each of the above methods as verbs in our tank vocabularly.
+      # Each method expects the arguments specified in the array above, and
+      # an optional reaction block.
       define_method(method) do |*ss, &reaction|
-        raise ArgumentError, "Expects #{args.empty? ? 'nothing' : args.inspect} as args" unless ss.size == args.size
+        unless ss.size == args.size
+          raise ArgumentError,
+            "Expects #{args.empty? ? 'nothing' : args.inspect} as args"
+        end
         words = ([method] + ss).map{ |w| w.to_s }
         say words.join(" ")
         @message_queue << reaction
@@ -129,12 +134,11 @@ module BraveZealot
         cmd   &&= cmd.strip
         index &&= index.strip
         args  &&= args.strip.scan(/([^\s]+)+/).flatten
-        # puts "time: #{time.inspect}, cmd: #{cmd.inspect}, index: #{index.inspect}, args: #{args.inspect}"
         @response = Response.new(time, cmd, index, args)
       when /^error(.*)$/ then
         # Ignore errors for now
       when /^begin\s*$/ then
-        # Ignore
+        @response.value = []
       when /^(ok|fail)(.*)$/ then
         @response.value = ($1 == "ok" ? true : false)
         @response.complete!
@@ -152,9 +156,12 @@ module BraveZealot
       when /^shot ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/ then
         @response.add Shot.new($1.to_f, $2.to_f, $3.to_f, $4.to_f)
       when /^mytank (\d+) (\w+) (alive|dead|\w+) (\d+) ([\d\.\-\+]+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/ then
-        @response.add MyTank.new($1.to_i, $2, $3, $4.to_i, $5.to_f, $6, $7.to_f, $8.to_f, $9.to_f, $10.to_f, $11.to_f, $12.to_f)
+        @response.add \
+          MyTank.new($1.to_i, $2, $3, $4.to_i, $5.to_f, $6, $7.to_f,
+                     $8.to_f, $9.to_f, $10.to_f, $11.to_f, $12.to_f)
       when /^othertank (\w+) (\w+) (alive|dead|\w+) ([\-\w]+) ([\d\.\-\+]+) ([\d\.\-\+]+) ([\d\.\-\+]+)$/ then
-        @response.add OtherTank.new($1, $2, $3, $4, $5.to_f, $6.to_f, $7.to_f)
+        @response.add \
+          OtherTank.new($1, $2, $3, $4, $5.to_f, $6.to_f, $7.to_f)
       when /^constant (\w+) (.+)$/ then
         @response.add Constant.new($1, $2)
       when /^end\s*$/ then

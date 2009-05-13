@@ -1,15 +1,9 @@
-require 'rubygems'
-require 'eventmachine'
 require 'ostruct'
 require 'optparse'
 
-def bzrequire(relative_feature)
-  require File.expand_path(File.join(File.dirname(__FILE__), relative_feature))
-end
+# Use reasonable defaults and parse shell args for specific options
 
-bzrequire 'lib/headquarters'
-
-$options = OpenStruct.new(:server => '127.0.0.1', :port => 5000, :brain => 'smart')
+$options = OpenStruct.new(:server => '127.0.0.1', :port => 6000, :brain => 'smart')
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -25,13 +19,24 @@ opts = OptionParser.new do |opts|
     $options.port = port.to_i
   end
 
-  opts.on("-b", "--brain [NAME]", "Use NAME intelligence program (e.g. 'dummy', 'smart')") do |brain|
+  opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |brain|
     $options.brain = brain
   end
 end
 
 opts.parse!(ARGV)
 
+
+# Our main program begins here:
+
+require 'rubygems'
+require 'eventmachine'
+require(File.join(File.dirname(__FILE__), "bzrequire"))
+bzrequire 'lib/headquarters'
+
 EventMachine.run do
-  EventMachine::connect($options.server, $options.port, BraveZealot::Headquarters)
+  EventMachine::connect(
+    $options.server,
+    $options.port,
+    BraveZealot::Headquarters)
 end
