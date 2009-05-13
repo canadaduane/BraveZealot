@@ -17,7 +17,6 @@ module BraveZealot
       @flags = []
     end
     
-    
     def to_gnuplot(pf)
       hs = self.size / 2
       str = unindent(<<-GNUPLOT)

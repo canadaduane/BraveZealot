@@ -48,8 +48,8 @@ module BraveZealot
                     when 'dummy' then BraveZealot::DummyTank.new(self, t)
                     when 'smart' then BraveZealot::SmartTank.new(self, t)
                     end
-                  tank.goal = create_flag_goal
-                  tank.mode = :capture_flag
+                  # tank.goal = create_flag_goal
+                  tank.mode = :locate_flag
                   @tanks[t.index] = tank
                 end
               end
@@ -58,27 +58,37 @@ module BraveZealot
         end
       end
       
-      
       EventMachine::PeriodicTimer.new(0.5) do
-        if flag_possession?
-          @tanks.each_with_index do |t, i|
-            if t.mode != :home then
-               puts "changing tank #{i} to goal :home"
-              t.goal = create_home_base_goal
-              t.mode = :home
+        refresh(:flags, 0.2) do
+          if flag_possession?
+            @tanks.each_with_index do |t, i|
+              if t.mode != :home
+                puts "changing tank #{i} to goal :home"
+                t.goal = create_home_base_goal
+                t.mode = :home
+              end
             end
-          end
-        else
-          @tanks.each_with_index do |t, i|
-            # if t.mode != :capture_flag then
-              puts "changing tank #{i} to goal :capture_flag"
-              t.goal = create_flag_goal
-              t.mode = :capture_flag
-            # end
+          else
+            @tanks.each_with_index do |t, i|
+              if t.mode != :capture_flag and enemy_flag_exists?
+                puts "changing tank #{i} to goal :capture_flag"
+                t.goal = create_flag_goal
+                t.mode = :capture_flag
+              end
+            end
           end
         end
       end
       
+    end
+    
+    def enemy_flags
+      @map.flags.select{ |f| f.color != @my_color }
+    end
+    
+    # Returns true if the enemy's flag is in the game world
+    def enemy_flag_exists?
+      !(enemy_flags.empty?)
     end
     
     # Returns true if any of our tanks possesses an enemy flag
@@ -92,7 +102,6 @@ module BraveZealot
     
     def create_flag_goal
       flag_goal = PfGroup.new
-      p @map
       flag_goal.add_obstacles(@map.obstacles)
       refresh(:flags, 0.5) do
         enemy_flags = @map.flags.select{ |f| f.color != @my_color }
@@ -153,7 +162,7 @@ module BraveZealot
     
     def on_bases(r)
       @map.bases = r.bases
-      @my_base = @map.bases.find{ |b| b.color = @my_color }
+      @my_base = @map.bases.find{ |b| b.color == @my_color }
     end
     
     def on_obstacles(r)
