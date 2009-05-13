@@ -121,7 +121,7 @@ module BraveZealot
   
     protected
     def receive_line(line)
-      puts "RECV: #{line}"
+      # puts "RECV: #{line}"
       @last_msg = line
     
       case line
@@ -185,7 +185,7 @@ module BraveZealot
     end
   
     def say(text)
-      puts "SEND: #{text}"
+      # puts "SEND: #{text}"
       send_data(text.strip + "\n")
     end
   

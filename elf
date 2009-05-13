@@ -20,6 +20,7 @@ def waitport(port)
   begin
     result = `netstat -an|grep \.#{port}\s`
   end while result.empty?
+  sleep 0.2
 end
 
 def shell(cmd)
@@ -211,7 +212,7 @@ when "server" then
     start_server($options.bzfs, $options.world)
   end
 when "client" then
-  shell "#{$options.bzflag} -team observer -view stereo -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
+  shell "#{$options.bzflag} -team observer -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
 when "team" then
   puts "Waiting for server..."
   waitport($options.server_port)

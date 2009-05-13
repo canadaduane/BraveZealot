@@ -70,11 +70,11 @@ module BraveZealot
           end
         else
           @tanks.each_with_index do |t, i|
-            if t.mode != :capture_flag then
+            # if t.mode != :capture_flag then
               puts "changing tank #{i} to goal :capture_flag"
               t.goal = create_flag_goal
               t.mode = :capture_flag
-            end
+            # end
           end
         end
       end
@@ -152,7 +152,6 @@ module BraveZealot
     end
     
     def on_bases(r)
-      p r
       @map.bases = r.bases
       @my_base = @map.bases.find{ |b| b.color = @my_color }
     end
