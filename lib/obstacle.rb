@@ -9,21 +9,16 @@ module BraveZealot
 
     def to_gnuplot
       str = ""
-      first = nil
-      last = nil
-      @coords.each do |c|
-        if ( first.nil? ) then
-          first = c
-        else
-          str += "set arrow from " +
-                 "#{last.x}, #{last.y} to " +
-                 "#{c.x}, #{c.y} nohead lt 3\n"
-        end
-        last = c
+      sides.each do |s|
+        str +=  "set arrow from " +
+                "#{s.start.x},#{s.start.y} to " +
+                "#{s.finish.x},#{s.finish.y} nohead lt 3\n"
       end
-      str += "set arrow from " +
-             "#{last.x}, #{last.y} to " +
-             "#{first.x}, #{first.y} nohead lt 3\n"
+      if rect? then
+        str += "set arrow from " +
+                "#{@coords[0].x}, #{@coords[0].y} to " +
+                "#{@coords[2].x}, #{@coords[2].y} nohead lt 5\n"
+      end
       str
     end
 
@@ -44,8 +39,7 @@ module BraveZealot
 
     def side_length
       if ( @side_length.nil? )
-        @side_length = @coords.zip(@coords[1..-1] + [@coords[0]]).
-          map{ |c1,c2| Math.sqrt((c2.y-c1.y)**2 + (c2.x-c1.x)**2) }.max
+        @side_length = sides.map{ |s| s.length }.max
       end
       @side_length
     end
@@ -67,22 +61,48 @@ module BraveZealot
 
     #check if a point existst inside an obstacle
     def contains_point(p)
-      which_side = nil
-      sides.each do |s|
-        if which_side.nil? then
-          #puts "finding which side of the first line we are on..."
-          which_side = s.cross_product(s.start.vector_to(p))
-          #puts "we are on the #{which_side} side of the line..."
-          which_side = if which_side.zero? then nil else which_side end
-        else 
-          tmp = s.cross_product(s.start.vector_to(p))
-          #puts "we are the #{tmp} side of this line..."
-          if ( (tmp < 0) != (which_side < 0) ) then
-            return false
+      if rect? then
+        #get xmax and xmin
+        xs = coords.map{ |c| c.x }
+        xmax = xs.max
+        xmin = xs.min
+        if !p.x.between?(xmin,xmax) then
+          return false
+        end
+
+        ys = coords.map{ |c| c.y }
+        ymax = ys.max
+        ymin = ys.min
+        if !p.y.between?(ymin, ymax) then
+          return false
+        end
+        true
+      else
+        #Cross product Check
+        which_side = nil
+        sides.each do |s|
+          if which_side.nil? then
+            #puts "finding which side of the first line we are on..."
+            which_side = s.cross_product(s.start.vector_to(p))
+            #puts "we are on the #{which_side} side of the line..."
+            which_side = if which_side.zero? then nil else which_side end
+          else 
+            tmp = s.cross_product(s.start.vector_to(p))
+            #puts "we are the #{tmp} side of this line..."
+            if ( (tmp < 0) != (which_side < 0) ) then
+              return false
+            end
           end
         end
+        true
       end
-      true
+    end
+
+    def rect?
+      if @rect.nil? then
+        @rect = !sides.any? { |s| s.x.nonzero? && s.y.nonzero? }
+      end
+      @rect
     end
   end
 end

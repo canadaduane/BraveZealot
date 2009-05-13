@@ -39,6 +39,13 @@ module BraveZealot
       end
       @length
     end
+
+    def finish
+      if @finish.nil? then
+        @finish = Coord.new(start.x + x, start.y + y)
+      end
+      @finish
+    end
   end
   
 end
