@@ -34,8 +34,8 @@ def server_running?
   !(`ps auxww|grep bzfs|grep -v grep`).empty?
 end
 
-def start_server(bzfs)
-  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 >server.log 2>server.log"
+def start_server(bzfs, world)
+  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 #{world ? "-world " + File.expand_path(world) : ""} >server.log 2>server.log"
 end
 
 def kill_server!
@@ -47,7 +47,7 @@ def robot_running?
 end
 
 def start_robot(options)
-  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@localhost:#{options.server_port} >robot.log 2>robot.log"
+  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@#{options.server}:#{options.server_port} >robot_#{options.team}.log 2>robot_#{options.team}.log"
 end
 
 def kill_robot!(team)
@@ -86,7 +86,8 @@ $options = OpenStruct.new(
   :callsign      => nil,
   :brain         => "smart",
   :show_options  => false,
-  :force_restart => false)
+  :force_restart => false,
+  :world         => nil)
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: elf [options]"
@@ -105,7 +106,11 @@ opts = OptionParser.new do |opts|
   opts.on("", "--bzflag [BZFLAG]", "Path to bzflag server executable") do |b|
     $options.bzflag = b
   end
-  
+
+  opts.on("-w", "--world [FILE]", "Load an alternate world file") do |w|
+    $options.world = w
+  end
+
   opts.on("-s", "--server [IPADDR]", "Connect to server at IPADDR") do |srv|
     $options.server = srv
   end
@@ -203,7 +208,7 @@ when "server" then
     puts "Server already running."
   else
     puts "Starting server..."
-    start_server($options.bzfs)
+    start_server($options.bzfs, $options.world)
   end
 when "client" then
   shell "#{$options.bzflag} -team observer -view stereo -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
