@@ -211,6 +211,13 @@ when "server" then
     puts "Starting server..."
     start_server($options.bzfs, $options.world)
   end
+when "robot" then
+  if $options.force_restart
+    kill_robot!(:all)
+  else
+    kill_robot!($options.team)
+  end
+  start_robot($options)
 when "client" then
   shell "#{$options.bzflag} -team observer -window 1024x768 -directory #{$options.datadir} obs@#{$options.server}:#{$options.server_port} >client.log 2>client.log"
 when "team" then

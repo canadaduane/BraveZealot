@@ -3,7 +3,11 @@ require 'optparse'
 
 # Use reasonable defaults and parse shell args for specific options
 
-$options = OpenStruct.new(:server => '127.0.0.1', :port => 6000, :brain => 'smart')
+$options = OpenStruct.new(
+  :server  => '127.0.0.1',
+  :port    => 6000,
+  :brain   => 'smart',
+  :refresh => 0.05)
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -21,6 +25,10 @@ opts = OptionParser.new do |opts|
 
   opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |brain|
     $options.brain = brain
+  end
+
+  opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
+    $options.refresh = r.to_f
   end
 end
 

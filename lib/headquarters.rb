@@ -1,7 +1,10 @@
 bzrequire 'lib/communicator'
-bzrequire 'lib/tank'
 bzrequire 'lib/map'
 bzrequire 'lib/map_discrete'
+
+bzrequire 'lib/agent/dummy'
+bzrequire 'lib/agent/smart'
+bzrequire 'lib/agent/search'
 
 module BraveZealot
   class Headquarters < Communicator
@@ -53,9 +56,9 @@ module BraveZealot
                 r.mytanks.each do |t|
                   tank =
                     case $options.brain
-                    when 'dummy' then BraveZealot::DummyTank.new(self, t)
-                    when 'smart' then BraveZealot::SmartTank.new(self, t)
-                    when 'search' then BraveZealot::DummyTank.new(self, t)
+                    when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
+                    when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
+                    when 'search' then BraveZealot::Agent::Search.new(self, t)
                     end
                   tank.mode = :locate_flag
                   @tanks[t.index] = tank
