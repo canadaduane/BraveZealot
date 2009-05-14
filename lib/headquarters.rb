@@ -47,10 +47,11 @@ module BraveZealot
                   # base_file.write(@map.to_gnuplot(create_home_base_goal))
                   # base_file.close
                 when 'search'
-                  search_file = File.new('search.gpi','w')
-                  search_file.write(@map.to_gnuplot)
-                  search_file.close
-                  puts "Done building search.gpi!"
+                  #search_file = File.new('search.gpi','w')
+                  #search_file.write(@map.to_gnuplot)
+                  #search_file.close
+                  #puts "Done building search.gpi!"
+                  #puts "flag is at #{@map.goal.to_coord.inspect}"
                 end
 
                 r.mytanks.each do |t|
@@ -58,10 +59,14 @@ module BraveZealot
                     case $options.brain
                     when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
                     when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
-                    when 'search' then BraveZealot::Agent::Search.new(self, t)
+                    when 'search' then
+                      case $options.algorithm
+                      when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
+                      else BraveZealot::Agent::Search.new(self,t)
+                      end
                     end
                   agent.mode = :locate_flag
-                  @agents[t.index] = tank
+                  @agents[t.index] = agent
                 end
               end
             end

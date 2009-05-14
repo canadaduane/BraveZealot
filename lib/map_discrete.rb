@@ -9,6 +9,7 @@ module BraveZealot
       @flags = []
       @chunks = []
       @hq = hq
+      @hs = @size /2
       
       @chunks_per_side = (@size / CHUNK_SIZE).ceil
       (1..@chunks_per_side).each do |y|
@@ -73,23 +74,32 @@ module BraveZealot
     
     # Return the chunk at x, y (measured in world units)
     def chunk_at_point(x, y)
-      chunk((x / @chunks_per_side).to_i, (y / @chunks_per_side).to_i)
+      chunk(((x + @hs)  / CHUNK_SIZE).to_i, ((y + @hs) / CHUNK_SIZE).to_i)
     end
     
     def chunks_per_side
       @chunks_per_side
     end
 
-    def goal?(n)
+    def goal
       if @goal.nil? then
         flags.each do |f|
-          if f.color == @hq.my_color then
+          if f.color != @hq.my_color then
             @goal = chunk_at_point(f.x, f.y)
             break
           end
         end
       end
-      @goal.eql?(n)
+      @goal
+    end
+
+    def goal?(n)
+      goal.eql?(n)
+    end
+
+    #give the heuristic function of the chunk passed in (ie straight line distance to the goal node)
+    def heuristic(c)
+      c.center.vector_to(goal.center).length #* c.penalty #how awesome is that function?
     end
   end
 
@@ -130,20 +140,20 @@ module BraveZealot
 
     def penalty
       if @penalty.nil? then
-        @penalty = 0
+        @penalty = 1
         if @x == 0 or @x == ((map.chunks_per_side)-1) then
-          @penalty = 1
+          @penalty = 1.5
         elsif @y == 0 or @y == ((map.chunks_per_side)-1) then
-          @penalty = 1
+          @penalty = 1.5
         else
           if map.chunk(@x-1,@y).blocked? then
-            @penalty = 1
+            @penalty = 1.5
           elsif map.chunk(@x+1,@y).blocked? then
-            @penalty = 1
+            @penalty = 1.5
           elsif map.chunk(@x,@y-1).blocked? then
-            @penalty = 1
+            @penalty = 1.5
           elsif map.chunk(@x,@y+1).blocked? then
-            @penalty = 1
+            @penalty = 1.5
           end
         end
       end
@@ -162,7 +172,7 @@ module BraveZealot
 
       if blocked? then
         str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
-      elsif penalty.nonzero?
+      elsif penalty > 1 then
         str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
       end
       str
@@ -187,5 +197,34 @@ module BraveZealot
     def goal?
       @map.goal?(self)
     end
+
+    def to_coord
+      Coord.new(@x, @y)
+    end
+
+    def h
+      @h ||= @map.heuristic(self)
+    end
+
+    def g=(cost)
+      @g = cost
+    end
+
+    def g
+      @g ||= 0
+    end
+
+    def cost
+      g + h
+    end
+
+    def predecessors=(p)
+      @predecessors = p
+    end
+
+    def predecessors
+      @predecessors ||= []
+    end
+    alias_method :priority, :cost
   end
 end

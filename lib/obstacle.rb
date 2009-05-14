@@ -14,11 +14,11 @@ module BraveZealot
                 "#{s.start.x},#{s.start.y} to " +
                 "#{s.finish.x},#{s.finish.y} nohead lt 3\n"
       end
-      if rect? then
-        str += "set arrow from " +
-                "#{@coords[0].x}, #{@coords[0].y} to " +
-                "#{@coords[2].x}, #{@coords[2].y} nohead lt 5\n"
-      end
+      #if rect? then
+      #  str += "set arrow from " +
+      #          "#{@coords[0].x}, #{@coords[0].y} to " +
+      #          "#{@coords[2].x}, #{@coords[2].y} nohead lt 5\n"
+      #end
       str
     end
 

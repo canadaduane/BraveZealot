@@ -7,7 +7,8 @@ $options = OpenStruct.new(
   :server  => '127.0.0.1',
   :port    => 6000,
   :brain   => 'smart',
-  :refresh => 0.05)
+  :refresh => 0.05,
+  :algorithm => 'df') #algorithms = bf -> breadth first | df -> depth first | id -> iterative deepening | gbf -> greedy best first | a*
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -29,6 +30,10 @@ opts = OptionParser.new do |opts|
 
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
     $options.refresh = r.to_f
+  end
+
+  opts.on("-a", "--algorithm [VALUE]", "Search algorithm to use (only applies when using -b search") do |r|
+    $options.algorithm = r
   end
 end
 
