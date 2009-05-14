@@ -116,9 +116,10 @@ module BraveZealot
             closed.add(node)
             #this is where informed searches are different we must evaluate a priority before pushing onto the priority queue
             node.succ.each do |n|
-              n.g = node.g + (node.center.vector_to(n.center).length)
-              n.predecessors = ( node.predecessors.clone ) << node
-              fringe.insert(n)
+              n2 = n.clone
+              n2.g = node.g + (node.center.vector_to(n.center).length)
+              n2.predecessors = ( node.predecessors.clone ) << node
+              fringe.insert(n2)
             end
           end
         end
