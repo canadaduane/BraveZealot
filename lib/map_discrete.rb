@@ -2,11 +2,13 @@ bzrequire 'lib/map'
 module BraveZealot
   class MapDiscrete < Map
     CHUNK_SIZE = 20
-    def initialize(size)
+    attr_accessor :hq
+    def initialize(size, hq)
       @size = size.to_i
       @obstacles = []
       @flags = []
       @chunks = []
+      @hq = hq
       
       @chunks_per_side = (@size / CHUNK_SIZE).ceil
       (1..@chunks_per_side).each do |y|
@@ -76,6 +78,18 @@ module BraveZealot
     
     def chunks_per_side
       @chunks_per_side
+    end
+
+    def goal?(n)
+      if @goal.nil? then
+        flags.each do |f|
+          if f.color == @hq.my_color then
+            @goal = chunk_at_point(f.x, f.y)
+            break
+          end
+        end
+      end
+      @goal.eql?(n)
     end
   end
 
@@ -158,9 +172,20 @@ module BraveZealot
     def hash
       @x * @y
     end
+
+    def succ
+      if @succ.nil? then
+        @succ = @map.succ(@x, @y)
+      end
+      @succ
+    end
     
     def eql?(other)
       @x == other.x && @y == other.y
+    end
+
+    def goal?
+      @map.goal?(self)
     end
   end
 end

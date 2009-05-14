@@ -57,12 +57,13 @@ module BraveZealot
           return node if goal?(node)
           if !closed.include?(node)
             closed.add(node)
-            fringe.insert_all(@hq.map.succ(node.x, node.y))
+            fringe.insert_all(node.succ)
           end
         end
       end
       
       def goal?(chunk)
+        @hq.map.goal?(chunk)
       end
     end
   end

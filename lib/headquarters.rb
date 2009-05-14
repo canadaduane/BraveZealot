@@ -27,7 +27,7 @@ module BraveZealot
           end
         end
         if ( $options.brain == 'search' ) 
-          @map = BraveZealot::MapDiscrete.new(world_size)
+          @map = BraveZealot::MapDiscrete.new(world_size, self)
         else
           @map = BraveZealot::Map.new(world_size)
         end
