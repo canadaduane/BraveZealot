@@ -89,6 +89,7 @@ module BraveZealot
             break
           end
         end
+        @goal = chunk_at_point(0.0, 0.0) if @goal.nil?
       end
       @goal
     end
@@ -170,11 +171,11 @@ module BraveZealot
       str += "set arrow from #{tl.x}, #{tl.y} to #{tr.x}, #{tr.y} nohead lt 7\n"
       str += "set arrow from #{tr.x}, #{tr.y} to #{br.x}, #{br.y} nohead lt 7\n"
 
-      if blocked? then
-        str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
-      elsif penalty > 1 then
-        str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
-      end
+      #if blocked? then
+      #  str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
+      #elsif penalty > 1 then
+      #  str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
+      #end
       str
     end
     
