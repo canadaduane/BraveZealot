@@ -64,6 +64,9 @@ end
 module BraveZealot
   module Agent
     class Search < Basic
+    end
+    
+    class UninformedSearch < Search
       def start
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
         fringe = Stack.new
