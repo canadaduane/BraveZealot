@@ -44,6 +44,14 @@ module BraveZealot
         str += "pause 0.005000\n"
         str
       end
+      
+      def save_gnuplot
+        f = File.new($options.gnuplot_file,'w')
+        f.write(to_gnuplot)
+        f.close
+        puts "Finished!"
+        $stdout.flush
+      end
 
       def log(n)
         @log ||= []
@@ -56,11 +64,6 @@ module BraveZealot
     end
     
     class UninformedSearch < Search
-      def start
-        init = @hq.map.chunk_at_point(@tank.x, @tank.y)
-        fringe = Collection::Stack.new
-        search(init, fringe)
-      end
       
       protected
       
@@ -68,19 +71,48 @@ module BraveZealot
         closed = Set.new
         fringe = fringe.insert(init)
         loop do
-          return false if fringe.empty?
+          puts closed.size
+          puts
+          if fringe.empty?
+            puts "Done search: no goal"
+            return false
+          end
           node = fringe.remove
           log(node)
-          return node if goal?(node)
+          if node.goal?
+            puts "Done search: found"
+            @n = node
+            return node
+          end
           if !closed.include?(node)
             closed.add(node)
-            fringe.insert_all(node.succ)
+            node.succ.each do |n|
+              n2 = n.clone
+              n2.predecessors = ( node.predecessors.clone ) << node
+              fringe.insert(n2)
+            end
+            
+            # fringe.insert_all(node.succ)
           end
         end
       end
-      
-      def goal?(chunk)
-        @hq.map.goal?(chunk)
+    end
+    
+    class DepthFirstSearch < UninformedSearch
+      def start
+        init = @hq.map.chunk_at_point(@tank.x, @tank.y)
+        fringe = Collection::Stack.new
+        search(init, fringe)
+        save_gnuplot
+      end
+    end
+
+    class BreadthFirstSearch < UninformedSearch
+      def start
+        init = @hq.map.chunk_at_point(@tank.x, @tank.y)
+        fringe = Collection::Queue.new
+        search(init, fringe)
+        save_gnuplot
       end
     end
 
@@ -89,12 +121,7 @@ module BraveZealot
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
         fringe = Collection::PriorityQueue.new
         @n = search(init, fringe)
-        
-        f = File.new($options.gnuplot_file,'w')
-        f.write(to_gnuplot)
-        f.close
-        puts "Finished!"
-        $stdout.flush
+        save_gnuplot
       end
 
       def search(init, fringe)

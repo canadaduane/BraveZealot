@@ -86,6 +86,7 @@ $options = OpenStruct.new(
   :team          => "green",
   :callsign      => nil,
   :brain         => "smart",
+  :algorithm     => "a*",
   :show_options  => false,
   :force_restart => false,
   :world         => nil)
@@ -135,11 +136,15 @@ opts = OptionParser.new do |opts|
   opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |b|
     $options.brain = b
   end
-  
+
+  opts.on("-a", "--algorithm [NAME]", "(e.g. 'a*', 'df', 'bf')") do |a|
+    $options.algorithm = a
+  end
+
   opts.on("-o", "--[no-]options", "Show options in standard output") do |o|
     $options.show_options = o
   end
-  
+
   opts.on("-f", "--[no-]force", "Force restart of server and client") do |f|
     $options.force_restart = f
   end
@@ -236,5 +241,5 @@ when "team" then
   waitport($options.robot_port)
   puts "  bzrobots up."
   
-  shell "ruby ./brave.rb -s #{$options.server} -p #{$options.robot_port} -b #{$options.brain} >#{$options.callsign}.log"
+  shell "ruby ./brave.rb -s #{$options.server} -p #{$options.robot_port} -b #{$options.brain} -a '#{$options.algorithm}' >#{$options.callsign}.log"
 end

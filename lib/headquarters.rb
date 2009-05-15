@@ -55,18 +55,18 @@ module BraveZealot
                     #puts "Done building search.gpi!"
                     #puts "flag is at #{@map.goal.to_coord.inspect}"
                   end
-
-                  r.mytanks.each do |t|
-                    agent =
-                      case $options.brain
-                      when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
-                      when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
-                      when 'search' then
-                        case $options.algorithm
-                        when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
-                        when 'gbf' then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
-                        else BraveZealot::Agent::Search.new(self,t)
-                        end
+                r.mytanks.each do |t|
+                  agent =
+                    case $options.brain
+                    when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
+                    when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
+                    when 'search' then
+                      case $options.algorithm
+                      when 'a*'   then BraveZealot::Agent::InformedSearch.new(self, t)
+                      when 'gbf'  then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
+                      when 'df'   then BraveZealot::Agent::DepthFirstSearch.new(self,t)
+                      when 'bf'   then BraveZealot::Agent::BreadthFirstSearch.new(self,t)
+                      else BraveZealot::Agent::Search.new(self,t)
                       end
                     agent.mode = :locate_flag
                     @agents[t.index] = agent
