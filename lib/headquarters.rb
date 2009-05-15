@@ -62,6 +62,7 @@ module BraveZealot
                     when 'search' then
                       case $options.algorithm
                       when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
+                      when 'gbf' then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
                       else BraveZealot::Agent::Search.new(self,t)
                       end
                     end

@@ -99,7 +99,7 @@ module BraveZealot
 
     #give the heuristic function of the chunk passed in (ie straight line distance to the goal node)
     def heuristic(c)
-      c.center.vector_to(goal.center).length #* c.penalty #how awesome is that function?
+      c.center.vector_to(goal.center).length * c.penalty #how awesome is that function?
     end
   end
 
@@ -216,6 +216,21 @@ module BraveZealot
 
     def cost
       g + h
+    end
+
+    def actual_cost
+      list = predecessors + [self]
+      last = nil
+      cost = 0.0
+      list.each do |n|
+        if last.nil? then
+          last = n
+        else
+          cost += last.center.vector_to(n.center).length
+          last = n
+        end
+      end
+      cost
     end
 
     def predecessors=(p)

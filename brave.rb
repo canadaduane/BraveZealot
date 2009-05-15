@@ -8,7 +8,9 @@ $options = OpenStruct.new(
   :port    => 6000,
   :brain   => 'smart',
   :refresh => 0.05,
-  :algorithm => 'df') #algorithms = bf -> breadth first | df -> depth first | id -> iterative deepening | gbf -> greedy best first | a*
+  :algorithm => 'df',#algorithms = bf -> breadth first | df -> depth first | id -> iterative deepening | gbf -> greedy best first | a*
+  :gnuplot_file => 'search.gpi', 
+  :debug => false) 
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -34,6 +36,14 @@ opts = OptionParser.new do |opts|
 
   opts.on("-a", "--algorithm [VALUE]", "Search algorithm to use (only applies when using -b search") do |r|
     $options.algorithm = r
+  end
+
+  opts.on("-g", "--gnuplot [VALUE]", "Where should we export the gnuplot file?") do |r|
+    $options.gnuplot_file = r
+  end
+
+  opts.on("-d", "--debug", "Do you want to see the detailed gnuplot?") do |r|
+    $options.debug = true
   end
 end
 
