@@ -1,4 +1,4 @@
-bzrequire 'lib/algorithms/heap'
+bzrequire 'lib/collection/containers/heap'
 
 =begin rdoc
     A Priority Queue is a data structure that behaves like a queue except that elements have an

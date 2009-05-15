@@ -1,65 +1,8 @@
 bzrequire 'lib/agent/basic'
-bzrequire 'lib/algorithms/heap'
-bzrequire 'lib/algorithms/priority_queue'
+bzrequire 'lib/collection/stack'
+bzrequire 'lib/collection/queue'
+bzrequire 'lib/collection/priority_queue'
 require 'set'
-
-class Collection
-  def initialize(elems = [])
-    @data = elems
-  end
-  def insert_all(elems)
-    elems.each{ |e| insert(e) }
-  end
-  def empty?
-    @data.empty?
-  end
-  def each(&block)
-    @data.each(&block)
-  end
-end
-
-class Stack < Collection
-  def insert(e)
-    @data.push(e)
-  end
-  def remove
-    @data.pop
-  end
-end
-
-#class Queue < Collection
-#  def insert(e)
-#    @data << e
-#  end
-#  def remove
-#    @data.shift
-#  end
-#end
-
-class PriorityQueue < Collection
-  def initialize
-    @pq = Containers::PriorityQueue.new()
-  end
-
-  def insert(e)
-    #we can just make sure that each Chunk can return a priority for us
-    #we negate the priority so that we get a priority that returns the 'smallest' priority
-    #first instead of the 'biggest' priority first
-    @pq.push(e, -1*e.priority)
-  end
-
-  def remove
-    @pq.pop
-  end
-
-  def size
-    @pq.size
-  end
-
-  def empty?
-    @pq.empty?
-  end
-end
 
 module BraveZealot
   module Agent
@@ -69,7 +12,7 @@ module BraveZealot
     class UninformedSearch < Search
       def start
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
-        fringe = Stack.new
+        fringe = Collection::Stack.new
         search(init, fringe)
       end
       
@@ -81,6 +24,7 @@ module BraveZealot
         loop do
           return false if fringe.empty?
           node = fringe.remove
+          log(node)
           return node if goal?(node)
           if !closed.include?(node)
             closed.add(node)
@@ -97,7 +41,7 @@ module BraveZealot
     class InformedSearch < Basic
       def start
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
-        fringe = PriorityQueue.new
+        fringe = Collection::PriorityQueue.new
         @n = search(init, fringe)
         
         f = File.new($options.gnuplot_file,'w')
