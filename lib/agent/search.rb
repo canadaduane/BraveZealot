@@ -64,6 +64,52 @@ end
 module BraveZealot
   module Agent
     class Search < Basic
+      def to_gnuplot
+        str = @hq.map.to_gnuplot
+        last = nil
+        s = @n
+        if $options.debug then
+          get_log.each do |n|
+            if !last.nil?  then
+              str += "set arrow from #{last.center.x}, #{last.center.y} to #{n.center.x}, #{n.center.y} nohead lt 5\n"
+              str += "plot '-' with lines\n"
+              str += " 0 0 0 0\n"
+              str += "e\n"
+              str += "pause 0.005000\n"
+            end
+            last = n
+          end
+        end
+        #puts "Found solution with path #{s.predecessors.map{|n| n.to_coord.inspect }}->#{s.to_coord.inspect}"
+        puts "Flag at #{@hq.map.goal.to_coord.inspect} -> Our solutions is #{s.to_coord.inspect} (#{s.actual_cost})"
+        last = nil
+        list = s.predecessors
+        s.predecessors.each do |n|
+          if !last.nil?  then
+            str += "set arrow from #{last.center.x}, #{last.center.y} to #{n.center.x}, #{n.center.y} nohead lt 1\n"
+            str += "plot '-' with lines\n"
+            str += " 0 0 0 0\n"
+            str += "e\n"
+            str += "pause 0.005000\n"
+          end
+          last = n
+        end
+        str += "set arrow from #{last.center.x}, #{last.center.y} to #{s.center.x}, #{s.center.y} nohead lt 1\n"
+        str += "plot '-' with lines\n"
+        str += " 0 0 0 0\n"
+        str += "e\n"
+        str += "pause 0.005000\n"
+        str
+      end
+
+      def log(n)
+        @log ||= []
+        @log << n
+      end
+
+      def get_log
+        @log ||= []
+      end
     end
     
     class UninformedSearch < Search
@@ -94,7 +140,7 @@ module BraveZealot
       end
     end
 
-    class InformedSearch < Basic
+    class InformedSearch < Search
       def start
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
         fringe = PriorityQueue.new
@@ -126,53 +172,6 @@ module BraveZealot
             end
           end
         end
-      end
-      def log(n)
-        #puts "Looking at node [#{n.x},#{n.y}] -> (#{n.g} + #{n.h} = #{n.cost})";
-        @log ||= []
-        @log << n
-      end
-
-      def get_log
-        @log ||= []
-      end
-
-      def to_gnuplot
-        str = @hq.map.to_gnuplot
-        last = nil
-        s = @n
-        if $options.debug then
-          get_log.each do |n|
-            if !last.nil?  then
-              str += "set arrow from #{last.center.x}, #{last.center.y} to #{n.center.x}, #{n.center.y} nohead lt 5\n"
-              str += "plot '-' with lines\n"
-              str += " 0 0 0 0\n"
-              str += "e\n"
-              str += "pause 0.005000\n"
-            end
-            last = n
-          end
-        end
-        puts# "Found solution with path #{s.predecessors.map{|n| n.to_coord.inspect }}->#{s.to_coord.inspect}"
-        puts "Flag at #{@hq.map.goal.to_coord.inspect} -> Our solutions is #{s.to_coord.inspect} (#{s.actual_cost})"
-        last = nil
-        list = s.predecessors
-        s.predecessors.each do |n|
-          if !last.nil?  then
-            str += "set arrow from #{last.center.x}, #{last.center.y} to #{n.center.x}, #{n.center.y} nohead lt 1\n"
-            str += "plot '-' with lines\n"
-            str += " 0 0 0 0\n"
-            str += "e\n"
-            str += "pause 0.005000\n"
-          end
-          last = n
-        end
-        str += "set arrow from #{last.center.x}, #{last.center.y} to #{s.center.x}, #{s.center.y} nohead lt 1\n"
-        str += "plot '-' with lines\n"
-        str += " 0 0 0 0\n"
-        str += "e\n"
-        str += "pause 0.005000\n"
-        str
       end
     end
 
