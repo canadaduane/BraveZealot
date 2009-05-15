@@ -8,7 +8,7 @@ bzrequire 'lib/agent/search'
 
 module BraveZealot
   class Headquarters < Communicator
-    attr_reader :map, :my_color, :my_base, :mytanks_time
+    attr_reader :map, :my_color, :my_base, :mytanks_time, :other_tanks
     
     class MissingData < Exception; end
     
@@ -16,6 +16,7 @@ module BraveZealot
       @agents = []                # Current BraveZealot::Agent objects
       @world_time = 0.0           # Last communicated world time
       @message_times = {}         # Last time we received a message (in Time.now units)
+      @other_tanks = []
       
       # Gather initial world data... which team are we?  how big is the map?
       constants do |r|
@@ -35,39 +36,41 @@ module BraveZealot
         refresh(:bases) do
           refresh(:obstacles) do
             refresh(:flags) do
-              # Initialize each of our tanks
-              mytanks do |r|
-                case $options.brain
-                when 'smart'
-                  #flag_file = File.new('flag.gpi', 'w')
-                  #flag_file.write(@map.to_gnuplot(create_flag_goal))
-                  #flag_file.close
-                  # 
-                  # base_file = File.new('base.gpi','w')
-                  # base_file.write(@map.to_gnuplot(create_home_base_goal))
-                  # base_file.close
-                when 'search'
-                  #search_file = File.new('search.gpi','w')
-                  #search_file.write(@map.to_gnuplot)
-                  #search_file.close
-                  #puts "Done building search.gpi!"
-                  #puts "flag is at #{@map.goal.to_coord.inspect}"
-                end
+              refresh(:othertanks) do
+                # Initialize each of our tanks
+                mytanks do |r|
+                  case $options.brain
+                  when 'smart'
+                    #flag_file = File.new('flag.gpi', 'w')
+                    #flag_file.write(@map.to_gnuplot(create_flag_goal))
+                    #flag_file.close
+                    # 
+                    # base_file = File.new('base.gpi','w')
+                    # base_file.write(@map.to_gnuplot(create_home_base_goal))
+                    # base_file.close
+                  when 'search'
+                    #search_file = File.new('search.gpi','w')
+                    #search_file.write(@map.to_gnuplot)
+                    #search_file.close
+                    #puts "Done building search.gpi!"
+                    #puts "flag is at #{@map.goal.to_coord.inspect}"
+                  end
 
-                r.mytanks.each do |t|
-                  agent =
-                    case $options.brain
-                    when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
-                    when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
-                    when 'search' then
-                      case $options.algorithm
-                      when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
-                      when 'gbf' then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
-                      else BraveZealot::Agent::Search.new(self,t)
+                  r.mytanks.each do |t|
+                    agent =
+                      case $options.brain
+                      when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
+                      when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
+                      when 'search' then
+                        case $options.algorithm
+                        when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
+                        when 'gbf' then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
+                        else BraveZealot::Agent::Search.new(self,t)
+                        end
                       end
-                    end
-                  agent.mode = :locate_flag
-                  @agents[t.index] = agent
+                    agent.mode = :locate_flag
+                    @agents[t.index] = agent
+                  end
                 end
               end
             end
@@ -188,6 +191,14 @@ module BraveZealot
     
     def on_obstacles(r)
       @map.obstacles = r.obstacles
+    end
+
+    def on_othertanks(r)
+      r.othertanks.each do |ot|
+        puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{@map.chunk_at_point(ot.x,ot.y).to_coord.inspect} which will be penalized"
+        @map.chunk_at_point(ot.x,ot.y).penalty=2.0
+      end
+      other_tanks = r.othertanks
     end
   end
 end

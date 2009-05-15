@@ -100,7 +100,11 @@ module BraveZealot
 
     #give the heuristic function of the chunk passed in (ie straight line distance to the goal node)
     def heuristic(c)
-      c.center.vector_to(goal.center).length * c.penalty #how awesome is that function?
+      if $options.penalty_mode then
+        c.center.vector_to(goal.center).length * c.penalty #how awesome is that function?
+      else 
+        c.center.vector_to(goal.center).length
+      end
     end
   end
 
@@ -161,6 +165,10 @@ module BraveZealot
       @penalty
     end
 
+    def penalty=(p)
+      @penalty = p
+    end
+
     def to_gnuplot
       str = ""
       tl = @corners[3]
@@ -171,11 +179,14 @@ module BraveZealot
       str += "set arrow from #{tl.x}, #{tl.y} to #{tr.x}, #{tr.y} nohead lt 7\n"
       str += "set arrow from #{tr.x}, #{tr.y} to #{br.x}, #{br.y} nohead lt 7\n"
 
-      #if blocked? then
-      #  str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
-      #elsif penalty > 1 then
-      #  str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
-      #end
+      if $options.debug then
+        #if blocked? then
+        #  str += "set arrow from #{tl.x}, #{tl.y} to #{br.x}, #{br.y} nohead lt 1\n"
+        #end
+        if penalty > 1.6 then
+          str += "set arrow from #{bl.x}, #{bl.y} to #{tr.x}, #{tr.y} nohead lt 8\n"
+        end
+      end
       str
     end
     

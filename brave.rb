@@ -10,7 +10,8 @@ $options = OpenStruct.new(
   :refresh => 0.05,
   :algorithm => 'df',#algorithms = bf -> breadth first | df -> depth first | id -> iterative deepening | gbf -> greedy best first | a*
   :gnuplot_file => 'search.gpi', 
-  :debug => false) 
+  :debug => false,
+  :penalty_mode => false) 
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -44,6 +45,10 @@ opts = OptionParser.new do |opts|
 
   opts.on("-d", "--debug", "Do you want to see the detailed gnuplot?") do |r|
     $options.debug = true
+  end
+
+  opts.on("-p", "--penalty", "Do you want to run in penalized mode?") do |r|
+    $options.penalty_mode = true
   end
 end
 
