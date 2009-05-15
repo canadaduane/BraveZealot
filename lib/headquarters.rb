@@ -61,8 +61,10 @@ module BraveZealot
                     when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
                     when 'search' then
                       case $options.algorithm
-                      when 'a*' then BraveZealot::Agent::InformedSearch.new(self, t)
-                      when 'gbf' then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
+                      when 'a*'   then BraveZealot::Agent::InformedSearch.new(self, t)
+                      when 'gbf'  then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
+                      when 'df'   then BraveZealot::Agent::DepthFirstSearch.new(self,t)
+                      when 'bf'   then BraveZealot::Agent::BreadthFirstSearch.new(self,t)
                       else BraveZealot::Agent::Search.new(self,t)
                       end
                     end
