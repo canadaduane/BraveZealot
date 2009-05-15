@@ -1,7 +1,7 @@
 bzrequire 'lib/map'
 module BraveZealot
   class MapDiscrete < Map
-    CHUNK_SIZE = 40
+    CHUNK_SIZE = 20
     attr_accessor :hq
     def initialize(size, hq)
       @size = size.to_i
@@ -103,7 +103,11 @@ module BraveZealot
       if $options.penalty_mode then
         c.center.vector_to(goal.center).length * c.penalty #how awesome is that function?
       else 
-        c.center.vector_to(goal.center).length
+        case $options.heuristic
+        when 'arc' then c.center.vector_to(goal.center).length*Math::PI
+        when 'poly' then ((c.center.vector_to(goal.center).length**2) + 183)
+        else c.center.vector_to(goal.center).length
+        end
       end
     end
   end

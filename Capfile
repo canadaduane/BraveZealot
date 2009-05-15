@@ -70,3 +70,9 @@ task :stop_robot, :hosts => "#{machine}.cs.byu.edu" do
   puts "Stopping bzrobots server/client"
   run "ps auxww|grep bzrobots|grep -v grep|awk '{print $2}'|xargs kill; true"
 end
+
+#/users/ta/cs470s/bzflag/src/bzfs/bzfs -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 -world rotated.bzw &
+#
+#/users/ta/cs470s/bzflag/src/bzrobots/bzrobots -team green -solo 1 -p 3000 nerds@localhost &
+#/users/ta/cs470s/bzflag/src/bzrobots/bzrobots -team red -solo 1 -p 3001 jocks@localhost &
+#
