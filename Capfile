@@ -7,9 +7,9 @@
 set :callsign, "brave"
 set :team, "green"
 set :players, "1"
-set :machine, "virus"
+set :machine, "protozoa"
 set :bzfs_port, "5154"
-set :bzport, "6002"
+set :bzport, "3000"
 set :world, nil
 
 

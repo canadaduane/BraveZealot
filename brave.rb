@@ -47,7 +47,7 @@ opts = OptionParser.new do |opts|
     $options.debug = true
   end
 
-  opts.on("-p", "--penalty", "Do you want to run in penalized mode?") do |r|
+  opts.on("-y", "--penalty", "Do you want to run in penalized mode?") do |r|
     $options.penalty_mode = true
   end
 end

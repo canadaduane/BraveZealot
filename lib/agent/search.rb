@@ -24,8 +24,8 @@ module BraveZealot
           end
         end
         #puts "Found solution with path #{s.predecessors.map{|n| n.to_coord.inspect }}->#{s.to_coord.inspect}"
-        puts "Flag at #{@hq.map.goal.to_coord.inspect} -> Our solutions is #{s.to_coord.inspect} (#{s.actual_cost})"
-        last = nil
+        puts "Flag at #{@hq.map.goal.to_coord.inspect} -> Our solution is #{s.to_coord.inspect} (#{s.actual_cost} -> #{s.predecessors.size + 1}) Nodes popped: #{get_log.size}"
+        last = s
         list = s.predecessors
         s.predecessors.each do |n|
           if !last.nil?  then
@@ -37,11 +37,11 @@ module BraveZealot
           end
           last = n
         end
-        str += "set arrow from #{last.center.x}, #{last.center.y} to #{s.center.x}, #{s.center.y} nohead lt 1\n"
-        str += "plot '-' with lines\n"
-        str += " 0 0 0 0\n"
-        str += "e\n"
-        str += "pause 0.005000\n"
+        # str += "set arrow from #{last.center.x}, #{last.center.y} to #{s.center.x}, #{s.center.y} nohead lt 1\n"
+        # str += "plot '-' with lines\n"
+        # str += " 0 0 0 0\n"
+        # str += "e\n"
+        # str += "pause 0.005000\n"
         str
       end
       
@@ -67,15 +67,16 @@ module BraveZealot
       
       protected
       
-      def search(init, fringe)
+      def search(init, fringe, limit = 0)
+        limited = false
         closed = Set.new
         fringe = fringe.insert(init)
         loop do
-          puts closed.size
-          puts
+          # puts closed.size
+          # puts
           if fringe.empty?
-            puts "Done search: no goal"
-            return false
+            puts "Done search: #{limit}"
+            return (limited ? :limited : false)
           end
           node = fringe.remove
           log(node)
@@ -86,12 +87,16 @@ module BraveZealot
           end
           if !closed.include?(node)
             closed.add(node)
-            node.succ.each do |n|
-              n2 = n.clone
-              n2.predecessors = ( node.predecessors.clone ) << node
-              fringe.insert(n2)
+            size = node.predecessors.size
+            if size < limit
+              node.succ.each do |n|
+                n2 = n.clone
+                n2.predecessors = ( node.predecessors.clone ) << node
+                fringe.insert(n2)
+              end
+            else
+              limited = true
             end
-            
             # fringe.insert_all(node.succ)
           end
         end
@@ -105,6 +110,44 @@ module BraveZealot
         search(init, fringe)
         save_gnuplot
       end
+    end
+
+    class DepthLimitedSearch < UninformedSearch
+      def start
+        init = @hq.map.chunk_at_point(@tank.x, @tank.y)
+        iter_search(init)
+        save_gnuplot
+      end
+      
+      def iter_search(init)
+        i = 1
+        while (search([init], i)) == :limited
+          puts "Iter depth: #{i}"
+          i += 1
+        end
+      end
+
+      def search(list, limit)
+        (return :limited) if list.size > limit
+        me = list.first
+        return me if me.goal?
+        puts "I am chunk #{me.x}, #{me.y}"
+        log(me)
+        result = false
+        me.succ.each do |s|
+          unless list.include?(s)
+            puts ("  " * (list.size - 1)) + "successor #{s.x}, #{s.y}"
+            s.predecessors = list.clone
+            result = search([s] + list, limit)
+            # p result.class
+            # If it's a goal node, return right away
+            return (@n = result) if result.is_a?(Chunk)
+          end
+        end
+        # The last result will either be 'false' or :limited, and we should return it in either case
+        return result
+      end
+      
     end
 
     class BreadthFirstSearch < UninformedSearch

@@ -1,7 +1,7 @@
 bzrequire 'lib/map'
 module BraveZealot
   class MapDiscrete < Map
-    CHUNK_SIZE = 20
+    CHUNK_SIZE = 40
     attr_accessor :hq
     def initialize(size, hq)
       @size = size.to_i
