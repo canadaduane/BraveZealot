@@ -1,0 +1,130 @@
+#!/usr/bin/env ruby
+
+$min_x = -2.0; $max_x = 89.0
+$min_y = -1.0; $max_y = 60.0
+
+# $grow_y = 8.7 * (($max_x - $min_x)/($max_y - $min_y))
+# $grow_x = 8.7
+$grow_y = 20 * (($max_x - $min_x)/($max_y - $min_y))
+$grow_x = 20
+$thick = 1.0
+$high = 20.0
+$smudge_len = 1.2
+
+class Numeric
+  def to_deg
+    (self.to_f / 3.14159) * 180
+  end
+end
+
+class Rect
+  attr_accessor :x, :y, :w, :h
+  def initialize(x, y, w, h)
+    @x, @y, @w, @h = x.to_f, y.to_f, w.to_f, h.to_f
+  end
+  
+  def left()   @x - (@w/2) end
+  def right()  @x + (@w/2) end
+  def top()    @y - (@h/2) end
+  def bottom() @y + (@h/2) end
+  
+  def inside?(x, y)
+    x >= left &&
+    x <= right &&
+    y >= top &&
+    y <= bottom
+  end
+end
+
+class Circle
+  attr_accessor :x, :y, :radius
+  def initialize(x, y, r)
+    @x, @y, @radius = x.to_f, y.to_f, r.to_f
+  end
+  
+  def inside?(x, y)
+    Math.sqrt((x - @x) ** 2 + (y - @y) ** 2) < @radius
+  end
+end
+
+def normalize(x1, y1, x2, y2)
+  x1 -= ($max_x + $min_x) / 2.0; y1 -= ($max_y + $min_y) / 2.0
+  x2 -= ($max_x + $min_x) / 2.0; y2 -= ($max_y + $min_y) / 2.0
+  x1 *= $grow_x; y1 *= $grow_y
+  x2 *= $grow_x; y2 *= $grow_y
+  return [x1, y1, x2, y2]
+end
+
+def box(x1, y1, x2, y2)
+  dx, dy = (x2 - x1).to_f, (y2 - y1).to_f
+  length = Math.sqrt(dx ** 2 + dy ** 2) + $smudge_len
+  a = 360 - Math.atan2(dx, dy).to_deg
+  x, y, z = (x1 + x2) / 2.0, (y1 + y2) / 2.0, 0.0
+  w, d, h = $thick, length / 2.0, $high
+  
+  format = Proc.new do |v, *args|
+    f = args.first || 2
+    "%.#{f}f" % v
+  end
+  
+  puts "box"
+  puts "  position #{format[x]} #{format[y]} #{format[z]}"
+  puts "  size #{format[w]} #{format[d]} #{format[h]}"
+  puts "  rotation #{format[a]}"
+  puts "end\n\n"
+end
+
+def base(x, y, color = 0, w = 15, h = 15)
+  puts "base"
+  puts "  position #{x} #{y} 0"
+  puts "  rotation 0"
+  puts "  size #{w} #{h} 0"
+  puts "  color #{color}"
+  puts "end\n\n"
+end
+
+
+min_x, max_x = nil, nil
+min_y, max_y = nil, nil
+
+circle = Circle.new(0, 0, 120.0)
+outer = Rect.new(0, 0, 800, 800)
+# outer = Circle.new(0, 0, 450.0)
+
+puts "# Map by Duane Johnson"
+puts "# #{Time.now.strftime "%b %d, %Y"}"
+
+f = IO.read(ARGV[0])
+f.lines.each_with_index do |l, i|
+  # puts "# #{i}: #{l}"
+  m = l.scan(/^\s*([\-\d]+)\s+([\-\d]+)\s+m\s+([\-\d]+)\s+([\-\d]+)\s+l\s*$/).flatten
+  if (m.size == 4)
+    # Get actual coords and report the range at the end
+    x1, y1, x2, y2 = m.map{ |v| v.to_f }
+    min_x = x1 if min_x.nil? or min_x > x1
+    min_x = x2 if min_x.nil? or min_x > x2
+    max_x = x1 if max_x.nil? or max_x < x1
+    max_x = x2 if max_x.nil? or max_x < x2
+    min_y = y1 if min_y.nil? or min_y > y1
+    min_y = y2 if min_y.nil? or min_y > y2
+    max_y = y1 if max_y.nil? or max_y < y1
+    max_y = y2 if max_y.nil? or max_y < y2
+    
+    # Now get normalized coords with which to plot our boxes
+    x1, y1, x2, y2 = normalize(x1, y1, x2, y2)
+    if (outer.inside?(x1, y1) or outer.inside?(x2, y2)) and
+       (!circle.inside?(x1, y1) and !circle.inside?(x2, y2))
+      box(x1, y1, x2, y2)
+    end
+  end
+end
+
+pull = 25.0
+base(0, 0, 1)
+base(outer.left + pull, outer.top + pull, 2)
+base(outer.right - pull, outer.bottom - pull, 3)
+base(outer.right - pull, outer.top + pull, 4)
+# base(outer.left + pull, outer.bottom - pull, 5)
+
+puts "# x range: #{min_x} to #{max_x}"
+puts "# y range: #{min_y} to #{max_y}"

@@ -1,0 +1,1946 @@
+# Map by Duane Johnson
+# May 16, 2009
+box
+  position -360.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -180.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 60.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 180.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 360.00 -387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -390.00 -372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -300.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -270.00 -372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -150.00 -372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -120.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 -343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 0.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 30.00 -343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 60.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 180.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 180.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 240.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 270.00 -343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 -358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 -372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 -328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -270.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -210.00 -283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -180.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -150.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -90.00 -283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -60.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -30.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 0.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 60.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 180.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 330.00 -313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 -298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 360.00 -268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 -253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -180.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -150.00 -253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -120.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 -223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -60.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -30.00 -253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 0.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 60.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 90.00 -253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 150.00 -223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 180.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 -253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 270.00 -223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 -238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 360.00 -208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -300.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -270.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -210.00 -164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -180.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -150.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -90.00 -164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -60.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -30.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 0.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 0.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 30.00 -164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 60.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 180.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 270.00 -164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 -179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 -193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 -149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 -134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -300.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -240.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -210.00 -104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -180.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 -134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 150.00 -104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 180.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 -134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 300.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 -134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 -119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 360.00 -89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 -74.59 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 -44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -240.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -180.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 120.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 150.00 -44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 240.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 270.00 -44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 -59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 360.00 -29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 -44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 -14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 0.00 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -300.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -270.00 -14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 0.00 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -150.00 -14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 150.00 14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 210.00 -14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 300.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 330.00 -14.92 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 29.84 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -390.00 44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -330.00 74.59 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -270.00 44.75 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -120.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 120.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 150.00 74.59 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 300.00 89.51 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 360.00 59.67 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 390.00 74.59 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -390.00 104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -270.00 104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -210.00 134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -180.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -150.00 104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -90.00 134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 60.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 60.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 180.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 104.43 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 270.00 134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 360.00 119.34 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 360.00 149.18 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 390.00 134.26 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -270.00 164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -240.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -180.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -150.00 164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -120.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 0.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 0.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 30.00 193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 60.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 150.00 193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 210.00 164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 300.00 208.85 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 164.10 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 179.02 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 390.00 193.93 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -360.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -180.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -120.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 0.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 0.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 30.00 253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 90.00 223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 150.00 253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 210.00 223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 240.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 270.00 253.61 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 223.77 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 238.69 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 360.00 268.52 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -240.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -210.00 313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -180.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -180.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -120.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -60.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -30.00 283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 0.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 30.00 313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 60.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 60.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 120.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 120.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 180.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 270.00 313.28 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 300.00 328.20 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 330.00 283.44 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 298.36 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -360.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -330.00 372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -300.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -300.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -240.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -240.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -210.00 372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -150.00 343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -120.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -120.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position -90.00 372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position -60.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position -30.00 343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 0.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 60.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 90.00 343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 120.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 150.00 372.95 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 180.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 180.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 210.00 343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 240.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 300.00 387.87 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+box
+  position 300.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 213.83
+end
+
+box
+  position 330.00 343.11 0.00
+  size 1.00 20.60 20.00
+  rotation 270.00
+end
+
+box
+  position 360.00 358.03 0.00
+  size 1.00 18.56 20.00
+  rotation 326.16
+end
+
+base
+  position 0 0 0
+  rotation 0
+  size 15 15 0
+  color 1
+end
+
+base
+  position -375.0 -375.0 0
+  rotation 0
+  size 15 15 0
+  color 2
+end
+
+base
+  position 375.0 375.0 0
+  rotation 0
+  size 15 15 0
+  color 3
+end
+
+base
+  position 375.0 -375.0 0
+  rotation 0
+  size 15 15 0
+  color 4
+end
+
+# x range: -2.0 to 89.0
+# y range: -1.0 to 60.0
