@@ -7,7 +7,7 @@ bzrequire 'lib/indent'
 
 module BraveZealot
   class Map
-    attr_accessor :size, :bases, :obstacles, :flags
+    attr_accessor :size, :bases, :obstacles, :flags, :othertanks
     
     def initialize(size)
       raise ArgumentError, "World size cannot be nil or zero" if size.nil? or size == 0
@@ -15,6 +15,7 @@ module BraveZealot
       @bases = []
       @obstacles = []
       @flags = []
+      @othertanks = []
     end
     
     def to_gnuplot(pf)

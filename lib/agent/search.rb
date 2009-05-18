@@ -155,6 +155,44 @@ module BraveZealot
 
     class InformedSearch < Search
       def start
+        start_search
+        @nodes = get_log.last.predecessors
+        update_goal
+        EventMachine::PeriodicTimer.new($options.refresh) do
+          refresh($options.refresh) do
+            update_goal
+            move = @goal.suggest_move(@tank.x, @tank.y, angle)
+            #puts "Move: #{move.inspect}"
+            speed move.speed
+            angvel move.angvel
+          end
+        end
+      end
+
+      def update_goal
+        if @nodes.size >= 2 then
+          #if we still have at least 2 nodes on our list of nodes then we can interpret the list as:
+          #   -> First node is the most recently visited node
+          #   -> Second node is where we are headed
+          #   -> if we are within 10% of the total length of the vector then we consider the node visited and move on to the next node
+          v_desired = @nodes.first.center.vector_to(@nodes[1].center)
+          v_mine = @tank.to_coord.vector_to(@nodes[1].center)
+
+          
+          @goal = PfGroup.new
+          @goal.add_goal(@nodes[1].center.x, @nodes[1].center.y, @hq.map.size)
+
+          #puts "Heading towards #{@nodes[1].center.inspect}, distance=#{v_mine.length}/#{v_desired.length}"
+      
+          if v_mine.length <= (v_desired.length / 3) then
+            @nodes.shift
+          end
+        else
+          @goal = PfGroup.new
+        end
+      end
+
+      def start_search
         init = @hq.map.chunk_at_point(@tank.x, @tank.y)
         fringe = Collection::PriorityQueue.new
         search(init, fringe)
@@ -184,6 +222,13 @@ module BraveZealot
     end
 
     class GreedyInformedSearch < InformedSearch
+      def start_search
+        init = @hq.map.chunk_at_point(@tank.x, @tank.y)
+        fringe = Collection::PriorityQueue.new
+        search(init, fringe)
+        save_gnuplot
+      end
+    
       def search(init, fringe)
         closed = Set.new
         fringe.insert(init)
