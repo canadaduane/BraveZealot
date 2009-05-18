@@ -1922,14 +1922,14 @@ base
 end
 
 base
-  position -375.0 -375.0 0
+  position -345.0 -375.0 0
   rotation 0
   size 15 15 0
   color 2
 end
 
 base
-  position 375.0 375.0 0
+  position 345.0 375.0 0
   rotation 0
   size 15 15 0
   color 3
