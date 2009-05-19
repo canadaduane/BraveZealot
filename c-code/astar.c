@@ -17,6 +17,7 @@ typedef struct Chunk {
     double g; // distance so far
     double h; // heuristic disance to go
     double weight;
+    void* prev_chunk;
 } Chunk;
 
 bool chunk_less_than(const void *p1, const void *p2)
@@ -52,6 +53,22 @@ void show_int_queue(PriorityQueue* queue)
     printf("\n");
 }
 
+// A global reference to the Astar class
+VALUE Astar = Qnil;
+
+// The Astar#initialize method
+static VALUE astar_init(VALUE self, VALUE map, VALUE width) {
+    if (RARRAY_LEN(map) < NUM2INT(width))
+        rb_raise(rb_eArgError, "Map size must be greater than or equal to width");
+    if (RARRAY_LEN(map) % NUM2INT(width) != 0)
+        rb_raise(rb_eArgError, "Map size must be divisible by width");
+    
+    rb_iv_set(self, "@map", map);
+    rb_iv_set(self, "@width", width);
+    rb_iv_set(self, "@height", INT2NUM(RARRAY_LEN(map) / NUM2INT(width)));
+    return self;
+}
+
 static void explore(
     Chunk* cmap, int* closed, PriorityQueue* queue, Chunk* cval,
     int width, int height,
@@ -85,85 +102,15 @@ static void explore(
                 if( cval->g + gdist < nextval->g )
                 {
                     nextval->g = cval->g + gdist;
-
+                    nextval->prev_chunk = (void *)cval;
                     pq_insert(queue, (void *)(nextval));
 
-                    rb_warn("explore added x: %d, y: %d, g: %f, h: %f", sx, sy, nextval->g, hdist);
+                    // rb_warn("explore added x: %d, y: %d, g: %f, h: %f", sx, sy, nextval->g, hdist);
                     // rb_warn("explore added x: %d, y: %d, w: %f", sx, sy, nextval->weight);
                 }
             }
         }
     }
-}
-
-static int neighbor_value(Chunk* cmap, int width, int height, int x, int y)
-{
-    if( x >= 0 && x < width &&
-        y >= 0 && y < height )
-    {
-        return cmap[AT(x, y)].g;
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-// Returns the smallest neighbor to cval, or NULL if no neighbors
-static Chunk* smallest_neighbor(Chunk* cmap, Chunk* cval, int width, int height)
-{
-    Chunk* rval = NULL;
-    int g, min = INT_MAX;
-    
-    g = neighbor_value(cmap, width, height, cval->x - 1, cval->y - 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x - 1, cval->y - 1); }
-    
-    g = neighbor_value(cmap, width, height, cval->x - 1,  cval->y);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x - 1, cval->y); }
-    
-    g = neighbor_value(cmap, width, height, cval->x - 1, cval->y + 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x - 1, cval->y + 1); }
-    
-    g = neighbor_value(cmap, width, height, cval->x, cval->y - 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x, cval->y - 1); }
-    
-    g = neighbor_value(cmap, width, height, cval->x, cval->y + 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x, cval->y + 1); }
-    
-    g = neighbor_value(cmap, width, height, cval->y + 1, cval->y - 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x + 1, cval->y - 1); }
-    
-    g = neighbor_value(cmap, width, height, cval->y + 1,  cval->y);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x + 1, cval->y); }
-    
-    g = neighbor_value(cmap, width, height, cval->y + 1, cval->y + 1);
-    if( g >= 0 && g < min )
-    { min = g; rval = cmap + AT(cval->x + 1, cval->y + 1); }
-    
-    return rval;
-}
-
-// A global reference to the Astar class
-VALUE Astar = Qnil;
-
-// The Astar#initialize method
-static VALUE astar_init(VALUE self, VALUE map, VALUE width) {
-    if (RARRAY_LEN(map) < NUM2INT(width))
-        rb_raise(rb_eArgError, "Map size must be greater than or equal to width");
-    if (RARRAY_LEN(map) % NUM2INT(width) != 0)
-        rb_raise(rb_eArgError, "Map size must be divisible by width");
-    
-    rb_iv_set(self, "@map", map);
-    rb_iv_set(self, "@width", width);
-    rb_iv_set(self, "@height", INT2NUM(RARRAY_LEN(map) / NUM2INT(width)));
-    return self;
 }
 
 static VALUE astar_search(
@@ -205,42 +152,9 @@ static VALUE astar_search(
         cmap[i].g = FLT_MAX;
         cmap[i].h = 0;
         cmap[i].weight = (double)NUM2INT(map[i]) / 100.0;
+        cmap[i].prev_chunk = NULL;
         // rb_warn("init %d: x: %d, y: %d, weight: %f", i, cmap[i].x, cmap[i].y, cmap[i].weight);
     }
-    
-    // int integers[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    // 
-    // PriorityQueue* q = pq_new(QUEUE_MAX, icmp, dummy_free);
-    // pq_insert(q, (void*)(integers + 5));
-    // pq_insert(q, (void*)(integers + 1));
-    // pq_insert(q, (void*)(integers + 3));
-    // pq_insert(q, (void*)(integers + 2));
-    // 
-    // show_int_queue(q);
-    // int* top = pq_pop(q);
-    // printf("top: %d", *top);
-    // 
-    // pq_insert(q, (void*)(integers + 0));
-    // pq_insert(q, (void*)(integers + 9));
-    // pq_insert(q, (void*)(integers + 5));
-    // show_int_queue(q);
-    // 
-    // top = pq_pop(q);
-    // show_int_queue(q);
-    // 
-    // top = pq_pop(q);
-    // show_int_queue(q);
-    // 
-    // top = pq_pop(q);
-    // show_int_queue(q);
-    // 
-    // top = pq_pop(q);
-    // show_int_queue(q);
-    // 
-    // top = pq_pop(q);
-    // show_int_queue(q);
-    // 
-    // return self;
     
     // Create the PQ and initialize it with the starting chunk
     PriorityQueue* queue = pq_new(QUEUE_MAX, chunk_less_than, dummy_free);
@@ -253,11 +167,11 @@ static VALUE astar_search(
     // Actually do the search
     int coord;
     double distance = 0.0;
-    while(cval->x != end_x && cval->y != end_y)
+    while(cval->x != end_x || cval->y != end_y)
     {
-        show_chunk_queue(queue);
+        // show_chunk_queue(queue);
         cval = (Chunk*)pq_pop(queue);
-        rb_warn("cval | x: %d, y: %d, f: %f, g: %f, h: %f", cval->x, cval->y, (cval->g + cval->h), cval->g, cval->h);
+        // rb_warn("cval | x: %d, y: %d, f: %f, g: %f, h: %f", cval->x, cval->y, (cval->g + cval->h), cval->g, cval->h);
         // Add 8 neighbors if they are not in the closed list
         explore(cmap, closed, queue, cval, width, height, end_x, end_y, -1, -1);
         explore(cmap, closed, queue, cval, width, height, end_x, end_y, -1,  0);
@@ -272,18 +186,22 @@ static VALUE astar_search(
     
     // Start traceback from the goal
     cval = cmap + AT(end_x, end_y);
-    
-    // Find our way from the goal back to the start
     VALUE trace = rb_ary_new();
-    rb_ary_unshift(trace, rb_ary_new3(2, INT2NUM(cval->x), INT2NUM(cval->y)));
-    // rb_warn("traceback: x: %d, y: %d", cval->x, cval->y);
-    while(cval->x != start_x || cval->y != start_y)
+    
+    if( cval->prev_chunk != NULL )
     {
-        cval = smallest_neighbor(cmap, cval, width, height);
-        if( cval == NULL ) { rb_warn("null traceback"); break; }
+        // Find our way from the goal back to the start
         rb_ary_unshift(trace, rb_ary_new3(2, INT2NUM(cval->x), INT2NUM(cval->y)));
         // rb_warn("traceback: x: %d, y: %d", cval->x, cval->y);
+        while(cval->x != start_x || cval->y != start_y)
+        {
+            cval = (Chunk *)cval->prev_chunk;
+            if( cval == NULL ) { rb_warn("null traceback"); break; }
+            rb_ary_unshift(trace, rb_ary_new3(2, INT2NUM(cval->x), INT2NUM(cval->y)));
+            // rb_warn("traceback: x: %d, y: %d", cval->x, cval->y);
+        }
     }
+    
     
     free(cmap);
     pq_free(queue);
