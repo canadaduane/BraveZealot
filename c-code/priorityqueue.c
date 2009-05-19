@@ -4,18 +4,15 @@
 
 #define START_CAPA 127
 
-int icmp(const void *p1, const void *p2)
+bool icmp(const void *p1, const void *p2)
 {
     int i1 = *(int *) p1;
     int i2 = *(int *) p2;
-
-    if (i1 > i2) {
+    printf("icmp %d <=> %d\n", i1, i2);
+    if (i1 < i2)
         return 1;
-    }
-    else if (i1 < i2) {
-        return -1;
-    }
-    return 0;
+    else
+        return 0;
 }
 
 void dummy_free(void *p)

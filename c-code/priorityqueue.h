@@ -1,16 +1,9 @@
 #ifndef PRIORITYQUEUE_H
 #define PRIORITYQUEUE_H
 
-// #include "global.h"
-
 typedef unsigned int bool;
 typedef bool(*lt_ft) (const void *p1, const void *p2);
 typedef void (*free_ft)(void *key);
-
-// #define ALLOC(type) (type *)emalloc(sizeof(type))
-// #define ALLOC_N(type,n) (type *)emalloc(sizeof(type)*(n))
-// #define REALLOC_N(ptr, type, n)\
-//     (ptr)=(type *)erealloc((ptr),sizeof(type)*(n))
 
 /**
  * A PriorityQueue has a fixed size and contains a less_than function and a
@@ -26,7 +19,7 @@ typedef struct PriorityQueue
     free_ft free_elem_i;
 } PriorityQueue;
 
-int icmp(const void *p1, const void *p2);
+bool icmp(const void *p1, const void *p2);
 void dummy_free(void *p);
 
 /**
