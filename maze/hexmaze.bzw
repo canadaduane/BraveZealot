@@ -1,5 +1,14 @@
 # Map by Duane Johnson
-# May 16, 2009
+# May 18, 2009
+
+box
+  position 0 0 0
+  size 1.00 1.00 5.00
+  rotation 0.0
+end
+
+
+
 box
   position -360.00 -387.87 0.00
   size 1.00 18.56 20.00

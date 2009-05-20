@@ -67,6 +67,9 @@ require 'rubygems'
 require 'eventmachine'
 require(File.join(File.dirname(__FILE__), "bzrequire"))
 bzrequire 'lib/headquarters'
+bzrequire 'lib/astar/astar',
+  "You may need to compile the astar (A*) extension: \n" +
+  "$ cd lib/astar && ruby extconf.rb && make\n"
 
 EventMachine.run do
   EventMachine::connect(
