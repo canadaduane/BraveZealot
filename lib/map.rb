@@ -1,9 +1,9 @@
 bzrequire 'lib/obstacle.rb'
 bzrequire 'lib/indent'
-
+map.to_gnuplot{ "some more gnuplot code" }
 module BraveZealot
   class Map
-    attr_accessor :size, :bases, :obstacles, :flags, :othertanks
+    attr_accessor :size, :bases, :obstacles, :flags
     
     def initialize(size)
       raise ArgumentError, "World size cannot be nil or zero" if size.nil? or size == 0
@@ -39,7 +39,7 @@ module BraveZealot
     end
   end
   
-  class MapPotentialField
+  class MapPotentialField < Map
     def to_gnuplot
       super do
         str = "plot '-' with vectors head\n"
