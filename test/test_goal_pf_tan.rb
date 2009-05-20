@@ -1,7 +1,5 @@
-#include dependencies
-require 'test/unit'
-require 'shoulda'
-require_relative '../lib/goal_pf_tan.rb'
+require(File.join(File.dirname(__FILE__), "helper"))
+bzrequire 'lib/goal_pf_tan.rb'
 
 module BraveZealot
   class TestGoalPfTan < Test::Unit::TestCase

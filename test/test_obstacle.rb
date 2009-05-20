@@ -1,7 +1,6 @@
-#include dependencies
-require 'test/unit'
-require 'shoulda'
-require_relative '../lib/obstacle.rb'
+require(File.join(File.dirname(__FILE__), "helper"))
+bzrequire 'lib/obstacle'
+
 module BraveZealot
   class TestObstacle < Test::Unit::TestCase
     context "small centered target" do
