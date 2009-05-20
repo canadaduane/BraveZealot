@@ -1,12 +1,12 @@
 bzrequire 'lib/obstacle.rb'
 bzrequire 'lib/indent'
-map.to_gnuplot{ "some more gnuplot code" }
+
 module BraveZealot
   class Map
     attr_accessor :world_size, :bases, :obstacles, :flags
     
     def initialize(world_size)
-      raise ArgumentError, "World size cannot be nil or zero" if size.nil? or size == 0
+      raise ArgumentError, "World size cannot be nil or zero" if world_size.nil? or world_size == 0
       @world_size = world_size
       @bases      = []
       @obstacles  = []

@@ -4,15 +4,12 @@ require 'optparse'
 # Use reasonable defaults and parse shell args for specific options
 
 $options = OpenStruct.new(
-  :server  => '127.0.0.1',
-  :port    => 6000,
-  :brain   => 'smart',
-  :refresh => 0.05,
-  :algorithm => 'df',#algorithms = bf -> breadth first | df -> depth first | id -> iterative deepening | gbf -> greedy best first | a*
-  :gnuplot_file => 'search.gpi', 
-  :debug => false,
-  :penalty_mode => false,
-  :heuristic => 'straight' #straight | poly | arc
+  :server        => '127.0.0.1',
+  :port          => 6000,
+  :initial_state => ['dummy'] * 10,
+  :refresh       => 0.5,
+  :gnuplot_file  => 'search.gpi', 
+  :debug         => false
 ) 
 
 opts = OptionParser.new do |opts|
@@ -29,16 +26,12 @@ opts = OptionParser.new do |opts|
     $options.port = port.to_i
   end
 
-  opts.on("-b", "--brain [NAME]", "(e.g. 'dummy', 'smart')") do |brain|
-    $options.brain = brain
+  opts.on("-i", "--initial-state [LIST,OF,STATES]", "(e.g. 'dummy', 'smart')") do |i|
+    $options.initial_state = i.split(',').map{ |j| j.strip.to_sym } * 10 # repeat for default of up to 10 agents
   end
 
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
     $options.refresh = r.to_f
-  end
-
-  opts.on("-a", "--algorithm [VALUE]", "Search algorithm to use (only applies when using -b search") do |r|
-    $options.algorithm = r
   end
 
   opts.on("-g", "--gnuplot [VALUE]", "Where should we export the gnuplot file?") do |r|
@@ -47,14 +40,6 @@ opts = OptionParser.new do |opts|
 
   opts.on("-d", "--debug", "Do you want to see the detailed gnuplot?") do |r|
     $options.debug = true
-  end
-
-  opts.on("-y", "--penalty", "Do you want to run in penalized mode?") do |r|
-    $options.penalty_mode = true
-  end
-
-  opts.on("-h", "--heuristic [VALUE]", "Which heuristic do you want to use? straight | arc | poly") do |r|
-    $options.heuristic = r
   end
 end
 

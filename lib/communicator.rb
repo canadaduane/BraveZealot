@@ -16,6 +16,21 @@ module BraveZealot
     attr_reader :last_msg
     attr_reader :message_queue
     
+    COMMANDS = {
+      :shoot      => ["index"],
+      :speed      => ["index", "speed"],
+      :angvel     => ["index", "angvel"],
+      :accelx     => ["index", "accel"],
+      :accely     => ["index", "accel"],
+      :teams      => [],
+      :obstacles  => [],
+      :bases      => [],
+      :flags      => [],
+      :shots      => [],
+      :mytanks    => [],
+      :othertanks => [],
+      :constants  => [] }
+    
     # Contains the response for a given command.  The +value+
     # can be a boolean or any of the Structs defined above.
     class Response
@@ -85,20 +100,7 @@ module BraveZealot
       puts "communicator started (you should subclass this)"
     end
   
-    { :shoot      => ["index"],
-      :speed      => ["index", "speed"],
-      :angvel     => ["index", "angvel"],
-      :accelx     => ["index", "accel"],
-      :accely     => ["index", "accel"],
-      :teams      => [],
-      :obstacles  => [],
-      :bases      => [],
-      :flags      => [],
-      :shots      => [],
-      :mytanks    => [],
-      :othertanks => [],
-      :constants  => [] }.
-    each do |method, args|
+    COMMANDS.each do |method, args|
       # Create each of the above methods as verbs in our tank vocabularly.
       # Each method expects the arguments specified in the array above, and
       # an optional reaction block.
@@ -121,7 +123,7 @@ module BraveZealot
   
     protected
     def receive_line(line)
-      # puts "RECV: #{line}"
+      puts "RECV: #{line}" if $options.debug
       @last_msg = line
     
       case line
@@ -185,7 +187,7 @@ module BraveZealot
     end
   
     def say(text)
-      # puts "SEND: #{text}"
+      puts "SEND: #{text}" if $options.debug
       send_data(text.strip + "\n")
     end
   

@@ -1,10 +1,6 @@
 bzrequire 'lib/communicator'
-bzrequire 'lib/map'
 bzrequire 'lib/map_discrete'
-
-bzrequire 'lib/agent/dummy'
-bzrequire 'lib/agent/smart'
-bzrequire 'lib/agent/search'
+bzrequire 'lib/agent'
 
 module BraveZealot
   class Headquarters < Communicator
@@ -27,11 +23,7 @@ module BraveZealot
           when 'worldsize' then world_size = c.value.to_f
           end
         end
-        if ( $options.brain == 'search' ) 
-          @map = BraveZealot::MapDiscrete.new(world_size, self)
-        else
-          @map = BraveZealot::Map.new(world_size)
-        end
+        @map = BraveZealot::MapDiscrete.new(world_size)
         
         refresh(:bases) do
           refresh(:obstacles) do
@@ -39,38 +31,8 @@ module BraveZealot
               refresh(:othertanks) do
                 # Initialize each of our tanks
                 mytanks do |r|
-                  case $options.brain
-                  when 'smart'
-                    #flag_file = File.new('flag.gpi', 'w')
-                    #flag_file.write(@map.to_gnuplot(create_flag_goal))
-                    #flag_file.close
-                    # 
-                    # base_file = File.new('base.gpi','w')
-                    # base_file.write(@map.to_gnuplot(create_home_base_goal))
-                    # base_file.close
-                  when 'search'
-                    #search_file = File.new('search.gpi','w')
-                    #search_file.write(@map.to_gnuplot)
-                    #search_file.close
-                    #puts "Done building search.gpi!"
-                    #puts "flag is at #{@map.goal.to_coord.inspect}"
-                  end
                   r.mytanks.each do |t|
-                    agent =
-                      case $options.brain
-                      when 'dummy'  then BraveZealot::Agent::Dummy.new(self, t)
-                      when 'smart'  then BraveZealot::Agent::Smart.new(self, t)
-                      when 'search' then
-                        case $options.algorithm
-                        when 'a*'   then BraveZealot::Agent::InformedSearch.new(self, t)
-                        when 'gbf'  then BraveZealot::Agent::GreedyInformedSearch.new(self,t)
-                        when 'df'   then BraveZealot::Agent::DepthFirstSearch.new(self,t)
-                        when 'dl'   then BraveZealot::Agent::DepthLimitedSearch.new(self,t)
-                        when 'bf'   then BraveZealot::Agent::BreadthFirstSearch.new(self,t)
-                        else BraveZealot::Agent::Search.new(self,t)
-                        end
-                      end
-                    agent.mode = :locate_flag
+                    agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
                 end
@@ -80,30 +42,31 @@ module BraveZealot
         end
       end
       
-      if $options.brain == 'smart' then
-        EventMachine::PeriodicTimer.new(0.5) do
-          refresh(:flags, 0.2) do
-            if flag_possession?
-              @agents.each_with_index do |t, i|
-                if t.mode != :home
-                  puts "changing tank #{i} to goal :home"
-                  t.goal = create_home_base_goal
-                  t.mode = :home
-                end
+      mobilize
+    end
+    
+    def mobilize
+      EventMachine::PeriodicTimer.new(0.5) do
+        refresh(:flags, 0.2) do
+          if flag_possession?
+            @agents.each_with_index do |t, i|
+              if t.mode != :home
+                puts "changing tank #{i} to goal :home"
+                t.goal = create_home_base_goal
+                t.mode = :home
               end
-            else
-              @agents.each_with_index do |t, i|
-                if enemy_flag_exists?
-                  puts "changing tank #{i} to goal :capture_flag"
-                  t.goal = create_flag_goal
-                  t.mode = :capture_flag
-                end
+            end
+          else
+            @agents.each_with_index do |t, i|
+              if enemy_flag_exists?
+                puts "changing tank #{i} to goal :capture_flag"
+                t.goal = create_flag_goal
+                t.mode = :capture_flag
               end
             end
           end
         end
       end
-      
     end
     
     def enemy_flags
