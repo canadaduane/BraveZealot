@@ -5,28 +5,74 @@ module BraveZealot
   class MapDiscrete < Map
     attr_reader :map
     
-    def initialize(size, chunk_size = 2)
-      super(size)
-      @size, @chunk_size = size, chunk_size
-      @side_length = @size / @chunk_size
+    def initialize(world_size, granularity = 2)
+      super(world_size)
+      @world_size, @granularity = world_size, granularity
+      @side_length = (@world_size / @granularity).ceil
       @map = Array.new(@side_length ** 2, 0)
-      place_obstacles(@map)
       @astar = Astar.new(@map, @side_length)
     end
-  
-    def place_obstacles(map)
-      for y in 0..@side_length
-        for x in 0..@side_length
-          if @obstacles.any? { |o| o.contains_point(@center) }
-            map[y * @side_length + x] = -1
+    
+    def world_x_min
+      @world_x_min ||= - @world_size / 2
+    end
+    
+    def world_x_max
+      @world_x_max ||= @world_size / 2
+    end
+    
+    def world_y_min
+      @world_y_min ||= - @world_size / 2
+    end
+    
+    def world_y_max
+      @world_y_max ||= @world_size / 2
+    end
+    
+    # the coordinates generated from this put the item directly in the center of
+    # the grid as it would translate into world coordinates
+    # so grid 0,0 would translate to -390, 390 assuming each grid was 20 meters wide
+    def array_to_world_coordinates(col, row)
+      return (world_x_min + (@granularity / 2) + (col * @granularity)), 
+             (world_y_max - (@granularity / 2) - (row * @granularity))
+    end
+    
+    # returns column, row
+    def world_to_array_coordinates(x, y)
+      return ((x - world_x_min) / @granularity).to_i, 
+             ((world_y_max - y) / @granularity).to_i
+    end
+    
+    def coord_to_index(x, y)
+      y * @side_length + x
+    end
+    
+    def obstacles=(obstacles)
+      @obstacles = obstacles
+      for row in 0..@side_length
+        for col in 0..@side_length
+          coord = Coord.new(*array_to_world_coordinates(col, row))
+          if @obstacles.any? { |o| o.contains_point(coord) }
+            @map[coord_to_index(col, row)] = -1
           end
         end
       end
     end
+    
+    def search(start, goal)
+      @astar.search(start.x, start.y, goal.x, goal.y)
+    end
+    
+    def to_gnuplot
+      super do
+        # discrete stuff
+      end
+    end
+    
   end
   
   # class MapDiscrete < Map
-  #   CHUNK_SIZE = 20
+  #   granularity = 20
   #   attr_accessor :hq
   #   def initialize(size, hq)
   #     @size = size.to_i
@@ -36,7 +82,7 @@ module BraveZealot
   #     @hq = hq
   #     @hs = @size /2
   #     
-  #     @chunks_per_side = (@size / CHUNK_SIZE).ceil
+  #     @chunks_per_side = (@size / granularity).ceil
   #     (1..@chunks_per_side).each do |y|
   #       (1..@chunks_per_side).each do |x|
   #         #puts "pushing #{@chunks.size} at #{x-1},#{y-1}"
@@ -99,7 +145,7 @@ module BraveZealot
   #   
   #   # Return the chunk at x, y (measured in world units)
   #   def chunk_at_point(x, y)
-  #     chunk(((x + @hs)  / CHUNK_SIZE).to_i, ((y + @hs) / CHUNK_SIZE).to_i)
+  #     chunk(((x + @hs)  / granularity).to_i, ((y + @hs) / granularity).to_i)
   #   end
   #   
   #   def chunks_per_side
@@ -150,13 +196,13 @@ module BraveZealot
   # 
   #     #first we add the four corners
   #     @corners = []
-  #     @corners.push(Coord.new((x_chunk*MapDiscrete::CHUNK_SIZE) -hs, (y_chunk*MapDiscrete::CHUNK_SIZE) -hs)) #Lower Left
-  #     @corners.push(Coord.new(((x_chunk+1)*MapDiscrete::CHUNK_SIZE) -hs, (y_chunk*MapDiscrete::CHUNK_SIZE) -hs)) #Lower Right
-  #     @corners.push(Coord.new(((x_chunk+1)*MapDiscrete::CHUNK_SIZE) -hs, ((y_chunk+1)*MapDiscrete::CHUNK_SIZE) -hs)) #Upper Right
-  #     @corners.push(Coord.new((x_chunk*MapDiscrete::CHUNK_SIZE) -hs, ((y_chunk+1)*MapDiscrete::CHUNK_SIZE) -hs)) #Upper Left
+  #     @corners.push(Coord.new((x_chunk*MapDiscrete::granularity) -hs, (y_chunk*MapDiscrete::granularity) -hs)) #Lower Left
+  #     @corners.push(Coord.new(((x_chunk+1)*MapDiscrete::granularity) -hs, (y_chunk*MapDiscrete::granularity) -hs)) #Lower Right
+  #     @corners.push(Coord.new(((x_chunk+1)*MapDiscrete::granularity) -hs, ((y_chunk+1)*MapDiscrete::granularity) -hs)) #Upper Right
+  #     @corners.push(Coord.new((x_chunk*MapDiscrete::granularity) -hs, ((y_chunk+1)*MapDiscrete::granularity) -hs)) #Upper Left
   # 
   #     #next we determine the center of the chunk
-  #     @center = Coord.new((x_chunk*MapDiscrete::CHUNK_SIZE) + (MapDiscrete::CHUNK_SIZE/2) -hs, (y_chunk*MapDiscrete::CHUNK_SIZE) + (MapDiscrete::CHUNK_SIZE/2) -hs)
+  #     @center = Coord.new((x_chunk*MapDiscrete::granularity) + (MapDiscrete::granularity/2) -hs, (y_chunk*MapDiscrete::granularity) + (MapDiscrete::granularity/2) -hs)
   #   end
   # 
   #   def blocked?
