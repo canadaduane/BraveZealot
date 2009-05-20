@@ -1,0 +1,50 @@
+\documentclass[letterpaper,12pt]{report}
+%
+%--------------------   start of the 'preamble'
+%
+\usepackage{graphicx,amssymb,amstext,amsmath,url}
+%
+%%    homebrew commands -- to save typing
+\newcommand\etc{\textsl{etc}}
+\newcommand\eg{\textsl{eg.}\ }
+\newcommand\etal{\textsl{et al.}}
+\newcommand\Quote[1]{\lq\textsl{#1}\rq}
+\newcommand\fr[2]{{\textstyle\frac{#1}{#2}}}
+\newcommand\miktex{\textsl{MikTeX}}
+\newcommand\comp{\textsl{The Companion}}
+\newcommand\nss{\textsl{Not so Short}}
+%
+%---------------------   end of the 'preamble'
+%
+
+\begin{document}
+%-----------------------------------------------------------
+\title{Search Algorithms \\
+{\large \textbf{CS 470 Lab 2}}}
+\author{Michael Ries and Duane Johnson}
+\maketitle
+%-----------------------------------------------------------
+\begin{abstract}
+This lab explores 5 possible search algorithms to be used in obstacle avoidance and
+goal-finding for intelligent agents in BZFlag.  We analyze depth-first, breadth-first,
+iterative deepening, greedy best first, and $A^*$ search algorithms.  The problem of
+discretization is discussed.  A comparison of results with another group is also reported.
+\end{abstract}
+%-----------------------------------------------------------
+\tableofcontents
+%-----------------------------------------------------------
+\include{labcontext}
+\include{experiences}
+\include{details}
+%-----------------------------------------------------------
+% \addcontentsline{toc}{chapter}{\numberline{}Bibliography}
+%\include{biblio}
+%-----------------------------------------------------------
+\appendix
+\include{rubycode}
+%\include{app1}
+%\include{app2}
+%\include{app5}
+%\include{app3}
+%-----------------------------------------------------------
+\end{document}

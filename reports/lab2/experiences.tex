@@ -1,0 +1,33 @@
+\chapter{Experiences and Time Spent}\label{chap:exp}
+\section{Duane's Summary}
+Michael took the lead on this project by implementing the two most challenging search algorithms of those assigned---$A^*$ and \texttt{greedy best first}.  My portion was to implement \texttt{depth first}, \texttt{breadth first}, and \texttt{iterative deepening} search.  I also spent some time refactoring from our last week's work since many of the shortcuts we took before the deadline compromised the quality of the code.
+\par
+The \texttt{depth first} and \texttt{breadth first} algorithms were fairly straight-forward to implement---the most interesting part was the insight (from Russell and Norvig) that these two algorithms can both be implemented with the same code, but different queueing mechanisms.  With that insight, we chose to create a single search algorithm that would take a \texttt{queue} or \texttt{stack} object as a parameter.  \texttt{Breadth first} search corresponded with the \texttt{queue} object and \texttt{depth first} with the \texttt{stack}.
+\par
+Implementing the \texttt{iterative deepening} search was less straight-forward.  While on the surface it appears that a depth-limited search inside an iteratively deepening outer loop is sufficient to implement \texttt{iterative deepening}, it did not appear to be the case.  Instead, we needed each node to keep track of its predecessors and to consider those predecessors as the ``closed set'' during each inner iteration.  This is not the same as depth-limited search inside an outer loop because a depth-limited search will retain its ``closed set'' when in fact it should be forgetting certain paths that it has already tried (but again, it should not be revisiting nodes in its line of predecessors).
+\par
+I spent about 16 hours on this project, divided as follows:
+\begin{itemize}
+    \item 6 hours cleaning up and refactoring code from last week
+    \item 3 hours implementing the search code mentioned above
+    \item 2 hours debugging and passing off with another team in the CS Sports lab.
+    \item 5 hours writing this report and formatting it in \LaTeX
+\end{itemize}
+
+\section{Michael's Summary}
+This lab was intensely interesting.  On Tuesday night way before we started feeling the pressure I was up until 3:30 AM trying to get $A^*$ finalized just because I wanted to see the gnuplot file.  We ended up getting the gnuplot files working in general on Tuesday night and finished getting $A^*$ optimal on Wednesday.  The rest of the week we finished the other algorithms and got them cleaned up and tried to make them faster.  I focused on the discretization of the world and implementing the search algorithms that use heuristics ($A^*$ and \texttt{greedy best first}).
+\par
+While I was working on the discretization of the map I had the chance to try several different methods of discovering if the center of a chunk was inside of an obstacle.  This is an easy computation for squares, but somewhat more difficult for diamonds.  Also I wasn't able to find any guarantees in the documentation of our labs that we never have obstacles with less than 4 or more than 4 sides so the algorithm needed to work for any polygon.  I ended up finding a cool technique in which you draw vectors and take the cross-product of the vector representing a side of the obstacle and the vector between the corner of the obstacle and the point of interest.  This cross-product will have the same sign for all sides of a convex polygon if the point is inside the object.  If the point is outside the obstacle then the sign will change and you can quit checking.  This ended up being really fast because there was no trigonometric functions which are costly for processors to execute.
+\par
+The night I stayed up late working on $A^*$ I made a costly error of assuming that the problem was in the execution of the algorithm.  This meant that I spent hours of time looking at the algorithm trying to figure out what was wrong before I realized that the problem was my bookkeeping.  The fringe list was stored with references to each chunk on the map so when I re-encountered that same node its path-cost and heuristic were updated and changed which affected when it would be popped off.  Once I found the problem the algorithm magically started to work!
+\par
+In the end I spent a total of about 20 hours split across the following tasks:
+\begin{itemize}
+    \item 4 hours of re-working code from last lab to try to make our ``smart'' agents notice when the position of the flag has changed.
+    \item 2 hours playing with algorithms to find if a point is inside an obstacle
+    \item 4 hours of discretizing the map
+    \item 3 hours implementing $A^*$
+    \item 1 hour implementing \texttt{greedy best first}
+    \item 2 hours finalizing and integrating code with Duane
+    \item 4 hours passing off and preparing report material
+\end{itemize}
