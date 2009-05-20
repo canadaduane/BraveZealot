@@ -3,22 +3,24 @@ bzrequire 'lib/astar/astar'
 
 module BraveZealot
   class MapDiscrete < Map
+    attr_reader :map
+    
     def initialize(size, chunk_size = 2)
-      super
+      super(size)
       @size, @chunk_size = size, chunk_size
       @side_length = @size / @chunk_size
       @map = Array.new(@side_length ** 2, 0)
       place_obstacles(@map)
-      p @map
-      @astar = Astar.new(@map, side_length)
+      @astar = Astar.new(@map, @side_length)
     end
-  end
   
-  def place_obstacles(map)
-    for y in 0..@side_length
-      for x in 0..@side_length
-        if @obstacles.any? { |o| o.contains_point(@center) }
-          map[y * @side_length + x] = -1
+    def place_obstacles(map)
+      for y in 0..@side_length
+        for x in 0..@side_length
+          if @obstacles.any? { |o| o.contains_point(@center) }
+            map[y * @side_length + x] = -1
+          end
+        end
       end
     end
   end

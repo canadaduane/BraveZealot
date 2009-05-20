@@ -1,11 +1,11 @@
 require(File.join(File.dirname(__FILE__), "helper"))
-bzrequire 'lib/goal_pf_tan.rb'
+bzrequire 'lib/pf_tan.rb'
 
 module BraveZealot
-  class TestGoalPfTan < Test::Unit::TestCase
+  class TestPfTan < Test::Unit::TestCase
     context "to the right of the goal" do
       setup do
-        @g = GoalPfTan.new(0,0,1,0)
+        @g = PfTan.new(0,0,1,0)
       end
       should "point up" do
         distance,angle = @g.suggestDistanceAngle(100,0)
@@ -15,7 +15,7 @@ module BraveZealot
     end
     context "to the left of the goal" do
       setup do
-        @g = GoalPfTan.new(0,0,1,0)
+        @g = PfTan.new(0,0,1,0)
       end
       should "point down" do
         distance,angle = @g.suggestDistanceAngle(-100,0)
@@ -25,7 +25,7 @@ module BraveZealot
     end
     context "above the goal" do
       setup do
-        @g = GoalPfTan.new(0,0,1,0)
+        @g = PfTan.new(0,0,1,0)
       end
       should "point left" do
         distance,angle = @g.suggestDistanceAngle(0,100)
@@ -35,7 +35,7 @@ module BraveZealot
     end
     context "below the goal" do
       setup do
-        @g = GoalPfTan.new(0,0,1,0)
+        @g = PfTan.new(0,0,1,0)
       end
       should "point right" do
         distance,angle = @g.suggestDistanceAngle(0,-100)

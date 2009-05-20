@@ -1,11 +1,11 @@
 require(File.join(File.dirname(__FILE__), "helper"))
-bzrequire 'lib/goal_pf.rb'
+bzrequire 'lib/pf.rb'
 
 module BraveZealot
-  class TestGoalPf < Test::Unit::TestCase
+  class TestPf < Test::Unit::TestCase
     context "on top of goal" do
       setup do
-        @g = GoalPf.new(0,0,1,0)
+        @g = Pf.new(0,0,1,0)
       end
       should "suggest a speed of 0" do
         m = @g.suggest_move(0,0,0)
@@ -25,7 +25,7 @@ module BraveZealot
 
     context "to the right of the goal facing up" do
       setup do
-        @g = GoalPf.new(0,0,1,0)
+        @g = Pf.new(0,0,1,0)
       end
       should "suggest a speed of .75" do
         m = @g.suggest_move(100,0,Math::PI/2)
