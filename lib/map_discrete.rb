@@ -7,26 +7,10 @@ module BraveZealot
     
     def initialize(world_size, granularity = 2)
       super(world_size)
-      @world_size, @granularity = world_size, granularity
+      @granularity = granularity
       @side_length = (@world_size / @granularity).ceil
       @map = Array.new(@side_length ** 2, 0)
       @astar = Astar.new(@map, @side_length)
-    end
-    
-    def world_x_min
-      @world_x_min ||= - @world_size / 2
-    end
-    
-    def world_x_max
-      @world_x_max ||= @world_size / 2
-    end
-    
-    def world_y_min
-      @world_y_min ||= - @world_size / 2
-    end
-    
-    def world_y_max
-      @world_y_max ||= @world_size / 2
     end
     
     # the coordinates generated from this put the item directly in the center of

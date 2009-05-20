@@ -3,18 +3,34 @@ bzrequire 'lib/indent'
 map.to_gnuplot{ "some more gnuplot code" }
 module BraveZealot
   class Map
-    attr_accessor :size, :bases, :obstacles, :flags
+    attr_accessor :world_size, :bases, :obstacles, :flags
     
-    def initialize(size)
+    def initialize(world_size)
       raise ArgumentError, "World size cannot be nil or zero" if size.nil? or size == 0
-      @size      = size
-      @bases     = []
-      @obstacles = []
-      @flags     = []
+      @world_size = world_size
+      @bases      = []
+      @obstacles  = []
+      @flags      = []
+    end
+    
+    def world_x_min
+      @world_x_min ||= -@world_size / 2
+    end
+    
+    def world_x_max
+      @world_x_max ||=  @world_size / 2
+    end
+    
+    def world_y_min
+      @world_y_min ||= -@world_size / 2
+    end
+    
+    def world_y_max
+      @world_y_max ||=  @world_size / 2
     end
     
     def obstacles_plot_string
-      hs = self.size / 2
+      hs = @world_size / 2
       str = unindent(<<-GNUPLOT)
         # Set up our map first:
         set xrange [-#{hs}: #{hs}]
@@ -32,7 +48,7 @@ module BraveZealot
     end
     
     def to_gnuplot
-      hs = self.size / 2
+      hs = @world_size / 2
       str = obstacles_plot_string
       str << yield if block_given?
       str << "e\n"
@@ -44,9 +60,9 @@ module BraveZealot
       super do
         str = "plot '-' with vectors head\n"
         41.times do |i|
-          x = ( (self.size / 40)*i - hs )
+          x = ( (@world_size / 40)*i - hs )
           41.times do |j|
-            y = ( (self.size / 40)*j - hs )
+            y = ( (@world_size / 40)*j - hs )
             #puts "computing dx,dy for #{x},#{y}\n"
             dx,dy = pf.suggest_delta(x,y)
             str += "#{x} #{y} #{dx} #{dy}\n"
