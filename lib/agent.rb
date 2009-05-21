@@ -3,11 +3,11 @@ bzrequire 'lib/communicator'
 module BraveZealot
   module DummyStates
     # Shortcut state for :forward_until_hit
-    def state_dummy
+    def dummy
       @state = :dummy_forward
     end
     
-    def state_dummy_forward
+    def dummy_forward
       curr_speed = Math.sqrt(@tank.vx**2 + @tank.vy**2)
       # Check if we've hit something
       @state =
@@ -19,7 +19,7 @@ module BraveZealot
         end
     end
     
-    def state_dummy_random_turn
+    def dummy_random_turn
       angvel(rand < 0.5 ? -1.0 : 1.0) do
         sleep(2.0) do
           speed 1.0
@@ -29,26 +29,39 @@ module BraveZealot
       end
     end
     
-    def state_dummy_accel_once
+    def dummy_accel_once
       @state = :wait
       sleep(1.5) { @state = :dummy_forward }
     end
   end
   
   module SmartStates
-    def state_smart
+    def smart
       if @goal
+        puts "Tank at: #{@tank.inspect}, Goal at: #{@goal.inspect}"
         path = hq.map.search(@tank, @goal)
-        puts "Path: #{path.inspect}"
-        # move = @goal.suggest_move(@tank.x, @tank.y, angle)
-        # speed move.speed
-        # angvel move.angvel
+        if path.size > 10
+          field = PfGroup.new
+          n = hq.map.array_to_world_coordinates(path[10][0], path[10][1])
+          field.add_goal(n[0], n[1], 1)
+          # puts "Path: #{path.inspect}"
+        
+          move = field.suggest_move(@tank.x, @tank.y, @tank.angle)
+          speed move.speed
+          angvel move.angvel
+        else
+          puts "Path is short: #{path.inspect}"
+        end
       else
-        @state = :smart_return_home
+        @state = :smart_look_for_enemy_flag
       end
     end
     
-    def state_smart_return_home
+    def smart_look_for_enemy_flag
+      @state = :smart_return_home
+    end
+    
+    def smart_return_home
       @goal = hq.my_base.center
       @state = :smart
     end
@@ -78,12 +91,12 @@ module BraveZealot
     def start
       EventMachine::PeriodicTimer.new($options.refresh) do
         refresh($options.refresh) do
-          send("state_#{@state}")
+          send(@state)
         end
       end
     end
     
-    def state_wait
+    def wait
       # do nothing
     end
     

@@ -44,7 +44,9 @@ module BraveZealot
     end
     
     def search(start, goal)
-      @astar.search(start.x, start.y, goal.x, goal.y)
+      s = world_to_array_coordinates(start.x, start.y)
+      g = world_to_array_coordinates(goal.x, goal.y)
+      @astar.search(s[0], s[1], g[0], g[1])
     end
     
     def to_gnuplot

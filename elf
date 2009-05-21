@@ -241,5 +241,5 @@ when "team" then
   waitport($options.robot_port)
   puts "  bzrobots up."
   
-  shell "ruby ./brave.rb #{$options.debug ? "--debug" : ""} -s #{$options.server} -p #{$options.robot_port} -i #{$options.initial_state} >#{$options.callsign}.log"
+  shell "ruby ./brave.rb #{$options.debug ? "--debug" : ""} -s #{$options.server} -p #{$options.robot_port} -i #{$options.initial_state}" # >#{$options.callsign}.log
 end
