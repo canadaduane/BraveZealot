@@ -3,7 +3,7 @@ bzrequire 'lib/astar/astar'
 
 module BraveZealot
   class MapDiscrete < Map
-    attr_reader :map
+    attr_reader :map, :astar
     
     def initialize(world_size, granularity = 2)
       super(world_size)
@@ -74,6 +74,7 @@ module BraveZealot
         end
         str
       end
+      str += yield if block_given?
       str
     end
     

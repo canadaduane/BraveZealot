@@ -48,6 +48,11 @@ class AstarTest < Test::Unit::TestCase
     assert_equal [[0,0], [1,0], [2,1], [2,2], [3,3]], tb
   end
   
+  def test_no_solution
+    none = Astar.new([-1] * 16, 4)
+    assert_nil none.search(0,0, 3,3)
+  end
+  
   def test_random_large
     @arr = []
     1000000.times{ @arr << (rand*1000).to_int }

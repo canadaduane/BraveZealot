@@ -49,54 +49,32 @@ module BraveZealot
       @idx ||= 0
       if @goal
         puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        path = hq.map.search(@tank, @goal)
+        new_path = hq.map.search(@tank, @goal)
+        @path = new_path || @path
+        group = PfGroup.new
+        
         if path.size > 10
-          field = PfGroup.new
           n = hq.map.array_to_world_coordinates(path[10][0], path[10][1])
-          field.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
+          group.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
           
-          File.open("map#{@idx += 1}.gpi", "w") do |f|
-            data = hq.map.to_gnuplot do
-              puts "prep path: #{path.inspect}"
-              "\n\n# Path:\n" +
-              "plot '-' with vectors head\n" +
-              path.map{ |x, y| x, y = hq.map.array_to_world_coordinates(x, y); "#{x} #{y} #{2} #{2}" }.join("\n") + "\n"
-              # field.to_gnuplot_part(hq.map.world_size)
-            end
-            puts "Done prep"
-            f.write data
-          end
+          # File.open("map#{@idx += 1}.gpi", "w") do |f|
+          #   data = hq.map.to_gnuplot do
+          #     puts "prep path: #{path.inspect}"
+          #     "\n\n# Path:\n" +
+          #     "plot '-' with vectors head\n" +
+          #     path.map{ |x, y| x, y = hq.map.array_to_world_coordinates(x, y); "#{x} #{y} #{2} #{2}" }.join("\n") + "\n"
+          #     # group.to_gnuplot_part(hq.map.world_size)
+          #   end
+          #   puts "Done prep"
+          #   f.write data
+          # end
           # exit(-1)
-          
-          move = field.suggest_move(@tank.x, @tank.y, @tank.angle)
-          speed move.speed
-          angvel move.angvel
         else
-          puts "Path is short: #{path.inspect}"
-          p @tank
-          p @goal
-          puts "343, 15"
-          p hq.map.astar.map[15*400+343]
-          
-          x, y = hq.map.world_to_array_coordinates(@tank.x, @tank.y)
-          puts "#{@tank.x.to_i}, #{@tank.y.to_i}"
-          
-          print hq.map.astar.map[(y-1) * 400 + (x-1)].to_s + " "
-          print hq.map.astar.map[(y-1) * 400 + x].to_s + " "
-          puts  hq.map.astar.map[(y-1) * 400 + (x+1)].to_s
-          
-          print hq.map.astar.map[y * 400 + (x-1)].to_s + " "
-          print hq.map.astar.map[y * 400 + x].to_s + " "
-          puts  hq.map.astar.map[y * 400 + (x+1)].to_s
-          
-          print hq.map.astar.map[(y+1) * 400 + (x-1)].to_s + " "
-          print hq.map.astar.map[(y+1) * 400 + x].to_s + " "
-          puts  hq.map.astar.map[(y+1) * 400 + (x+1)].to_s
-
-          exit(1)
-          # hq.map.astar.map.each_slice(400){ |s| p s }
-          # debugger
+          group.add_goal(@goal.x, @goal.y, hq.map.world_size)
         end
+        move = group.suggest_move(@tank.x, @tank.y, @tank.angle)
+        speed move.speed
+        angvel move.angvel
       else
         @state = :smart_look_for_enemy_flag
       end

@@ -4,7 +4,7 @@
 #include <float.h>
 #include "priorityqueue.h"
 
-#define QUEUE_MAX INT_MAX
+#define QUEUE_MAX 100000
 #define AT(x, y) ((y)*width+(x))
 
 double unitdist[] = {1.4142135623731, 1.0000000000000, 1.4142135623731,
@@ -171,6 +171,14 @@ static VALUE astar_search(
     {
         // show_chunk_queue(queue);
         cval = (Chunk*)pq_pop(queue);
+        
+        // No solution if there are no chunks left
+        if( cval == NULL ) {
+            free(cmap);
+            pq_free(queue);
+            return Qnil;
+        }
+        
         // rb_warn("cval | x: %d, y: %d, f: %f, g: %f, h: %f", cval->x, cval->y, (cval->g + cval->h), cval->g, cval->h);
         // Add 8 neighbors if they are not in the closed list
         explore(cmap, closed, queue, cval, width, height, end_x, end_y, -1, -1);
