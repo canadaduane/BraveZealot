@@ -1,0 +1,191 @@
+# World built by jmac
+
+#!name base-0
+base
+position -360 0 0
+rotation 0
+size 20 20 0
+color 1
+end
+
+#!name base-1
+base
+position 380 0 0
+rotation 0
+size 20 20 0
+color 2
+end
+
+#!name base-2
+base
+position 380 -380 0
+rotation 0
+size 20 20 0
+color 3
+end
+
+#!name base-1
+base
+position 380 380 0
+rotation 0
+size 20 20 0
+color 4
+end
+
+# Central divider
+box #1
+position -40 230 0
+rotation 0
+size 20 170 20
+end
+
+box #2
+position -10 50 0
+rotation 45
+size 29 42 20
+end
+
+box #3
+position 20 0 0
+rotation 0
+size 20 40 20
+end
+
+box #4
+position -10 -50 0
+rotation -45
+size 29 42 20
+end
+
+box #5
+position -40 -150 0
+rotation 0
+size 20 90 20
+end
+
+box #6
+position -10 -250 0
+rotation 45
+size 29 42 20
+end
+
+box #7
+position -30 -380 0
+rotation 0
+size 30 20 20
+end
+
+# Inner maze
+box #8
+position -120 320 0
+rotation 0
+size 20 40 20
+end
+
+box #9
+position -200 340 0
+rotation 0
+size 80 20 20
+end
+
+box #10
+position -170 260 0
+rotation -45
+size 29 63 20
+end
+
+box #11
+position -240 280 0
+rotation 45
+size 29 86 20
+end
+
+box #12
+position -120 -60 0
+rotation 0
+size 20 230 20
+end
+
+box #13
+position -130 -290 0
+rotation 45
+size 29 120 20
+end
+
+box #14
+position -170 100 0
+rotation -45
+size 29 70 20
+end
+
+box #15
+position -180 55 0
+rotation 45
+size 29 115 20
+end
+
+box #16
+position -180 -65 0
+rotation -45
+size 29 115 20
+end
+
+box #17
+position -210 -250 0
+rotation -45
+size 29 128 20
+end
+
+box #18
+position -190 -340 0
+rotation 0
+size 90 20 20
+end
+
+box #19
+position -260 140 0
+rotation 0
+size 20 30 20
+end
+
+box #20
+position -240 -70 0
+rotation 0
+size 40 20 20
+end
+
+box #21
+position -260 -90 0
+rotation 0
+size 20 80 20
+end
+
+box #22
+position -340 170 0
+rotation 0
+size 20 150 20
+end
+
+box #23
+position -340 -170 0
+rotation 0
+size 20 150 20
+end
+
+box #24
+position -340 -170 0
+rotation 0
+size 20 150 20
+end
+
+box #24
+position -380 380 0
+rotation 0
+size 20 20 20
+end
+
+box #25
+position -380 -380 0
+rotation 0
+size 20 20 20
+end

@@ -4,7 +4,7 @@ module BraveZealot
   class Agent
     # hq   :: Headquarters  -> The headquarters object
     # tank :: Tank          -> Data object
-    attr_accessor :hq, :tank
+    attr_accessor :hq, :tank, :mode
 
     # state :: Symbol  -> :capture_flag, :home
     # goal :: Coord   -> Coordinate indicating where the agent is headed
@@ -85,6 +85,7 @@ module BraveZealot
       if Communicator::COMMANDS.keys.include?(m.to_sym)
         @hq.send(m, @tank.index, *args, &block)
       else
+        puts "Failed to find #{m}"
         raise NameError
       end
     end
