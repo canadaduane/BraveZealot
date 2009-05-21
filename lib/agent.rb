@@ -53,16 +53,16 @@ module BraveZealot
         @path = new_path || @path
         group = PfGroup.new
         
-        if path.size > 10
-          n = hq.map.array_to_world_coordinates(path[10][0], path[10][1])
+        if @path.size > 10
+          n = hq.map.array_to_world_coordinates(@path[10][0], @path[10][1])
           group.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
           
           # File.open("map#{@idx += 1}.gpi", "w") do |f|
           #   data = hq.map.to_gnuplot do
-          #     puts "prep path: #{path.inspect}"
+          #     puts "prep path: #{@path.inspect}"
           #     "\n\n# Path:\n" +
           #     "plot '-' with vectors head\n" +
-          #     path.map{ |x, y| x, y = hq.map.array_to_world_coordinates(x, y); "#{x} #{y} #{2} #{2}" }.join("\n") + "\n"
+          #     @path.map{ |x, y| x, y = hq.map.array_to_world_coordinates(x, y); "#{x} #{y} #{2} #{2}" }.join("\n") + "\n"
           #     # group.to_gnuplot_part(hq.map.world_size)
           #   end
           #   puts "Done prep"
@@ -141,7 +141,7 @@ module BraveZealot
       if Communicator::COMMANDS.keys.include?(m.to_sym)
         @hq.send(m, @tank.index, *args, &block)
       else
-        puts "Failed to find #{m}"
+        puts "Failed to find method '#{m}'"
         raise NameError
       end
     end
