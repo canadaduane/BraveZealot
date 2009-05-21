@@ -61,6 +61,12 @@ class AstarTest < Test::Unit::TestCase
     # @arr.each_slice(100) { |slice| p slice }
   end
   
+  def test_add_rect
+    four = Astar.new([0] * 16, 4)
+    four.add_rect(1,1,  2,1,  -1);
+    assert_equal([0,0,0,0, 0,-1,-1,0, 0,0,0,0, 0,0,0,0], four.map)
+  end
+  
   def benchmark_large
     Benchmark.bm(10) do |x|
       x.report("init @large")   { @large = Astar.new([0] * 1_000_000, 1000) }

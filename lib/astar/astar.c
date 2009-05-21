@@ -208,39 +208,88 @@ static VALUE astar_search(
     return trace;
 }
 
-static VALUE astar_obstacles_equals(VALUE rb_ary_obstacles, VALUE rb_num_weight)
+static VALUE astar_get_map(VALUE self)
 {
-    int weight = NUM2INT(rb_num_weight);
-    long i, obstacles_len = RARRAY_LEN(rb_ary_obstacles);
-    VALUE* obstacles = RARRAY_PTR(rb_ary_obstacles);
+    return rb_iv_get(self, "@map");
+}
+
+static VALUE astar_add_rect(
+    VALUE self,
+    VALUE rb_min_x, VALUE rb_min_y,
+    VALUE rb_max_x, VALUE rb_max_y,
+    VALUE rb_weight)
+{
+    int x, y;
+    int min_x  = NUM2INT(rb_min_x);
+    int min_y  = NUM2INT(rb_min_y);
+    int max_x  = NUM2INT(rb_max_x);
+    int max_y  = NUM2INT(rb_max_y);
+    int width  = NUM2INT(rb_iv_get(self, "@width"));
+    int height = NUM2INT(rb_iv_get(self, "@height"));
     VALUE* map = RARRAY_PTR(rb_iv_get(self, "@map"));
     
-    ID Intern_coords = rb_intern("coords");
-    ID Intern_x = rb_intern("x");
-    ID Intern_y = rb_intern("y");
-    for( i = 0; i < obstacles_len; i++ )
+    if( min_x > max_x ) rb_raise(rb_eException, "min_x is greater than max_x");
+    if( min_y > max_y ) rb_raise(rb_eException, "min_y is greater than max_y");
+    
+    for( y = min_y; y <= max_y; y++ )
     {
-        VALUE rb_coords = rb_funcall(obstacles[i], Intern_coords, 0);
-        long j, coords_len = RARRAY_LEN(rb_coords);
-        VALUE* coords = RARRAY_PTR(rb_coords);
-        if( coords_len > 1 )
+        for( x = min_x; x <= max_x; x++ )
         {
-            // Get coordinate of
-            double x1 = rb_funcall(coords[coords_len-1], Intern_x, 0);
-            double y1 = rb_funcall(coords[coords_len-1], Intern_y, 0);
-            // Cycle through pairs of coordinates
-            for( j = 0; j < coords_len; j++ )
-            {
-                double x2 = rb_funcall(coords[j], Intern_x, 0);
-                double y2 = rb_funcall(coords[j], Intern_y, 0);
-                
-                // Line from x1,y1 to x2,y2
-                
-                x2 = x1;
-                y2 = y1;
-            }
+            map[y * width + x] = rb_weight;
         }
     }
+    // (double)NUM2INT(map[i]) / 100.0;
+    
+    return self;
+}
+
+static VALUE astar_add_poly(VALUE self, VALUE rb_ary_coords, VALUE rb_weight)
+{
+    long i, coords_len = RARRAY_LEN(rb_ary_coords);
+    VALUE* coords = RARRAY_PTR(rb_ary_coords);
+    VALUE* map = RARRAY_PTR(rb_iv_get(self, "@map"));
+    int min_x = INT_MAX, min_y = INT_MAX, max_x = 0, max_y = 0;
+    
+    if( coords_len == 4 )
+    {
+        int is_rectangle = 1;
+        VALUE* a = RARRAY_PTR( coords[coords_len-1] );
+        for( i = 0; i < coords_len; i++ )
+        {
+            VALUE* b = RARRAY_PTR( coords[i] );
+            double x1 = NUM2INT(a[0]), y1 = NUM2INT(a[1]);
+            double x2 = NUM2INT(b[0]), y2 = NUM2INT(b[1]);
+            min_x = min3(min_x, x1, x2);
+            min_y = min3(min_y, y1, y2);
+            max_x = max3(max_x, x1, x2);
+            max_y = max3(max_y, y1, y2);
+            if( x1 - x2 != 0 && y1 - y2 != 0 )
+            {
+                is_rectangle = 0;
+                break;
+            }
+            a = b;
+        }
+        
+        if( is_rectangle )
+        {
+            ID Intern_add_rect = rb_intern("add_rect");
+            rb_funcall(self, Intern_add_rect, 5,
+                INT2NUM(min_x), INT2NUM(min_y),
+                INT2NUM(max_x), INT2NUM(max_y),
+                rb_weight);
+        }
+        else
+        {
+            rb_raise(rb_eException, "Obstacles must be rectangular (for now).");
+        }
+    }
+    else
+    {
+        // Polygons not supported for now
+        rb_raise(rb_eException, "Obstacles must have four sides.");
+    }
+    return self;
 }
 
 // The initialization method for this module; Ruby calls this for us
@@ -248,5 +297,7 @@ void Init_astar() {
     Astar = rb_define_class("Astar", rb_cObject);
     rb_define_method(Astar, "initialize", astar_init, 2);
     rb_define_method(Astar, "search", astar_search, 4);
-    rb_define_method(Astar, "obstacles=", astar_obstacles_equals, 2);
+    rb_define_method(Astar, "map", astar_get_map, 0);
+    rb_define_method(Astar, "add_rect", astar_add_rect, 5);
+    rb_define_method(Astar, "add_poly", astar_add_poly, 2);
 }
