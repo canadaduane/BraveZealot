@@ -127,8 +127,8 @@ static VALUE astar_search(
     int dx = end_x - start_x;
     int dy = end_y - start_y;
     
-    long i, len = RARRAY(rb_iv_get(self, "@map"))->len;
-    VALUE* map = RARRAY(rb_iv_get(self, "@map"))->ptr;
+    long i, len = RARRAY_LEN(rb_iv_get(self, "@map"));
+    VALUE* map = RARRAY_PTR(rb_iv_get(self, "@map"));
     
     if (start_x < 0 || start_x >= width)
         rb_raise(rb_eArgError, "start_x not in range");
@@ -205,8 +205,42 @@ static VALUE astar_search(
     
     free(cmap);
     pq_free(queue);
-    // return INT2NUM(x);
     return trace;
+}
+
+static VALUE astar_obstacles_equals(VALUE rb_ary_obstacles, VALUE rb_num_weight)
+{
+    int weight = NUM2INT(rb_num_weight);
+    long i, obstacles_len = RARRAY_LEN(rb_ary_obstacles);
+    VALUE* obstacles = RARRAY_PTR(rb_ary_obstacles);
+    VALUE* map = RARRAY_PTR(rb_iv_get(self, "@map"));
+    
+    ID Intern_coords = rb_intern("coords");
+    ID Intern_x = rb_intern("x");
+    ID Intern_y = rb_intern("y");
+    for( i = 0; i < obstacles_len; i++ )
+    {
+        VALUE rb_coords = rb_funcall(obstacles[i], Intern_coords, 0);
+        long j, coords_len = RARRAY_LEN(rb_coords);
+        VALUE* coords = RARRAY_PTR(rb_coords);
+        if( coords_len > 1 )
+        {
+            // Get coordinate of
+            double x1 = rb_funcall(coords[coords_len-1], Intern_x, 0);
+            double y1 = rb_funcall(coords[coords_len-1], Intern_y, 0);
+            // Cycle through pairs of coordinates
+            for( j = 0; j < coords_len; j++ )
+            {
+                double x2 = rb_funcall(coords[j], Intern_x, 0);
+                double y2 = rb_funcall(coords[j], Intern_y, 0);
+                
+                // Line from x1,y1 to x2,y2
+                
+                x2 = x1;
+                y2 = y1;
+            }
+        }
+    }
 }
 
 // The initialization method for this module; Ruby calls this for us
@@ -214,4 +248,5 @@ void Init_astar() {
     Astar = rb_define_class("Astar", rb_cObject);
     rb_define_method(Astar, "initialize", astar_init, 2);
     rb_define_method(Astar, "search", astar_search, 4);
+    rb_define_method(Astar, "obstacles=", astar_obstacles_equals, 2);
 }
