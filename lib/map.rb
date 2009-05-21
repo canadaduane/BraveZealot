@@ -51,6 +51,8 @@ module BraveZealot
       hs = @world_size / 2
       str = obstacles_plot_string
       str << yield if block_given?
+      str << "plot '-' with lines\n"
+      str << " 0 0 0 0\n"
       str << "e\n"
     end
   end

@@ -1,6 +1,7 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/map_discrete'
 bzrequire 'lib/agent'
+bzrequire 'lib/pf_group'
 
 module BraveZealot
   class Headquarters < Communicator
@@ -30,9 +31,9 @@ module BraveZealot
             refresh(:flags) do
               refresh(:othertanks) do
                 #Spit out a map
-                f = File.new($options.gnuplot_file, 'w')
-                f.write(@map.to_gnuplot)
-                f.close
+                #f = File.new($options.gnuplot_file, 'w')
+                #f.write(@map.to_gnuplot)
+                #f.close
 
                 # Initialize each of our tanks
                 mytanks do |r|
@@ -98,7 +99,7 @@ module BraveZealot
       refresh(:flags, 0.5) do
         enemy_flags = @map.flags.select{ |f| f.color != @my_color }
         puts "adding flag goal at #{enemy_flags.first.x}, #{enemy_flags.first.y}"
-        flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.size) unless enemy_flags.empty?
+        flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.world_size) unless enemy_flags.empty?
       end
       flag_goal
     end
@@ -165,8 +166,9 @@ module BraveZealot
 
     def on_othertanks(r)
       r.othertanks.each do |ot|
-        puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{@map.chunk_at_point(ot.x,ot.y).to_coord.inspect} which will be penalized"
-        @map.chunk_at_point(ot.x,ot.y).penalty=2.0
+        col,row = @map.world_to_array_coordinates(ot.x, ot.y)
+        puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{col},#{row} no penalty currently occuring..."
+        #@map.chunk_at_point(ot.x,ot.y).penalty=2.0
       end
       other_tanks = r.othertanks
     end
