@@ -57,21 +57,4 @@ module BraveZealot
     end
   end
   
-  class MapPotentialField < Map
-    def to_gnuplot
-      super do
-        str += "plot '-' with vectors head\n"
-        41.times do |i|
-          x = ( (@world_size / 40)*i - hs )
-          41.times do |j|
-            y = ( (@world_size / 40)*j - hs )
-            #puts "computing dx,dy for #{x},#{y}\n"
-            dx,dy = pf.suggest_delta(x,y)
-            str += "#{x} #{y} #{dx} #{dy}\n"
-          end
-        end
-        str
-      end
-    end
-  end
 end

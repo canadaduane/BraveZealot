@@ -1,5 +1,13 @@
 bzrequire 'lib/communicator'
 
+class Array
+  # If +number+ is greater than the size of the array, the method
+  # will simply return the array itself sorted randomly
+  def randomly_pick(number)
+    sort_by{ rand }.slice(0...number)
+  end
+end
+
 module BraveZealot
   module DummyStates
     # Shortcut state for :forward_until_hit
@@ -38,12 +46,19 @@ module BraveZealot
   module SmartStates
     def smart
       if @goal
-        puts "Tank at: #{@tank.inspect}, Goal at: #{@goal.inspect}"
+        puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
         path = hq.map.search(@tank, @goal)
         if path.size > 10
           field = PfGroup.new
           n = hq.map.array_to_world_coordinates(path[10][0], path[10][1])
-          field.add_goal(n[0], n[1], 1)
+          field.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
+          # File.open("map.gpi", "w") do |f|
+          #   # data = hq.map.to_gnuplot do
+          #     data = field.to_gnuplot_part(hq.map.world_size)
+          #   # end
+          #   f.write data
+          # end
+          # exit(-1)
           # puts "Path: #{path.inspect}"
         
           move = field.suggest_move(@tank.x, @tank.y, @tank.angle)
@@ -58,7 +73,14 @@ module BraveZealot
     end
     
     def smart_look_for_enemy_flag
-      @state = :smart_return_home
+      if hq.enemy_flag_exists?
+        puts "Enemy flags:"
+        p hq.enemy_flags
+        @goal = hq.enemy_flags.randomly_pick(1).first
+        @state = :smart
+      else
+        # Remain in :smart_look_for_enemy_flag state otherwise
+      end
     end
     
     def smart_return_home
@@ -84,15 +106,13 @@ module BraveZealot
       @hq, @tank = hq, tank
       @state = initial_state || :dummy
       @goal = nil
-      puts "Starting agent #{@tank.index}: #{@state}"
-      start
-    end
-    
-    def start
+      
+      puts "\nStarting agent #{@tank.index}: #{@state}"
+      
+      # Change state up to every +refresh+ seconds
       EventMachine::PeriodicTimer.new($options.refresh) do
-        refresh($options.refresh) do
-          send(@state)
-        end
+        puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        send(@state)
       end
     end
     

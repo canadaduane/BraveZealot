@@ -98,5 +98,18 @@ module BraveZealot
       return m
     end
     
+    def to_gnuplot_part(world_size, detail = 40)
+      hs = world_size / 2
+      str = "plot '-' with vectors head\n"
+      (detail + 1).times do |i|
+        x = ( (world_size / detail)*i - hs )
+        (detail + 1).times do |j|
+          y = ( (world_size / detail)*j - hs )
+          dx,dy = suggest_delta(x,y)
+          str += "#{x} #{y} #{dx} #{dy}\n"
+        end
+      end
+      str
+    end
   end
 end

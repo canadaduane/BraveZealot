@@ -38,6 +38,7 @@ module BraveZealot
                 # Initialize each of our tanks
                 mytanks do |r|
                   r.mytanks.each do |t|
+                    # Tell each agent about this Headquarters, its own +t+ index, and its initial state
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
@@ -47,31 +48,17 @@ module BraveZealot
           end
         end
       end
-      
-      mobilize
+      periodic_update
     end
     
-    def mobilize
-      EventMachine::PeriodicTimer.new(0.5) do
-        refresh(:flags, 0.2) do
-          if flag_possession?
-            @agents.each_with_index do |t, i|
-              if t.mode != :home
-                puts "changing tank #{i} to goal :home"
-                t.goal = create_home_base_goal
-                t.mode = :home
-              end
-            end
-          else
-            @agents.each_with_index do |t, i|
-              if enemy_flag_exists?
-                puts "changing tank #{i} to goal :capture_flag"
-                t.goal = create_flag_goal
-                t.mode = :capture_flag
-              end
-            end
-          end
-        end
+    def periodic_update
+      # Spread out our information gathering over time so we don't
+      # constantly overwhelm the network.
+      EventMachine::PeriodicTimer.new(0.4) do
+        sleep(0.1) { flags      }
+        sleep(0.2) { mytanks    }
+        sleep(0.3) { othertanks }
+        sleep(0.4) { shots      }
       end
     end
     
@@ -144,6 +131,10 @@ module BraveZealot
       end
     end
     
+    def sleep(time, &block)
+      EventMachine::Timer.new(time, &block)
+    end
+    
     def on_mytanks(r)
       r.mytanks.each do |t|
         @agents[t.index].tank = t if @agents.size > t.index
@@ -151,7 +142,6 @@ module BraveZealot
     end
     
     def on_flags(r)
-      
       @map.flags = r.flags
     end
     
@@ -166,8 +156,8 @@ module BraveZealot
 
     def on_othertanks(r)
       r.othertanks.each do |ot|
-        col,row = @map.world_to_array_coordinates(ot.x, ot.y)
-        puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{col},#{row} no penalty currently occuring..."
+        # col,row = @map.world_to_array_coordinates(ot.x, ot.y)
+        # puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{col},#{row} no penalty currently occuring..."
         #@map.chunk_at_point(ot.x,ot.y).penalty=2.0
       end
       other_tanks = r.othertanks
