@@ -58,7 +58,7 @@ module BraveZealot
   class MapPotentialField < Map
     def to_gnuplot
       super do
-        str = "plot '-' with vectors head\n"
+        str += "plot '-' with vectors head\n"
         41.times do |i|
           x = ( (@world_size / 40)*i - hs )
           41.times do |j|

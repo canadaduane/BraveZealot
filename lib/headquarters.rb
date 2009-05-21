@@ -29,6 +29,11 @@ module BraveZealot
           refresh(:obstacles) do
             refresh(:flags) do
               refresh(:othertanks) do
+                #Spit out a map
+                f = File.new($options.gnuplot_file, 'w')
+                f.write(@map.to_gnuplot)
+                f.close
+
                 # Initialize each of our tanks
                 mytanks do |r|
                   r.mytanks.each do |t|

@@ -33,12 +33,12 @@ module BraveZealot
     
     def obstacles=(obstacles)
       @obstacles = obstacles
-      for row in 0..@side_length
-        for col in 0..@side_length
-          coord = Coord.new(*array_to_world_coordinates(col, row))
-          if @obstacles.any? { |o| o.contains_point(coord) }
-            @map[coord_to_index(col, row)] = -1
-          end
+      # instead of asking each location if its center is in any of
+      # of the obstacles, we can ask each obstacle which locations it
+      # blocks
+      obstacles.each do |o|
+        o.locations_blocked(self).each do |c|
+          @map[coord_to_index(c.x,c.y)] = -1
         end
       end
     end
@@ -49,7 +49,23 @@ module BraveZealot
     
     def to_gnuplot
       super do
-        # discrete stuff
+        for idx in 1..@side_length 
+          str << "set arrow from " +
+                "#{idx*@granularity},#{-1*@side_length*@granularity} to " +
+                "#{idx*@grandularity},#{@side_length*@granularity} nohead lt 1\n"
+          str << "set arrow from " +
+                "#{-1*@side_length*@granularity},#{idx*@granularity} to " +
+                "#{@side_length*@grandularity},#{idx*@granularity} nohead lt 1\n"
+        end
+        #for row in 0..@side_length
+        #  for col in 0..@side_length
+        #    if @map[coord_to_index(col, row)] == -1
+        #      str << "set arrow from " +
+        #          "#{row*@granularity - },#{} to " +
+        #          "#{},#{} nohead lt 3\n" 
+        #    end
+        #  end
+        #end
       end
     end
     

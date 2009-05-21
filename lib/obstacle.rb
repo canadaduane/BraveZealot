@@ -104,5 +104,28 @@ module BraveZealot
       end
       @rect
     end
+
+    def locations_blocked(map)
+      if rect? then
+        arr = []
+        indices = @coords.map do |c| 
+          x,y = map.world_to_array_coordinates(c.x, c.y) 
+          Coord.new(x,y)
+        end
+        min_x = indices.map{|c| c.x}.min
+        min_y = indices.map{|c| c.y}.min
+        max_x = indices.map{|c| c.x}.max
+        max_y = indices.map{|c| c.y}.max
+
+        for col in min_x..max_x
+          for row in min_y..max_y
+            arr.push(Coord.new(col,row))
+          end
+        end
+        arr
+      else
+        []
+      end
+    end
   end
 end
