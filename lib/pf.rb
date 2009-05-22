@@ -30,8 +30,9 @@ module BraveZealot
       #if ( ang_g < 0 ) then
       #  ang_g = ang_g + Math::PI*2
       #end
-      
+      puts "distance = #{distance}"
       if ( distance < @radius ) then
+        puts "inside the radius!"
         return [0,0]
       elsif ( distance < (@spread + @radius)) then
         dx = @alpha*(distance-@radius)*Math.cos(ang_g)

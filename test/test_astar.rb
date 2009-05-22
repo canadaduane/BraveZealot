@@ -48,6 +48,19 @@ class AstarTest < Test::Unit::TestCase
     assert_equal [[0,0], [1,0], [2,1], [2,2], [3,3]], tb
   end
   
+  def test_indent
+    arr = [
+       0, -1, -1,  0,  0,
+       0,  0, -1,  0,  0,
+       0,  0, -1,  0,  0,
+       0, -1, -1,  0,  0,
+       0,  0,  0,  0,  0
+    ]
+    map = Astar.new(arr, 5)
+    tb = map.search(0,0, 4,4)
+    assert_equal [[0,0], [0,1], [0,2], [0,3], [1,4], [2,4], [3,4], [4,4]], tb
+  end
+  
   def test_no_solution
     none = Astar.new([-1] * 16, 4)
     assert_nil none.search(0,0, 3,3)
