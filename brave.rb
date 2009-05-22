@@ -12,7 +12,7 @@ end
 config_file = "config.yml"
 
 if File.exist?(config_file)
-  $options = OpenStruct.new(YAML.load(IO.read(config_file)))
+  $options = OpenStruct.new(YAML.load(IO.read(config_file)).merge(:config_file => "config.yml"))
 else
   $options = OpenStruct.new(:config_file => "config.yml")
 end
@@ -31,8 +31,12 @@ opts = OptionParser.new do |opts|
     $options.port = port.to_i
   end
 
+  opts.on("-c", "--config-file [FILE]", "The Yaml configuration file") do |c|
+    $options.config_file = c
+  end
+
   opts.on("-i", "--initial-state [LIST,OF,STATES]", "(e.g. 'dummy', 'smart')") do |i|
-    $options.initial_state = state_list(i)
+    $options.initial_state = i
   end
 
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
@@ -49,6 +53,8 @@ opts = OptionParser.new do |opts|
 end
 
 opts.parse!(ARGV)
+
+$options.initial_state = state_list($options.initial_state)
 
 puts "Starting brave.rb with the following options: \n"
 y $options.instance_variable_get("@table")

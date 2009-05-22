@@ -40,6 +40,9 @@ module BraveZealot
                 mytanks do |r|
                   r.mytanks.each do |t|
                     # Tell each agent about this Headquarters, its own +t+ index, and its initial state
+                    puts "Initial state:"
+                    p $options.initial_state
+                    p t.index
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
@@ -167,7 +170,9 @@ module BraveZealot
     def install_signal_trap
       trap("INT") do
         if File.exist?($options.config_file)
-          $options = YAML.load(IO.read($options.config_file))
+          $options = OpenStruct.new(
+            $options.instance_variable_get("@table").merge(
+              YAML.load(IO.read($options.config_file))))
           if $options.pdf_file
             @pdf_count ||= 0
             file = $options.pdf_file || "map.pdf"
