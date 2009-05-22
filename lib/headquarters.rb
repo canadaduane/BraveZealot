@@ -40,9 +40,6 @@ module BraveZealot
                 mytanks do |r|
                   r.mytanks.each do |t|
                     # Tell each agent about this Headquarters, its own +t+ index, and its initial state
-                    puts "Initial state:"
-                    p $options.initial_state
-                    p t.index
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end

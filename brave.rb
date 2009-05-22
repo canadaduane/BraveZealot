@@ -54,10 +54,10 @@ end
 
 opts.parse!(ARGV)
 
-$options.initial_state = state_list($options.initial_state)
-
 puts "Starting brave.rb with the following options: \n"
 y $options.instance_variable_get("@table")
+
+$options.initial_state = state_list($options.initial_state)
 
 # Our main program begins here:
 
