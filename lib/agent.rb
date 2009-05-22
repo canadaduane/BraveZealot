@@ -79,7 +79,7 @@ module BraveZealot
             @path.slice!(0..nex_idx)
             @group = PfGroup.new
             puts "updating goal to be at #{nex[0]},#{nex[1]}"
-            @group.add_field(Pf.new(nex[0], nex[1], hq.map.world_size, 0, 5))
+            @group.add_field(Pf.new(nex[0], nex[1], hq.map.world_size, 0, 1))
             @dest = nex
           end
         else
