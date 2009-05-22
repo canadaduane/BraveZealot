@@ -82,11 +82,11 @@ static void explore(
         sy >= 0 && sy < height )
     {
         int coord = AT(sx, sy);
-        Chunk* nextval = cmap + coord;
         
-        if( nextval->weight >= 0 )
+        if ( !closed[coord] )
         {
-            if ( !closed[coord] )
+            Chunk* nextval = cmap + coord;
+            if( nextval->weight >= 0 )
             {
                 double gdist, hdist;
                 gdist = unitdist[ (nextval->y - cval->y + 1) * 3 +
