@@ -10,7 +10,8 @@ module BraveZealot
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
       
-      fill, stroke = team_colors(color)
+      puts "Draw mytank #{x}, #{y}"
+      fill, stroke = team_colors(options[:my_color] || "none")
       
       # Draw the tank
       pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))

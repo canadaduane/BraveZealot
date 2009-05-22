@@ -41,6 +41,10 @@ module BraveZealot
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
+                  
+                  # Spit out a map
+                  @map.to_pdf(nil, :my_color => my_color).save_as($options.pdf_file || "map.pdf")
+                  
                 end
               end
             end

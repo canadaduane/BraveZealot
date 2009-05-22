@@ -43,10 +43,13 @@ module BraveZealot
         :othertanks => othertanks
       }.merge(options)
       
-      pdf ||= PDF::Writer.new(:paper => [-450, -450, 450, 450])
+      pdf ||= PDF::Writer.new(:paper =>
+                [world_x_min - 50, world_y_min - 50,
+                 world_x_max + 50, world_y_max + 50])
       
       # Draw optional map parts
       options.each_pair do |key, items|
+        puts "Draw #{key} #{items.size}"
         items.each do |i|
           i.to_pdf(pdf, options) if i.respond_to?(:to_pdf)
         end if items
