@@ -48,7 +48,6 @@ module BraveZealot
   
   module SmartStates
     attr_accessor :path
-    
     def smart
       @idx ||= 0
       if @goal
@@ -493,6 +492,18 @@ module BraveZealot
     
     def wait
       # do nothing
+    end
+    
+    def push_next_state(state, next_state)
+      @next_state ||= {}
+      @next_state[state] ||= []
+      @next_state[state].push next_state
+    end
+    
+    def transition(state, default)
+      @next_state ||= {}
+      @next_state[state] ||= []
+      @state = @next_state[state].shift || default
     end
     
     def refresh(freshness, &block)
