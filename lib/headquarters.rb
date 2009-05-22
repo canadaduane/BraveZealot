@@ -18,9 +18,12 @@ module BraveZealot
         # Spit out a map
         @pdf_count ||= 0
         file = $options.pdf_file || "map.pdf"
-        file = file.sub(".", "#{@pdf_count += 1}.")
-        puts "Writing map to pdf: #{file}"
-        @map.to_pdf(nil, :my_color => my_color).save_as(file)
+        file.sub!(".", "#{@pdf_count += 1}.")
+        puts "\nWriting map to pdf: #{file}\n"
+        @map.to_pdf(nil,
+          :my_color => my_color,
+          :paths    => @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+        ).save_as(file)
       end
       
       # Gather initial world data... which team are we?  how big is the map?

@@ -45,6 +45,8 @@ module BraveZealot
   end
   
   module SmartStates
+    attr_accessor :path
+    
     def smart
       @idx ||= 0
       if @goal
