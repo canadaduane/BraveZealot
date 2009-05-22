@@ -14,6 +14,15 @@ module BraveZealot
       @world_time = 0.0           # Last communicated world time
       @message_times = {}         # Last time we received a message (in Time.now units)
       
+      trap("INT") do
+        # Spit out a map
+        @pdf_count ||= 0
+        file = $options.pdf_file || "map.pdf"
+        file = file.sub(".", "#{@pdf_count += 1}.")
+        puts "Writing map to pdf: #{file}"
+        @map.to_pdf(nil, :my_color => my_color).save_as(file)
+      end
+      
       # Gather initial world data... which team are we?  how big is the map?
       constants do |r|
         world_size = nil
@@ -41,9 +50,6 @@ module BraveZealot
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
-                  
-                  # Spit out a map
-                  @map.to_pdf(nil, :my_color => my_color).save_as($options.pdf_file || "map.pdf")
                   
                 end
               end

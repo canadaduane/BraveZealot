@@ -10,7 +10,7 @@ module BraveZealot
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
       
-      puts "Draw mytank #{x}, #{y}"
+      puts "Draw mytank #{x}, #{y} angle #{self.angle}"
       fill, stroke = team_colors(options[:my_color] || "none")
       
       # Draw the tank
@@ -18,13 +18,11 @@ module BraveZealot
       pdf.stroke_color stroke
       pdf.fill_color   fill
       
-      c = Math.cos(angle / 3.14159 * 180)
-      s = Math.sin(angle / 3.14159 * 180)
-      pdf.move_to(x, y).
-          line_to(x + s, y + c).
-          line_to(x + c*2, y + s*2).
-          line_to(x - s, y - s).
-          fill_stroke
+      pdf.circle_at(x, y, 10).fill_stroke
+      c = Math.cos(angle)
+      s = Math.sin(angle)
+      
+      pdf.line(x, y, x+c*10, y+s*10).stroke
       
     end
   end
