@@ -1,17 +1,15 @@
 \chapter{Experiences and Time Spent}\label{chap:exp}
 \section{Duane's Summary}
-Michael took the lead on this project by implementing the two most challenging search algorithms of those assigned---$A^*$ and \texttt{greedy best first}.  My portion was to implement \texttt{depth first}, \texttt{breadth first}, and \texttt{iterative deepening} search.  I also spent some time refactoring from our last week's work since many of the shortcuts we took before the deadline compromised the quality of the code.
+The majority of my time this week was spent optimizing our $A^*$ algorithm.  Our original implementation was entirely in Ruby, but it turned out to be too slow for discretization below 40 meters or so.  The new code is a Ruby extension written in C, and performs much better (1/2 second compared with 45 seconds).
 \par
-The \texttt{depth first} and \texttt{breadth first} algorithms were fairly straight-forward to implement---the most interesting part was the insight (from Russell and Norvig) that these two algorithms can both be implemented with the same code, but different queueing mechanisms.  With that insight, we chose to create a single search algorithm that would take a \texttt{queue} or \texttt{stack} object as a parameter.  \texttt{Breadth first} search corresponded with the \texttt{queue} object and \texttt{depth first} with the \texttt{stack}.
+I also refactored our agent code to use state transitions for this lab.  Rather than using several different Agent classes for each task (e.g. a `dummy' agent vs a `smart' agent), we unified our code into a single agent that could make decisions regarding states.  Once this refactoring was in place, Jon Brandenburg specialized our agents for sniper and decoy capabilities.
 \par
-Implementing the \texttt{iterative deepening} search was less straight-forward.  While on the surface it appears that a depth-limited search inside an iteratively deepening outer loop is sufficient to implement \texttt{iterative deepening}, it did not appear to be the case.  Instead, we needed each node to keep track of its predecessors and to consider those predecessors as the ``closed set'' during each inner iteration.  This is not the same as depth-limited search inside an outer loop because a depth-limited search will retain its ``closed set'' when in fact it should be forgetting certain paths that it has already tried (but again, it should not be revisiting nodes in its line of predecessors).
-\par
-I spent about 16 hours on this project, divided as follows:
+I spent about 15 hours on this project, divided as follows:
 \begin{itemize}
-    \item 6 hours cleaning up and refactoring code from last week
-    \item 3 hours implementing the search code mentioned above
+    \item 8 hours implementing a fast $A^*$ algorithm in C
+    \item 3 hours refactoring our agents to use state information
     \item 2 hours debugging and passing off with another team in the CS Sports lab.
-    \item 5 hours writing this report and formatting it in \LaTeX
+    \item 2 hours writing this report and formatting it in \LaTeX
 \end{itemize}
 
 \section{Michael's Summary}
