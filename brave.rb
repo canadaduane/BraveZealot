@@ -1,16 +1,21 @@
 require 'ostruct'
 require 'optparse'
+require 'yaml'
 
 # Use reasonable defaults and parse shell args for specific options
 
-$options = OpenStruct.new(
-  :server        => '127.0.0.1',
-  :port          => 3002,
-  :initial_state => ['dummy'] * 10,
-  :refresh       => 0.1,
-  :gnuplot_file  => 'search.gpi', 
-  :debug         => false
-) 
+def state_list(list = "dummy")
+  # Repeat for default of up to 10 agents
+  list.split(',').map{ |j| j.strip.to_sym } * 10
+end
+
+config_file = "config.yml"
+
+if File.exist?(config_file)
+  $options = OpenStruct.new(YAML.load(IO.read(config_file)))
+else
+  $options = OpenStruct.new(:config_file => "config.yml")
+end
 
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: brave.rb [options]"
@@ -27,7 +32,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-i", "--initial-state [LIST,OF,STATES]", "(e.g. 'dummy', 'smart')") do |i|
-    $options.initial_state = i.split(',').map{ |j| j.strip.to_sym } * 10 # repeat for default of up to 10 agents
+    $options.initial_state = state_list(i)
   end
 
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
@@ -45,6 +50,8 @@ end
 
 opts.parse!(ARGV)
 
+puts "Starting brave.rb with the following options: \n"
+y $options.instance_variable_get("@table")
 
 # Our main program begins here:
 
@@ -56,6 +63,10 @@ bzrequire 'lib/astar/astar',
   "You may need to compile the astar (A*) extension: \n" +
   "$ cd lib/astar && ruby extconf.rb && make\n"
 
+puts
+if `netstat -an|grep \.#{$options.port}\s`.empty?
+  puts "Warning: unable to connect to port #{$options.port}"
+end
 EventMachine.run do
   EventMachine::connect(
     $options.server,

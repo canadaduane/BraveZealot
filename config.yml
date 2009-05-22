@@ -1,0 +1,10 @@
+---
+  :server:        127.0.0.1
+  :port:          6000
+  :initial_state: smart,dummy
+  :refresh:       0.1
+  :debug:         false
+# This line makes ctrl-C dump a PDF map of the world:
+  # :pdf_file:      map.pdf
+# This line makes ctrl-C update the running state:
+  # :state:         wait,smart
