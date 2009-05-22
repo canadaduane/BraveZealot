@@ -58,35 +58,6 @@ module BraveZealot
       @astar.search(s[0], s[1], g[0], g[1])
     end
     
-    def to_gnuplot
-      str = super do
-        str = ""
-        #puts "Looping from 1..#{@side_length}"
-        #for idx in 1..@side_length 
-        #  str << "set arrow from " +
-        #        "#{idx*@granularity - world_x_max},#{@side_length*@granularity - world_y_max} to " +
-        #        "#{idx*@granularity},#{@side_length*@granularity} nohead lt 1\n"
-        #  str << "set arrow from " +
-        #        "#{-1*@side_length*@granularity - world_x_max},#{idx*@granularity - world_y_max} to " +
-        #        "#{@side_length*@granularity},#{idx*@granularity} nohead lt 1\n"
-        #end
-        #str
-        for row in 0..@side_length
-          for col in 0..@side_length
-            if @map[coord_to_index(col, row)] == -1
-              x,y = array_to_world_coordinates(col,row)
-              str << "set arrow from " +
-                  "#{x - (@granularity/2)},#{y - (@granularity/2)} to " +
-                  "#{x + (@granularity/2)},#{y + (@granularity/2)} nohead lt 3\n" 
-            end
-          end
-        end
-        str
-      end
-      str += yield if block_given?
-      str
-    end
-    
   end
 
 end
