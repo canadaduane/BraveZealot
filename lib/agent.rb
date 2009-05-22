@@ -1,6 +1,8 @@
 bzrequire 'lib/communicator'
 require 'ruby-debug'
 
+RADIANS_PER_DEGREE = Math::PI/180
+
 class Array
   # If +number+ is greater than the size of the array, the method
   # will simply return the array itself sorted randomly
@@ -97,6 +99,316 @@ module BraveZealot
     end
   end
 
+	module DecoyStates
+		# need to determine whether the enemy is in a corner or in the middle, since the position will dictate the decoy path.
+		def decoy()
+			set_decoy_goal_point
+			decoy_move_to_start
+		end
+
+		def decoy_move_to_start
+
+			# determine whether we've reached the goal, if so, transition
+			if goal_reached()
+				set_decoy_goal_point
+			else
+	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
+		    speed move.speed
+		    angvel move.angvel
+			end
+		end
+
+		def decoy_move_to_goal
+
+			# determine whether we've reached the goal, if so, transition
+			if enemy_tanks_alive() == false
+				# transition to the next state
+			 	@state = :smart_return_home
+				return
+			end
+
+			if goal_reached()
+				# this has a logic bug in it since if I'm in move_to_start and have killed 
+				# the enemies I don't immediate change my behavior, I continue to proceed until
+				# I transition back to moving towards the goal before I check the state of whether
+				# the enemies are killed
+				set_decoy_starting_point
+			else
+	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
+		    speed move.speed
+		    angvel move.angvel
+			end
+		end
+		
+		#
+		#
+		#
+		# NOTE: the following methods do not represent states
+		#
+		#
+		#
+		def goal_reached(threshold = 5)
+			return calc_dist(@tank, @goal) < threshold
+		end
+
+		def tank_moving()
+			return (@tank.vx == 0 and @tank.vy == 0)
+		end
+
+		def calculate_decoy_starting_point()
+			# figure out where the flag is
+			# should give us back x, y coordinates, then
+			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+			# 
+			# I'll hard code everything for this map just to do a proof of concept
+
+			
+			x = 100
+			y = -395
+			return x, y
+		end
+
+		def calculate_decoy_ending_point()
+			x = 100
+			y = 395
+
+			return x, y
+		end
+
+		def set_decoy_starting_point
+				# reset the potential fields group
+	      @group = PfGroup.new(false)
+
+				# calculate a new destination
+				x, y = calculate_decoy_starting_point()
+	      @goal = Coord.new(x, y)
+	      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+
+				# transition to the next state
+			 	@state = :decoy_move_to_start
+		end
+
+		def set_decoy_goal_point
+				# reset the potential fields group
+	      @group = PfGroup.new(false)
+
+				# calculate a new destination
+				x, y = calculate_decoy_ending_point()
+	      @goal = Coord.new(x, y)
+	      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+
+				# transition to the next state
+			 	@state = :decoy_move_to_goal
+		end
+	end
+
+	module SniperStates
+		def sniper
+			set_sniper_starting_point
+			sniper_move_to_start_position
+		end
+
+		def sniper_move_to_start_position
+
+			# determine whether we've reached the goal, if so, transition
+			if goal_reached(10)
+				speed(0)
+				if decoy_is_closer()
+					set_sniper_attacking_point()
+				else
+					# otherwise just wait until it is safe to attack.
+				end
+			else
+	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
+				log_move(move)
+		    speed move.speed
+		    angvel move.angvel
+			end
+		end
+
+		def sniper_move_to_attack_position
+
+			# determine whether we've reached the goal, if so, transition
+			if goal_reached(10)
+				speed(0)
+				# I should be doing a check at this point, but I'm just going to
+				# set it in bezerker mode for now
+				@state = :sniper_attack
+				sniper_attack
+			else
+	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
+				log_move(move)
+		    speed move.speed
+		    angvel move.angvel
+			end
+		end
+
+		def log_move(move)
+			puts "input     : tank.x, tank.y, tank.angle = #{@tank.x}, #{tank.y}, #{tank.angle}"
+			puts "suggestion: speed, angvel = #{move.speed}, #{move.angvel}"
+		end
+
+		def sniper_attack
+			puts "sniper attack"
+			if enemy_tanks_alive()
+				puts "enemy tanks are alive"
+				puts "shot fired"
+				shoot()
+				if enemy_targeted()
+					puts "shot fired"
+					shoot()
+				else
+					puts "targeting enemy"
+					target_enemy()
+				end
+			else
+				# capture the flag..
+			end
+		end
+
+		#
+		# NOTE:  The following methods are not considered states
+		#
+		def enemy_tanks_alive()
+			@hq.other_tanks.each do |enemy_tank|
+				if enemy_tank.status != 'dead'
+					return true
+				end
+			end
+
+			return false
+		end
+
+		def enemy_targeted
+			# if tank is directly pointing at other tank..
+			# we'll just turn firing on.. not a good idea for the final solution, but should work.
+			puts "@tank.angle = #{@tank.angle}"
+			return (@tank.angle < 2 * RADIANS_PER_DEGREE and @tank.angle > -2 * RADIANS_PER_DEGREE)
+		end
+
+		def select_target()
+			world_size = 800
+      best_enemy = nil
+      best_dist = 2.0 * world_size
+      @hq.other_tanks.each do |enemy|
+
+        if enemy.status != 'normal'
+          next
+				end
+
+        dist = calc_dist(enemy, @tank)
+
+        if dist < best_dist
+          best_dist = dist
+          best_enemy = enemy
+				end
+			end
+		end
+
+		def calc_dist(p1, p2)
+			return (Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2))
+		end
+
+		def target_enemy
+			# the actual angle needs to be calculated..
+			# this is where a PD controller would be really nice to have.
+			# in addition i really must have the info updated every time it is called 
+			# and it should be called continuously at this point.. or it should be 
+			# more efficient and predict how long it will be before it rotates into
+			# position and sleep until that time
+
+			best_enemy = select_target()
+      target_angle = Math.atan2(best_enemy.y - @tank.y,
+              best_enemy.x - @tank.x)
+      relative_angle = normalize_angle(target_angle - @tank.angle)
+
+			angvel(2 * relative_angle)
+		end
+
+		def normalize_angle(angle)
+			# Make any angle be between +/- pi.
+			angle -= 2 * MATH::PI * (angle / (2 * MATH::PI))
+
+			if angle <= -MATH::PI
+				angle += 2 * MATH::PI
+			elsif angle > MATH::PI
+				angle -= 2 * MATH::PI
+			end
+
+			return angle
+		end
+
+		def decoy_is_closer
+			# make an assumption we only have two tanks, this will
+			# need to be modified for future labs when we start adding in more tanks
+
+			decoy_tank = nil
+
+			if @tank.index == 0
+				decoy_tank = @hq.agents[1].tank
+			else
+				decoy_tank = @hq.agents[0].tank
+			end
+			
+			@hq.other_tanks.each do |enemy_tank|
+				if calc_dist(decoy_tank, enemy_tank) > calc_dist(@tank, enemy_tank)
+					return false
+				end
+			end
+
+			return true
+		end
+
+		def calculate_sniper_starting_position()
+			# figure out where the flag is
+			# should give us back x, y coordinates, then
+			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+			# 
+			# I'll hard code everything for this map just to do a proof of concept
+			x = 50
+			y = 375
+			return x, y
+		end
+
+		def calculate_sniper_attacking_position()
+			# figure out where the flag is
+			# should give us back x, y coordinates, then
+			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+			# 
+			# I'll hard code everything for this map just to do a proof of concept
+			x = 75
+			y = 350
+			return x, y
+		end
+
+		def set_sniper_starting_point()
+			# setup the potential fields...
+      @group = PfGroup.new(false)
+			start_x, start_y = calculate_sniper_starting_position()
+      @goal = Coord.new(start_x, start_y)
+
+			# attractive field (full weight)
+      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 10, 0.8))
+      #group.add_goal(@goal.x, @goal.y, hq.map.world_size)
+
+			@state = :sniper_move_to_start_position
+		end
+
+		def set_sniper_attacking_point()
+			# setup the potential fields...
+      @group = PfGroup.new(false)
+			start_x, start_y = calculate_sniper_attacking_position()
+      @goal = Coord.new(start_x, start_y)
+
+			# attractive field (full weight)
+      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+      #group.add_goal(@goal.x, @goal.y, hq.map.world_size)
+
+			# transition to the next state
+		 	@state = :sniper_move_to_attack_position
+		end
+	end
+
   class Agent
     # hq   :: Headquarters  -> The headquarters object
     # tank :: Tank          -> Data object
@@ -105,9 +417,12 @@ module BraveZealot
     # state :: Symbol  -> :capture_flag, :home
     # goal :: Coord   -> Coordinate indicating where the agent is headed
     attr_accessor :state, :goal
+		attr_accessor :group
     
     include DummyStates
     include SmartStates
+		include DecoyStates
+		include SniperStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)

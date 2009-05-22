@@ -5,9 +5,9 @@ require 'optparse'
 
 $options = OpenStruct.new(
   :server        => '127.0.0.1',
-  :port          => 6000,
+  :port          => 3002,
   :initial_state => ['dummy'] * 10,
-  :refresh       => 0.5,
+  :refresh       => 0.1,
   :gnuplot_file  => 'search.gpi', 
   :debug         => false
 ) 

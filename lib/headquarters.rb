@@ -6,7 +6,8 @@ bzrequire 'lib/pf_group'
 module BraveZealot
   class Headquarters < Communicator
     attr_reader :map, :my_color, :my_base, :mytanks_time, :other_tanks
-    
+    attr_reader :agents
+
     class MissingData < Exception; end
     
     def start
@@ -52,12 +53,13 @@ module BraveZealot
     end
     
     def periodic_update
+			puts "periodic update"
       # Spread out our information gathering over time so we don't
       # constantly overwhelm the network.
       EventMachine::PeriodicTimer.new(0.4) do
         sleep(0.1) { flags      }
-        sleep(0.2) { mytanks    }
-        sleep(0.3) { othertanks }
+        sleep(0.03) { mytanks    }
+        sleep(0.03) { othertanks }
         sleep(0.4) { shots      }
       end
     end
@@ -125,6 +127,8 @@ module BraveZealot
         # Note: Because global callbacks occur before local, on_* will
         # have a chance to update data before the following block.call
         ignore_arg = Proc.new { |r| block.call if block }
+
+
         send(command, &ignore_arg)
       else
         block.call if block
@@ -160,7 +164,7 @@ module BraveZealot
         # puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{col},#{row} no penalty currently occuring..."
         #@map.chunk_at_point(ot.x,ot.y).penalty=2.0
       end
-      other_tanks = r.othertanks
+      @other_tanks = r.othertanks
     end
   end
 end
