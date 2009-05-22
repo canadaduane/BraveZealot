@@ -50,7 +50,7 @@ module BraveZealot
     attr_accessor :path
     def smart
       @idx ||= 0
-      if @goal
+      unless goal_reached(10)#@goal
         
         #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
         new_path = check(:search, 1000* $options.refresh, @path){ hq.map.search(@tank, @goal) }
@@ -94,7 +94,8 @@ module BraveZealot
         speed move.speed
         angvel move.angvel
       else
-        @state = :smart_look_for_enemy_flag
+        puts "transitioning out of smart state because I reached #{@goal.inspect} I am at #{@tank.x},#{@tank.y}"
+        transition(:smart, :smart_look_for_enemy_flag)
       end
     end
     
@@ -119,7 +120,9 @@ module BraveZealot
 		# need to determine whether the enemy is in a corner or in the middle, since the position will dictate the decoy path.
 		def decoy()
 			set_decoy_goal_point
-			decoy_move_to_start
+			#decoy_move_to_start
+      push_next_state(:smart, :decoy_move_to_goal)
+      @state = :smart
 		end
 
 		def decoy_move_to_start
@@ -164,7 +167,9 @@ module BraveZealot
 		#
 		#
 		def goal_reached(threshold = 5)
-			return calc_dist(@tank, @goal) < threshold
+      dist = calc_dist(@tank,@goal)
+      puts "Distance to goal = #{dist}"
+			return dist < threshold
 		end
 
 		def tank_moving()
@@ -221,7 +226,9 @@ module BraveZealot
 	module SniperStates
 		def sniper
 			set_sniper_starting_point
-			sniper_move_to_start_position
+      push_next_state(:smart, :sniper_move_to_start_position)
+      puts "Changing state from sniper -> smart"
+			@state = :smart
 		end
 
 		def sniper_move_to_start_position
