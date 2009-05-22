@@ -168,7 +168,7 @@ module BraveZealot
 		#
 		def goal_reached(threshold = 5)
       dist = calc_dist(@tank,@goal)
-      puts "Distance to goal = #{dist}"
+      #puts "Distance to goal = #{dist}"
 			return dist < threshold
 		end
 
@@ -182,7 +182,6 @@ module BraveZealot
 			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
 			# 
 			# I'll hard code everything for this map just to do a proof of concept
-
 			
 			x = 100
 			y = -395
@@ -314,11 +313,13 @@ module BraveZealot
 			puts "@tank.angle = #{@tank.angle}"
 
 			best_enemy = select_target()
+			puts "distance to best enemy = #{calc_dist(best_enemy, @tank)}"
       target_angle = Math.atan2(best_enemy.y - @tank.y,
               best_enemy.x - @tank.x)
       relative_angle = normalize_angle(target_angle - @tank.angle)
 
-			return ((relative_angle).abs < RADIANS_PER_DEGREE)
+			puts "target_angle = #{target_angle}"
+			return ((relative_angle).abs < 0.001)
 		end
 
 		def select_target()
@@ -359,12 +360,14 @@ module BraveZealot
               best_enemy.x - @tank.x)
       relative_angle = normalize_angle(target_angle - @tank.angle)
 
+			puts "target, tank, relative = #{target_angle}, #{@tank.angle}, #{relative_angle}"			
+			puts "angvel = #{2 * relative_angle}"
 			angvel(2 * relative_angle)
 		end
 
 		def normalize_angle(angle)
 			# Make any angle be between +/- pi.
-			angle -= 2 * Math::PI * (angle / (2 * Math::PI))
+			angle -= 2 * Math::PI * (angle / (2 * Math::PI)).to_i
 
 			if angle <= -Math::PI
 				angle += 2 * Math::PI
@@ -402,8 +405,8 @@ module BraveZealot
 			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
 			# 
 			# I'll hard code everything for this map just to do a proof of concept
-			x = 50
-			y = 375
+			x = 115
+			y = 325
 			return x, y
 		end
 
@@ -413,8 +416,8 @@ module BraveZealot
 			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
 			# 
 			# I'll hard code everything for this map just to do a proof of concept
-			x = 75
-			y = 350
+			x = 150
+			y = 270
 			return x, y
 		end
 
