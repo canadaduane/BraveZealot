@@ -53,7 +53,7 @@ module BraveZealot
       if @goal
         
         #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        new_path = check(:search, 100* $options.refresh, @path){ hq.map.search(@tank, @goal) }
+        new_path = check(:search, 1000* $options.refresh, @path){ hq.map.search(@tank, @goal) }
         @path = new_path || @path || []
         @group ||= PfGroup.new
         @dest ||= [@tank.x, @tank.y]

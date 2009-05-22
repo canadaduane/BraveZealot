@@ -41,7 +41,7 @@ module BraveZealot
       dy = 0.0
       @fields.each do |f|
         fdx, fdy = f.suggest_delta(current_x, current_y)
-        puts "one of my fields suggested dx=#{fdx}, dy=#{fdy}"
+        #puts "one of my fields suggested dx=#{fdx}, dy=#{fdy}"
         dx += fdx
         dy += fdy
       end
