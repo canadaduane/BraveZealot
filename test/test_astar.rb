@@ -1,5 +1,5 @@
-require 'astar'
-require 'test/unit'
+require(File.join(File.dirname(__FILE__), "helper"))
+bzrequire 'lib/astar/astar'
 require 'benchmark'
 
 class AstarTest < Test::Unit::TestCase
