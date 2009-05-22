@@ -50,10 +50,11 @@ module BraveZealot
     attr_accessor :path
     def smart
       @idx ||= 0
-      unless goal_reached(10)#@goal
+      unless goal_reached(8)#@goal
         
         #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
         new_path = check(:search, 1000* $options.refresh, @path){ hq.map.search(@tank, @goal) }
+        #puts "I am done searching!!!"
         @path = new_path || @path || []
         @group ||= PfGroup.new
         @dest ||= [@tank.x, @tank.y]
@@ -92,8 +93,12 @@ module BraveZealot
         end
         move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
         speed move.speed
+        #puts "Setting my speed = #{move.speed}"
         angvel move.angvel
+        #puts "Setting my angvel = #{move.angvel}"
       else
+        @dest = nil
+        @path = nil
         puts "transitioning out of smart state because I reached #{@goal.inspect} I am at #{@tank.x},#{@tank.y}"
         transition(:smart, :smart_look_for_enemy_flag)
       end
@@ -290,9 +295,19 @@ module BraveZealot
 					target_enemy()
 				end
 			else
-				# capture the flag..
+				push_next_state(:smart, :sniper_flag_captured)
+        f = hq.enemy_flags.first
+        puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
+        @goal = Coord.new(f.x, f.y)
+        @state = :smart
 			end
 		end
+
+    def sniper_flag_captured
+      puts "got the enemy flag - going to my home base baby!"
+      #@goal = Coord.new(hq.my_base.center.x, hq.my_base.center.y)
+      @state = :smart_return_home
+    end
 
 		#
 		# NOTE:  The following methods are not considered states

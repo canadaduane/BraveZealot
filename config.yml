@@ -6,6 +6,6 @@
   :debug:         false
   # :abort_on_int:  true
 # This line makes ctrl-C dump a PDF map of the world:
-  # :pdf_file:      map.pdf
+  :pdf_file:      map.pdf
 # This line makes ctrl-C update the running state:
   # :state:         wait,smart

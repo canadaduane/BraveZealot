@@ -120,6 +120,9 @@ In addition to the path following optimizations we also 'tuned' the relative str
 
 \section{Tests with Another Group}
 \subsection{Our Tests}
+We ran our tests with another group:
+Michael Hansen
+Daniel Nelson
 All of our tests were run on the default BZFlag map with 24 large obstacles and 28 small.  In most cases, our team was the `green' team on the `east' side of the game area and was attempting to search out the `red' team on the `west' side of the game area.  In the case of \texttt{breadth first} search, the tank started somewhere near the middle of the game area, and targetted a flag on the `east' side.
 \par
 For each algorithm, the `nodes popped' and path distances were recorded in section ~\ref{sec:search}.  The numbers seem reasonable except in the case of our \texttt{iterative deepening} search, where the nodes popped are significantly lower than expected.  This is in part because our algorithm was so slow that we needed to give it a little boost by putting the tank close to the goal---very close, in fact.  Thus, our measurements in this particular case are not comparable with the other algorithm measurements.

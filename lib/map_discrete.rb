@@ -66,7 +66,7 @@ module BraveZealot
           pdf.stroke_color Color::RGB::Red
           # p options[:paths]
           options[:paths].each do |path|
-            if path
+            if path and path.size > 1
               x, y = array_to_world_coordinates(path[0][0], path[0][1])
               shape = pdf.move_to(x, y)
               path[1..-1].each do |ax, ay|
