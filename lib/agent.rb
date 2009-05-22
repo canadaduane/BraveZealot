@@ -47,34 +47,51 @@ module BraveZealot
   end
   
   module SmartStates
+    attr_accessor :path
+    
     def smart
       @idx ||= 0
       if @goal
-        puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        new_path = hq.map.search(@tank, @goal)
-        @path = new_path || @path
-        group = PfGroup.new
         
-        if @path.size > 10
-          n = hq.map.array_to_world_coordinates(@path[10][0], @path[10][1])
-          group.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
-          
-          # File.open("map#{@idx += 1}.gpi", "w") do |f|
-          #   data = hq.map.to_gnuplot do
-          #     puts "prep path: #{@path.inspect}"
-          #     "\n\n# Path:\n" +
-          #     "plot '-' with vectors head\n" +
-          #     @path.map{ |x, y| x, y = hq.map.array_to_world_coordinates(x, y); "#{x} #{y} #{2} #{2}" }.join("\n") + "\n"
-          #     # group.to_gnuplot_part(hq.map.world_size)
-          #   end
-          #   puts "Done prep"
-          #   f.write data
-          # end
-          # exit(-1)
+        #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
+        new_path = check(:search, 100* $options.refresh, @path){ hq.map.search(@tank, @goal) }
+        @path = new_path || @path
+        @group ||= PfGroup.new
+        @dest ||= [@tank.x, @tank.y]
+        
+        if @path.size > 2
+          refresh($options.refresh) do
+            #puts "Calculating distance to #{@dest[0]},#{@dest[1]}"
+            dist = Math::sqrt((@dest[0] - @tank.x)**2 + (@dest[1] - @tank.y)**2)
+            #puts "I am #{dist} away from my next destinattion at #{@dest[0]},#{@dest[1]}"
+            if dist < 15 then
+              last = hq.map.array_to_world_coordinates(@path[0][0], @path[0][1])
+              nex = hq.map.array_to_world_coordinates(@path[1][0], @path[1][1])
+              difference = nex[0]-last[0],nex[1]-last[1]
+              nex_idx = 1
+              @path.each_with_index do |pos, idx|
+                cand = hq.map.array_to_world_coordinates(pos[0],pos[1])
+                cand_diff = cand[0]-nex[0],cand[1]-nex[1]
+                if cand_diff[0] == difference[0] and cand_diff[1] == difference[1] then
+                  nex = cand
+                  nex_idx = idx
+                else
+                  break
+                end
+              end
+              @path.slice!(0..(nex_idx-1))
+              @group = PfGroup.new
+              puts "updating goal to be at #{nex[0]},#{nex[1]}"
+              @group.add_field(Pf.new(nex[0], nex[1], hq.map.world_size, 5, 1))
+              @dest = nex
+            end
+          end
         else
-          group.add_goal(@goal.x, @goal.y, hq.map.world_size)
+          #puts "Updating goal to be at the goal"
+          @group = PfGroup.new
+          @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 1))
         end
-        move = group.suggest_move(@tank.x, @tank.y, @tank.angle)
+        move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
         speed move.speed
         angvel move.angvel
       else
@@ -434,9 +451,30 @@ module BraveZealot
       
       # Change state up to every +refresh+ seconds
       EventMachine::PeriodicTimer.new($options.refresh) do
-        puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        #puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
+    end
+
+    # Check if we have fresh enough data, otherwise execute the block
+    def check(symbol, freshness, default)
+      if (Time.now - last_checked(symbol)) > freshness then
+        checked(symbol,Time.now)
+        yield
+      else
+        default
+      end
+    end
+
+    def last_checked(symbol)
+      @times ||= {}
+      @times[symbol] || Time.at(0)
+    end
+
+    def checked(symbol,time)
+      @times ||= {}
+      puts "Refreshing #{symbol}"
+      @times[symbol] = time
     end
     
     def wait

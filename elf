@@ -195,15 +195,24 @@ when "stop" then
     puts "Stopping brave.rb..."
     kill_brave!(:all)
   end
+  sleep 0.2
   
   if robot_running?
     puts "Stopping robots..."
     kill_robot!(:all)
   end
+  sleep 0.2
   
   if server_running?
     puts "Stopping server..."
     kill_server!
+  end
+when "killbrave" then
+  if brave_running?
+    puts "Stopping brave.rb..."
+    kill_brave!(:all)
+  else
+    puts "No brave.rb processes to kill."
   end
 when "server" then
   if $options.force_restart

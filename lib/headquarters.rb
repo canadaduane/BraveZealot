@@ -5,16 +5,26 @@ bzrequire 'lib/pf_group'
 
 module BraveZealot
   class Headquarters < Communicator
-    attr_reader :map, :my_color, :my_base, :mytanks_time, :other_tanks
-    attr_reader :agents
-
+    attr_reader :map, :my_color, :my_base, :mytanks_time, :agents
+    
     class MissingData < Exception; end
     
     def start
       @agents = []                # Current BraveZealot::Agent objects
       @world_time = 0.0           # Last communicated world time
       @message_times = {}         # Last time we received a message (in Time.now units)
-      @other_tanks = []
+      
+      trap("INT") do
+        # Spit out a map
+        @pdf_count ||= 0
+        file = $options.pdf_file || "map.pdf"
+        file.sub!(".", "#{@pdf_count += 1}.")
+        puts "\nWriting map to pdf: #{file}\n"
+        @map.to_pdf(nil,
+          :my_color => my_color,
+          :paths    => @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+        ).save_as(file)
+      end
       
       # Gather initial world data... which team are we?  how big is the map?
       constants do |r|
@@ -27,11 +37,11 @@ module BraveZealot
         end
         @map = BraveZealot::MapDiscrete.new(world_size)
         
-        refresh(:bases) do
-          refresh(:obstacles) do
-            refresh(:flags) do
-              refresh(:othertanks) do
-                #Spit out a map
+        bases do |r|
+          obstacles do |r|
+            flags do |r|
+              othertanks do |r|
+
                 #f = File.new($options.gnuplot_file, 'w')
                 #f.write(@map.to_gnuplot)
                 #f.close
@@ -43,6 +53,7 @@ module BraveZealot
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
+                  
                 end
               end
             end
@@ -140,6 +151,7 @@ module BraveZealot
     end
     
     def on_mytanks(r)
+      @map.mytanks = r.mytanks
       r.mytanks.each do |t|
         @agents[t.index].tank = t if @agents.size > t.index
       end
@@ -159,12 +171,7 @@ module BraveZealot
     end
 
     def on_othertanks(r)
-      r.othertanks.each do |ot|
-        # col,row = @map.world_to_array_coordinates(ot.x, ot.y)
-        # puts "I saw an enemy tank at #{ot.to_coord.inspect} or #{col},#{row} no penalty currently occuring..."
-        #@map.chunk_at_point(ot.x,ot.y).penalty=2.0
-      end
-      @other_tanks = r.othertanks
+      @map.othertanks = r.othertanks
     end
   end
 end

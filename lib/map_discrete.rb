@@ -23,8 +23,17 @@ module BraveZealot
     
     # returns column, row
     def world_to_array_coordinates(x, y)
-      return ((x - world_x_min) / @granularity).to_i, 
-             ((world_y_max - y) / @granularity).to_i
+      coords = [((x - world_x_min) / @granularity).to_i, 
+             ((world_y_max - y) / @granularity).to_i]
+      final = coords.map do |v|
+        if v < 0 then 
+          0
+        elsif v > (@side_length-1) then
+          (@side_length-1)
+        else 
+          v
+        end
+      end
     end
     
     def coord_to_index(x, y)
@@ -49,35 +58,28 @@ module BraveZealot
       @astar.search(s[0], s[1], g[0], g[1])
     end
     
-    def to_gnuplot
-      str = super do
-        str = ""
-        #puts "Looping from 1..#{@side_length}"
-        #for idx in 1..@side_length 
-        #  str << "set arrow from " +
-        #        "#{idx*@granularity - world_x_max},#{@side_length*@granularity - world_y_max} to " +
-        #        "#{idx*@granularity},#{@side_length*@granularity} nohead lt 1\n"
-        #  str << "set arrow from " +
-        #        "#{-1*@side_length*@granularity - world_x_max},#{idx*@granularity - world_y_max} to " +
-        #        "#{@side_length*@granularity},#{idx*@granularity} nohead lt 1\n"
-        #end
-        #str
-        for row in 0..@side_length
-          for col in 0..@side_length
-            if @map[coord_to_index(col, row)] == -1
-              x,y = array_to_world_coordinates(col,row)
-              str << "set arrow from " +
-                  "#{x - (@granularity/2)},#{y - (@granularity/2)} to " +
-                  "#{x + (@granularity/2)},#{y + (@granularity/2)} nohead lt 3\n" 
+    def to_pdf(pdf = nil, options = {})
+      super do |pdf|
+        
+        if options[:paths]
+          pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
+          pdf.stroke_color Color::RGB::Red
+          # p options[:paths]
+          options[:paths].each do |path|
+            if path
+              x, y = array_to_world_coordinates(path[0][0], path[0][1])
+              shape = pdf.move_to(x, y)
+              path[1..-1].each do |ax, ay|
+                x, y = array_to_world_coordinates(ax, ay)
+                shape.line_to(x, y)
+              end
+              shape.stroke
             end
           end
+          pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
         end
-        str
       end
-      str += yield if block_given?
-      str
     end
-    
   end
 
 end
