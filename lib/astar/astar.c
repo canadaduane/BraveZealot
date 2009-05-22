@@ -82,12 +82,11 @@ static void explore(
         sy >= 0 && sy < height )
     {
         int coord = AT(sx, sy);
-        if ( !closed[coord] )
+        Chunk* nextval = cmap + coord;
+        
+        if( nextval->weight >= 0 )
         {
-            closed[coord] = 1;
-            
-            Chunk* nextval = cmap + coord;
-            if( nextval->weight >= 0 )
+            if ( !closed[coord] )
             {
                 double gdist, hdist;
                 gdist = unitdist[ (nextval->y - cval->y + 1) * 3 +
@@ -105,8 +104,8 @@ static void explore(
                     nextval->prev_chunk = (void *)cval;
                     pq_insert(queue, (void *)(nextval));
 
-                    // rb_warn("explore added x: %d, y: %d, g: %f, h: %f", sx, sy, nextval->g, hdist);
-                    // rb_warn("explore added x: %d, y: %d, w: %f", sx, sy, nextval->weight);
+                    // printf("explore added x: %d, y: %d, w: %f, g: %f, h: %f\n",
+                    //         sx, sy, nextval->weight, nextval->g, hdist);
                 }
             }
         }
@@ -158,7 +157,7 @@ static VALUE astar_search(
     
     // Create the PQ and initialize it with the starting chunk
     PriorityQueue* queue = pq_new(QUEUE_MAX, chunk_less_than, dummy_free);
-    closed[AT(start_x, start_y)] = 1;
+    closed[AT(start_x, start_y)] = 0;
     Chunk* cval = cmap + AT(start_x, start_y);
     cval->h = sqrt((end_x-start_x)*(end_x-start_x)+(end_y-start_y)*(end_y-start_y));
     cval->g = 0;
@@ -170,6 +169,7 @@ static VALUE astar_search(
     while(cval->x != end_x || cval->y != end_y)
     {
         // show_chunk_queue(queue);
+        // Remove chunk with lowest f-score
         cval = (Chunk*)pq_pop(queue);
         
         // No solution if there are no chunks left
@@ -179,7 +179,10 @@ static VALUE astar_search(
             return Qnil;
         }
         
-        // rb_warn("cval | x: %d, y: %d, f: %f, g: %f, h: %f", cval->x, cval->y, (cval->g + cval->h), cval->g, cval->h);
+        // Add chunk to closed set
+        closed[AT(cval->x, cval->y)] = 1;
+        
+        // printf("cval | x: %d, y: %d, f: %f, g: %f, h: %f\n", cval->x, cval->y, (cval->g + cval->h), cval->g, cval->h);
         // Add 8 neighbors if they are not in the closed list
         explore(cmap, closed, queue, cval, width, height, end_x, end_y, -1, -1);
         explore(cmap, closed, queue, cval, width, height, end_x, end_y, -1,  0);
