@@ -1,9 +1,12 @@
 bzrequire 'lib/obstacle.rb'
 bzrequire 'lib/indent'
 
+require 'pdf/writer'
+
 module BraveZealot
   class Map
     attr_accessor :world_size, :bases, :obstacles, :flags
+    attr_accessor :mytanks, :othertanks
     
     def initialize(world_size)
       raise ArgumentError, "World size cannot be nil or zero" if world_size.nil? or world_size == 0
@@ -11,6 +14,8 @@ module BraveZealot
       @bases      = []
       @obstacles  = []
       @flags      = []
+      @mytanks    = []
+      @othertanks = []
     end
     
     def world_x_min
@@ -29,31 +34,32 @@ module BraveZealot
       @world_y_max ||=  @world_size / 2
     end
     
-    def obstacles_plot_string
-      hs = @world_size / 2
-      str = unindent(<<-GNUPLOT)
-        # Set up our map first:
-        set xrange [-#{hs}: #{hs}]
-        set yrange [-#{hs}: #{hs}]
-        unset key
-        set size square
-        
-        # Draw Obstacles:
-        unset arrow
-      GNUPLOT
-      self.obstacles.each do |o|
-        str += o.to_gnuplot
+    def to_pdf(pdf = nil, options = {})
+      options = {
+        :obstacles  => obstacles,
+        :flags      => flags,
+        :bases      => bases,
+        :mytanks    => mytanks,
+        :othertanks => othertanks
+      }.merge(options)
+      
+      pdf ||= PDF::Writer.new(:paper => [-450, -450, 450, 450])
+      
+      # Draw optional map parts
+      options.each_pair do |key, items|
+        items.each do |i|
+          i.to_pdf(pdf, options) if i.respond_to?(:to_pdf)
+        end if items
       end
-      str
-    end
-    
-    def to_gnuplot
-      hs = @world_size / 2
-      str = obstacles_plot_string
-      str << yield if block_given?
-      str << "plot '-' with lines\n"
-      str << " 0 0 0 0\n"
-      str << "e\n"
+      
+      yield pdf if block_given?
+      
+      # Draw surrounding wall
+      pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
+      pdf.stroke_color Color::RGB::Black
+      pdf.rectangle(-400, -400, 800, 800).close_stroke
+      
+      pdf
     end
   end
   

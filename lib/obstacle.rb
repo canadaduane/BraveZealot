@@ -6,21 +6,34 @@ module BraveZealot
     def initialize(coords)
       @coords = coords
     end
-
-    def to_gnuplot
-      str = ""
-      sides.each do |s|
-        str +=  "set arrow from " +
-                "#{s.start.x},#{s.start.y} to " +
-                "#{s.finish.x},#{s.finish.y} nohead lt 3\n"
+    
+    def to_pdf(pdf = nil, options = {})
+      return if pdf.nil?
+      
+      pdf.stroke_color Color::RGB::Red
+      pdf.fill_color   Color::RGB::Pink
+      
+      shape = pdf.move_to(coords[-1].x, coords[-1].y)
+      coords.each do |c|
+        shape.line_to(c.x, c.y)
       end
-      #if rect? then
-      #  str += "set arrow from " +
-      #          "#{@coords[0].x}, #{@coords[0].y} to " +
-      #          "#{@coords[2].x}, #{@coords[2].y} nohead lt 5\n"
-      #end
-      str
+      shape.fill_stroke
     end
+    
+    # def to_gnuplot
+    #   str = ""
+    #   sides.each do |s|
+    #     str +=  "set arrow from " +
+    #             "#{s.start.x},#{s.start.y} to " +
+    #             "#{s.finish.x},#{s.finish.y} nohead lt 3\n"
+    #   end
+    #   #if rect? then
+    #   #  str += "set arrow from " +
+    #   #          "#{@coords[0].x}, #{@coords[0].y} to " +
+    #   #          "#{@coords[2].x}, #{@coords[2].y} nohead lt 5\n"
+    #   #end
+    #   str
+    # end
 
     def center
       if @center.nil? then
