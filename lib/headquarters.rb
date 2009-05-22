@@ -14,19 +14,7 @@ module BraveZealot
       @world_time = 0.0           # Last communicated world time
       @message_times = {}         # Last time we received a message (in Time.now units)
       
-			if false
-		    trap("INT") do
-		      # Spit out a map
-		      @pdf_count ||= 0
-		      file = $options.pdf_file || "map.pdf"
-		      file.sub!(".", "#{@pdf_count += 1}.")
-		      puts "\nWriting map to pdf: #{file}\n"
-		      @map.to_pdf(nil,
-		        :my_color => my_color,
-		        :paths    => @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
-		      ).save_as(file)
-		    end
-			end
+      install_signal_trap
       
       # Gather initial world data... which team are we?  how big is the map?
       constants do |r|
@@ -174,6 +162,39 @@ module BraveZealot
 
     def on_othertanks(r)
       @map.othertanks = r.othertanks
+    end
+    
+    def install_signal_trap
+      trap("INT") do
+        if File.exist?($options.config_file)
+          $options = OpenStruct.new(
+            $options.instance_variable_get("@table").merge(
+              YAML.load(IO.read($options.config_file))))
+          if $options.pdf_file
+            @pdf_count ||= 0
+            file = $options.pdf_file || "map.pdf"
+            file.sub!(".", "#{@pdf_count += 1}.")
+            puts "\nWriting map to pdf: #{file}\n"
+            @map.to_pdf(nil,
+              :my_color => my_color,
+              :paths    => @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+            ).save_as(file)
+          end
+          if $options.state
+            # Convert a comma-delimited list into states array
+            states = state_list($options.state)
+            # Update the agent states
+            @agents.each_with_index { |a, i| a.state = states[i] }
+          end
+          if $options.abort_on_int
+            EventMachine::stop_event_loop
+            exit(0)
+          end
+        else
+          EventMachine::stop_event_loop
+          exit(0)
+        end
+      end
     end
   end
 end
