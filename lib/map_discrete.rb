@@ -23,8 +23,17 @@ module BraveZealot
     
     # returns column, row
     def world_to_array_coordinates(x, y)
-      return ((x - world_x_min) / @granularity).to_i, 
-             ((world_y_max - y) / @granularity).to_i
+      coords = [((x - world_x_min) / @granularity).to_i, 
+             ((world_y_max - y) / @granularity).to_i]
+      final = coords.map do |v|
+        if v < 0 then 
+          0
+        elsif v > (@side_length-1) then
+          (@side_length-1)
+        else 
+          v
+        end
+      end
     end
     
     def coord_to_index(x, y)

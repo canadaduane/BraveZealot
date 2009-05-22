@@ -86,13 +86,14 @@ module BraveZealot
       m = Move.new(speed, angvel)
 
       #if we don't need to move, then lets not spin
-      if ( speed == 0 ) then
+      if ( speed < 0.01 ) then
         angvel = 0
       end
 
       # And the final factor in our speed is based on how far off our desired
       # angle we are (Note: we should never be turning more than pi)
-      speed = m.speed()*((((Math::PI - a.abs()).abs())) / Math::PI )
+      #speed = m.speed()*((2*((((Math::PI - a.abs()).abs())) / Math::PI ))-1)
+      speed = m.speed()*((((((Math::PI - a.abs()).abs())) / Math::PI )))
       
       m = Move.new(speed, angvel)
       return m

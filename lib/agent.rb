@@ -53,9 +53,20 @@ module BraveZealot
         @path = new_path || @path
         group = PfGroup.new
         
-        if @path.size > 10
-          n = hq.map.array_to_world_coordinates(@path[10][0], @path[10][1])
-          group.add_field(Pf.new(n[0], n[1], hq.map.world_size, -50, 0.2))
+        if @path.size > 2
+          last = hq.map.array_to_world_coordinates(@path[0][0], @path[0][1])
+          nex = hq.map.array_to_world_coordinates(@path[1][0], @path[1][1])
+          difference = nex[0]-last[0],nex[1]-last[1]
+          @path.each do |pos|
+            cand = hq.map.array_to_world_coordinates(pos[0],pos[1])
+            cand_diff = cand[0]-nex[0],cand[1]-nex[1]
+            if cand_diff[0] == difference[0] and cand_diff[1] == difference[1] then
+              nex = cand
+            else
+              break
+            end
+          end
+          group.add_field(Pf.new(nex[0], nex[1], hq.map.world_size, 0, 500))
           
           # File.open("map#{@idx += 1}.gpi", "w") do |f|
           #   data = hq.map.to_gnuplot do
