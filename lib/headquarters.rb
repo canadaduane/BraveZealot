@@ -184,6 +184,10 @@ module BraveZealot
             # Update the agent states
             @agents.each_with_index { |a, i| a.state = states[i] }
           end
+          if $options.abort_on_int
+            EventMachine::stop_event_loop
+            exit(0)
+          end
         else
           EventMachine::stop_event_loop
           exit(0)
