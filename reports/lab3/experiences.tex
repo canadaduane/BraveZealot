@@ -1,21 +1,22 @@
 \chapter{Experiences and Time Spent}\label{chap:exp}
 \section{Duane's Summary}
-The majority of my time this week was spent optimizing our $A^*$ algorithm.  Our original implementation was entirely in Ruby, but it turned out to be too slow for discretization below 40 meters or so.  The new code is a Ruby extension written in C, and performs much better (1/2 second compared with 45 seconds).
+The majority of my time this week was spent optimizing our $A^*$ algorithm.  Our original implementation was entirely in Ruby, but it turned out to be too slow for discretization below 40 meters or so.  The new code is a Ruby extension written in C, and performs much better (1/2 second compared with 45 seconds on a $1000\times 1000$ grid).
 \par
 I also refactored our agent code to use state transitions for this lab.  Rather than using several different Agent classes for each task (e.g. a `dummy' agent vs a `smart' agent), we unified our code into a single agent that could make decisions regarding states.  Once this refactoring was in place, Jon Brandenburg specialized our agents for sniper and decoy capabilities.
 \par
-I spent about 15 hours on this project, divided as follows:
+I spent about 18 hours on this project, divided as follows:
 \begin{itemize}
     \item 8 hours implementing a fast $A^*$ algorithm in C
     \item 3 hours refactoring our agents to use state information
+    \item 3 hours building a new PDF output of our map with tank and flag positions
     \item 2 hours debugging and passing off with another team in the CS Sports lab.
     \item 2 hours writing this report and formatting it in \LaTeX
 \end{itemize}
 
 \section{Michael's Summary}
-This lab was especially fun because once again we got to see our agents take action in the bzflags world.  We now had the ability to see what our agents were 'thinking' by using Duane's code to generate PDF maps of how the agents saw the world.  We also had the ability to watch them act by joining the bzflag world as an observer.  This made it much more insteresting to work on because we could see immediate results.
+This lab was especially fun because once again we got to see our agents take action in the BZFlag world.  We now had the ability to see what our agents were `thinking' by using Duane's code to generate PDF maps of how the agents saw the world.  We also had the ability to watch them act by joining the BZFlag world as an observer.  This made it much more insteresting to work on because we could see immediate results.
 \par
-Duane was the first to make serious progress with his $A*$ module written in C.  This gave Jon and I a good place to start implementing out parts.  I focused on implementing the path-following code and using potential fields.  The original implementation would always place an attractive potential field on the next node in the solution path, but that made our agents very slow and tentative because the individual path segments were very small. This gave rise to the idea of placing the attractive field further ahead.  This eventually turned into the algorithm that places the Potential Field as far ahead as possible before encountering a turn.
+Duane was the first to make serious progress with his $A^*$ module written in C.  This gave Jon and me a good place to start implementing our parts.  I focused on implementing the path-following code and using potential fields.  The original implementation would always place an attractive potential field on the next node in the solution path, but that made our agents very slow and tentative because the individual path segments were very small. This gave rise to the idea of placing the attractive field further ahead.  This eventually turned into the algorithm that places the Potential Field as far ahead as possible before encountering a turn.
 \par
 In the end I spent a total of about 20 hours split across the following tasks:
 \begin{itemize}
@@ -29,3 +30,8 @@ In the end I spent a total of about 20 hours split across the following tasks:
 \end{itemize}
 
 \section{Jon's Summary}
+
+I worked on the sniper/decoy code.  The difficult part of this lab was transitioning to another team's code base.  I got a late start since it took  longer than anticipated to finish up the previous lab which left me with little time to work on completing this lab.
+
+In terms of time I spent somewhere between 15-20 hours on the project with about ten of those hours being spent writing/tweaking code, the rest being spent writing the report, thinking about it, demonstrating/observing, emails and team meetings.
+
