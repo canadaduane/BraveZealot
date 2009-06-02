@@ -49,11 +49,12 @@ module BraveZealot
   module SmartStates
     attr_accessor :path
     def smart
+      #puts "in the smart state"
       @idx ||= 0
       unless goal_reached(8)#@goal
         
         #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        new_path = check(:search, 1000* $options.refresh, @path){ hq.map.search(@tank, @goal) }
+        new_path = check(:search, 1000* $options.refresh, @path, (@path.nil? or @path.empty?)){ hq.map.search(@tank, @goal) }
         #puts "I am done searching!!!"
         @path = new_path || @path || []
         @group ||= PfGroup.new
@@ -64,7 +65,7 @@ module BraveZealot
             #puts "Calculating distance to #{@dest[0]},#{@dest[1]}"
             dist = Math::sqrt((@dest[0] - @tank.x)**2 + (@dest[1] - @tank.y)**2)
             #puts "I am #{dist} away from my next destinattion at #{@dest[0]},#{@dest[1]}"
-            if dist < 15 then
+            if dist < 25 then
               last = hq.map.array_to_world_coordinates(@path[0][0], @path[0][1])
               nex = hq.map.array_to_world_coordinates(@path[1][0], @path[1][1])
               difference = nex[0]-last[0],nex[1]-last[1]
@@ -89,7 +90,7 @@ module BraveZealot
         else
           #puts "Updating goal to be at the goal"
           @group = PfGroup.new
-          @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 1))
+          @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 0.001))
         end
         move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
         speed move.speed
@@ -99,6 +100,8 @@ module BraveZealot
       else
         @dest = nil
         @path = nil
+        @idx = 0
+        @group = nil
         puts "transitioning out of smart state because I reached #{@goal.inspect} I am at #{@tank.x},#{@tank.y}"
         transition(:smart, :smart_look_for_enemy_flag)
       end
@@ -116,7 +119,10 @@ module BraveZealot
     end
     
     def smart_return_home
+      puts "Going into the the smart_return_home state..."
       @goal = hq.my_base.center
+      puts "goal at #{@goal.inspect}, path=#{@path}, idx=#{@idx}, dest=#{@dest}, group=#{@group}"
+      push_next_state(:smart, :dummy)
       @state = :smart
     end
   end
@@ -125,43 +131,26 @@ module BraveZealot
 		# need to determine whether the enemy is in a corner or in the middle, since the position will dictate the decoy path.
 		def decoy()
 			set_decoy_goal_point
-			#decoy_move_to_start
-      push_next_state(:smart, :decoy_move_to_goal)
-      @state = :smart
 		end
 
 		def decoy_move_to_start
+      unless enemy_tanks_alive then
+        @state = :dummy
+        return
+      end
 
-			# determine whether we've reached the goal, if so, transition
-			if goal_reached()
-				set_decoy_goal_point
-			else
-	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-		    speed move.speed
-		    angvel move.angvel
-			end
+      set_decoy_starting_point
 		end
 
 		def decoy_move_to_goal
 
 			# determine whether we've reached the goal, if so, transition
-			if enemy_tanks_alive() == false
+			unless enemy_tanks_alive() then
 				# transition to the next state
-			 	@state = :smart_return_home
+			 	@state = :dummy
 				return
 			end
-
-			if goal_reached()
-				# this has a logic bug in it since if I'm in move_to_start and have killed 
-				# the enemies I don't immediate change my behavior, I continue to proceed until
-				# I transition back to moving towards the goal before I check the state of whether
-				# the enemies are killed
-				set_decoy_starting_point
-			else
-	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-		    speed move.speed
-		    angvel move.angvel
-			end
+      set_decoy_goal_point
 		end
 		
 		#
@@ -207,10 +196,11 @@ module BraveZealot
 				# calculate a new destination
 				x, y = calculate_decoy_starting_point()
 	      @goal = Coord.new(x, y)
-	      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+	      #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
 
 				# transition to the next state
-			 	@state = :decoy_move_to_start
+        push_next_state(:smart, :decoy_move_to_goal)
+			 	@state = :smart
 		end
 
 		def set_decoy_goal_point
@@ -220,59 +210,30 @@ module BraveZealot
 				# calculate a new destination
 				x, y = calculate_decoy_ending_point()
 	      @goal = Coord.new(x, y)
-	      @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+	      #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
 
 				# transition to the next state
-			 	@state = :decoy_move_to_goal
+			 	push_next_state(:smart, :decoy_move_to_start)
+        @state = :smart
 		end
 	end
 
 	module SniperStates
 		def sniper
-			set_sniper_starting_point
-      push_next_state(:smart, :sniper_move_to_start_position)
-      puts "Changing state from sniper -> smart"
-			@state = :smart
+			@state = sniper_move_to_start_position
 		end
 
 		def sniper_move_to_start_position
 			puts "snipe_move_to_start_position"
-
-			# determine whether we've reached the goal, if so, transition
-			if goal_reached(5.5)
-				puts "reached starting position"
-				speed(0)
-				if decoy_is_closer()
-					set_sniper_attacking_point()
-				else
-					# otherwise just wait until it is safe to attack.
-				end
-			else
-				puts "moving towards starting position"
-	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-				log_move(move)
-		    speed move.speed
-		    angvel move.angvel
-			end
+      set_sniper_starting_point
 		end
 
 		def sniper_move_to_attack_position
 			puts "snipe_move_to_attack_position"
-			# determine whether we've reached the goal, if so, transition
-			if goal_reached(5.5)
-				puts "reached attack position"
-				speed(0)
-				# I should be doing a check at this point, but I'm just going to
-				# set it in bezerker mode for now
-				@state = :sniper_attack
-				sniper_attack
-			else
-				puts "moving into attack position"
-	      move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-				#log_move(move)
-		    speed move.speed
-		    angvel move.angvel
-			end
+			speed(0)
+      if decoy_is_closer()
+        set_sniper_attacking_point
+      end
 		end
 
 		def log_move(move)
@@ -440,27 +401,18 @@ module BraveZealot
 			x, y = calculate_sniper_starting_position()
       @goal = Coord.new(x, y)
 
-			# setup the potential fields...
-      @group = PfGroup.new(false)
-
-			# attractive field (full weight)
-      @group.add_field(Pf.new(x, y, hq.map.world_size, 5, 0.8))
-
-			@state = :sniper_move_to_start_position
+      # transition to the next state
+      push_next_state(:smart, :sniper_move_to_attack_position)
+      @state = :smart
 		end
 
 		def set_sniper_attacking_point()
 			x, y = calculate_sniper_attacking_position()
       @goal = Coord.new(x, y)
 
-			# setup the potential fields...
-      @group = PfGroup.new(false)
-
-			# attractive field (full weight)
-      @group.add_field(Pf.new(x, y, hq.map.world_size, 5, 0.8))
-
-			# transition to the next state
-		 	@state = :sniper_move_to_attack_position
+      # transition to the next state
+      push_next_state(:smart, :sniper_attack)
+      @state = :smart
 		end
 	end
 
@@ -495,8 +447,8 @@ module BraveZealot
     end
 
     # Check if we have fresh enough data, otherwise execute the block
-    def check(symbol, freshness, default)
-      if (Time.now - last_checked(symbol)) > freshness then
+    def check(symbol, freshness, default, force_check)
+      if ((Time.now - last_checked(symbol)) > freshness) or force_check then
         checked(symbol,Time.now)
         yield
       else
