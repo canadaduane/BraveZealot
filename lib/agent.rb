@@ -82,7 +82,7 @@ module BraveZealot
               end
               @path.slice!(0..(nex_idx-1))
               @group = PfGroup.new
-              puts "updating goal to be at #{nex[0]},#{nex[1]}"
+              #puts "updating goal to be at #{nex[0]},#{nex[1]}"
               @group.add_field(Pf.new(nex[0], nex[1], hq.map.world_size, 5, 1))
               @dest = nex
             end
@@ -90,13 +90,11 @@ module BraveZealot
         else
           #puts "Updating goal to be at the goal"
           @group = PfGroup.new
-          @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 0.001))
+          @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 0.5))
         end
         move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
         speed move.speed
-        #puts "Setting my speed = #{move.speed}"
         angvel move.angvel
-        #puts "Setting my angvel = #{move.angvel}"
       else
         @dest = nil
         @path = nil
@@ -162,7 +160,7 @@ module BraveZealot
 		#
 		def goal_reached(threshold = 5)
       dist = calc_dist(@tank,@goal)
-      #puts "Distance to goal = #{dist}"
+#       #puts "Distance to goal = #{dist}"
 			return dist < threshold
 		end
 
