@@ -414,6 +414,87 @@ module BraveZealot
 		end
 	end
 
+  module SittingDuck
+    def duck
+      # do nothing
+			@state = :duck
+			speed(0)
+			angvel(0)
+    end
+  end
+
+  module ConstantVelocity
+    def cv
+      @state = :cv
+
+			puts "ca - iteration"
+			puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			speed(0.5)
+			angvel(0)
+    end
+  end
+
+  module ConstantAcceleration
+
+		@@current_accel = 0
+
+    def ca
+      @state = :ca
+
+			puts "ca - iteration"
+			puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			puts "\ttank.status = #{@tank.status}"
+			if @tank.status == 'dead'
+				@@current_accel = 0
+				angvel(0)
+			else
+				@@current_accel = @@current_accel + 0.001
+			end
+
+			speed(@@current_accel)
+			angvel(@@current_accel)
+    end
+  end
+
+  module GaussianAcceleration
+
+		current_accel = 0
+
+
+    def ga
+      @state = :ga_run
+			@E = 2.71828182845904523536
+			@a = 1.0
+			@b = 0.0
+			@c = 1.0
+    end
+
+		def ga_run
+			# this needs to be done..
+
+			x = rand(200)
+			puts "rand = #{x}"
+			x = (x - 100) / 100.0
+			puts "x = #{x}"
+
+			# function pulled from:
+			# http://en.wikipedia.org/wiki/Gaussian_function
+			gf = (@a * @E) * - ((x - @b)**2 / (2 * @c**2))
+			puts "gf = #{gf}"
+			speed(-1 * gf)
+			angvel(rand_sign() * gf)
+		end
+
+		def rand_sign()
+			if rand(2) == 1
+				return 1
+			else
+				return -1
+			end
+		end
+  end
+
+
   class Agent
     # hq   :: Headquarters  -> The headquarters object
     # tank :: Tank          -> Data object
@@ -428,6 +509,15 @@ module BraveZealot
     include SmartStates
 		include DecoyStates
 		include SniperStates
+
+		# Conforming Pigeons
+		include SittingDuck
+		include ConstantVelocity
+		include ConstantAcceleration
+		include GaussianAcceleration
+		
+		# Non-conforming Pigeons
+		include WildPigeon
     
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)
