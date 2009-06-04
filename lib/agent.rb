@@ -427,8 +427,8 @@ module BraveZealot
     def cv
       @state = :cv
 
-			puts "ca - iteration"
-			puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			#puts "cv - iteration"
+			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
 			speed(0.5)
 			angvel(0)
     end
@@ -441,9 +441,9 @@ module BraveZealot
     def ca
       @state = :ca
 
-			puts "ca - iteration"
-			puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
-			puts "\ttank.status = #{@tank.status}"
+			#puts "ca - iteration"
+			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			#puts "\ttank.status = #{@tank.status}"
 			if @tank.status == 'dead'
 				@@current_accel = 0
 				angvel(0)
@@ -473,14 +473,14 @@ module BraveZealot
 			# this needs to be done..
 
 			x = rand(200)
-			puts "rand = #{x}"
+			#puts "rand = #{x}"
 			x = (x - 100) / 100.0
-			puts "x = #{x}"
+			#puts "x = #{x}"
 
 			# function pulled from:
 			# http://en.wikipedia.org/wiki/Gaussian_function
 			gf = (@a * @E) * - ((x - @b)**2 / (2 * @c**2))
-			puts "gf = #{gf}"
+			#puts "gf = #{gf}"
 			speed(-1 * gf)
 			angvel(rand_sign() * gf)
 		end
@@ -494,6 +494,42 @@ module BraveZealot
 		end
   end
 
+  module WildPigeon
+
+		#	algorithm description
+		# ways to fool the filter..
+		#
+		# random period of time
+		# random acceleration
+		# random angle/direction
+
+
+    def wild
+			@state = :wild_run
+			@speed_timer = 1
+			@angvel_timer = 1
+			@max_period = 25.0
+    end
+
+		def wild_run
+			@speed_timer -= 1
+			@angvel_timer -= 1
+			
+			if @speed_timer == 0
+				@speed_timer = rand(@max_period.to_i) + 1
+				velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+				speed(velocity)
+				puts "speed_timer, velocity = #{@speed_timer}, #{velocity}"
+			end
+
+			if @angvel_timer == 0
+				@angvel_timer = rand(@max_period.to_i) + 1
+				angular_velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+				angvel(angular_velocity)
+				puts "angvel_timer, angular_velocity = #{@angvel_timer}, #{angular_velocity}"
+			end
+		end
+  end
 
   class Agent
     # hq   :: Headquarters  -> The headquarters object
