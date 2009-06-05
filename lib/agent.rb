@@ -432,6 +432,123 @@ module BraveZealot
 		end
 	end
 
+  module SittingDuck
+    def duck
+      # do nothing
+			@state = :duck
+			speed(0)
+			angvel(0)
+    end
+  end
+
+  module ConstantVelocity
+    def cv
+      @state = :cv
+
+			#puts "cv - iteration"
+			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			speed(0.5)
+			angvel(0)
+    end
+  end
+
+  module ConstantAcceleration
+
+		@@current_accel = 0
+
+    def ca
+      @state = :ca
+
+			#puts "ca - iteration"
+			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+			#puts "\ttank.status = #{@tank.status}"
+			if @tank.status == 'dead'
+				@@current_accel = 0
+				angvel(0)
+			else
+				@@current_accel = @@current_accel + 0.001
+			end
+
+			speed(@@current_accel)
+			angvel(@@current_accel)
+    end
+  end
+
+  module GaussianAcceleration
+
+		current_accel = 0
+
+
+    def ga
+      @state = :ga_run
+			@E = 2.71828182845904523536
+			@a = 1.0
+			@b = 0.0
+			@c = 1.0
+    end
+
+		def ga_run
+			# this needs to be done..
+
+			x = rand(200)
+			#puts "rand = #{x}"
+			x = (x - 100) / 100.0
+			#puts "x = #{x}"
+
+			# function pulled from:
+			# http://en.wikipedia.org/wiki/Gaussian_function
+			gf = (@a * @E) * - ((x - @b)**2 / (2 * @c**2))
+			#puts "gf = #{gf}"
+			speed(-1 * gf)
+			angvel(rand_sign() * gf)
+		end
+
+		def rand_sign()
+			if rand(2) == 1
+				return 1
+			else
+				return -1
+			end
+		end
+  end
+
+  module WildPigeon
+
+		#	algorithm description
+		# ways to fool the filter..
+		#
+		# random period of time
+		# random acceleration
+		# random angle/direction
+
+
+    def wild
+			@state = :wild_run
+			@speed_timer = 1
+			@angvel_timer = 1
+			@max_period = 25.0
+    end
+
+		def wild_run
+			@speed_timer -= 1
+			@angvel_timer -= 1
+			
+			if @speed_timer == 0
+				@speed_timer = rand(@max_period.to_i) + 1
+				velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+				speed(velocity)
+				puts "speed_timer, velocity = #{@speed_timer}, #{velocity}"
+			end
+
+			if @angvel_timer == 0
+				@angvel_timer = rand(@max_period.to_i) + 1
+				angular_velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+				angvel(angular_velocity)
+				puts "angvel_timer, angular_velocity = #{@angvel_timer}, #{angular_velocity}"
+			end
+		end
+  end
+
   class Agent
     # hq   :: Headquarters  -> The headquarters object
     # tank :: Tank          -> Data object
@@ -447,6 +564,15 @@ module BraveZealot
 		include DecoyStates
 		include SniperStates
     include HuntingStates
+
+		# Conforming Pigeons
+		include SittingDuck
+		include ConstantVelocity
+		include ConstantAcceleration
+		include GaussianAcceleration
+		
+		# Non-conforming Pigeons
+		include WildPigeon
     
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)

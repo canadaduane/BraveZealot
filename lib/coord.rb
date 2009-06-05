@@ -1,7 +1,11 @@
+bzrequire 'lib/kalman'
+
 module BraveZealot
   
   class Coord
     attr_accessor :x, :y
+    include Kalman
+    
     def initialize(x, y)
       @x = x.to_f
       @y = y.to_f
