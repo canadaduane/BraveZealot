@@ -16,12 +16,12 @@ module BraveZealot
         define_method(:observed_vy) { nil } unless base.method_defined?(:observed_vy)
         define_method(:observed_ax) { nil } unless base.method_defined?(:observed_ax)
         define_method(:observed_ay) { nil } unless base.method_defined?(:observed_ay)
-        define_method(:x)  { @kalman_mu[0, 0] }
-        define_method(:y)  { @kalman_mu[0, 3] }
-        define_method(:vx) { @kalman_mu[0, 1] }
-        define_method(:vy) { @kalman_mu[0, 4] }
-        define_method(:ax) { @kalman_mu[0, 2] }
-        define_method(:ay) { @kalman_mu[0, 5] }
+        define_method(:x)  { @kalman_mu[0, 0] rescue 0 }
+        define_method(:y)  { @kalman_mu[0, 3] rescue 0 }
+        define_method(:vx) { @kalman_mu[0, 1] rescue 0 }
+        define_method(:vy) { @kalman_mu[0, 4] rescue 0 }
+        define_method(:ax) { @kalman_mu[0, 2] rescue 0 }
+        define_method(:ay) { @kalman_mu[0, 5] rescue 0 }
       end
     end
     

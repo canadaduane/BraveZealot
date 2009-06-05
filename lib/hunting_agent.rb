@@ -4,23 +4,31 @@ module BraveZealot
   module HuntingStates
     #hunt the closest enemy tank
     def huntc
-      angvel 0
-      speed 0
-      puts "in huntc"
-      myc = @tank.to_coord
-      @target = nil
-      distance = 100000
-      @hq.map.othertanks.each do |et|
-        dt = myc.vector_to(et.to_coord).length
-        if ( dt < distance ) then
-          distance = dt
-          @target = et
+      refresh($options.refresh) do
+        if @tank.shots_available == 0 then
+          puts "Waiting for Ammo"
+          return
         end
-      end
+        angvel 0
+        speed 0
+        myc = @tank.to_coord
+        @hunter_target = nil
+        distance = 100000
+        @hq.map.othertanks.each do |et|
+          if et.alive? then
+            dt = myc.vector_to(et.to_coord).length
+            if ( dt < distance ) then
+              distance = dt
+              @hunter_target = et
+            end
+          end
+        end
 
-      unless @target.nil? then
-        @state = :hunter_target
-        puts "going to hunter_target mode: target = #{@target.inspect}"
+        unless @hunter_target.nil? then
+          #@state = :hunter_target
+          #puts "going to hunter_target mode: target = #{@target.inspect}"
+          @state = :hunter_find_range
+        end
       end
     end
 
@@ -90,6 +98,88 @@ module BraveZealot
     def hunter_wait
       sleep(1.0) do 
         @state = :huntc
+      end
+    end
+
+    def hunter_find_range
+      #these are the ranges we will check
+      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00]
+      #bullet velocity
+      bv = 100.0
+      refresh($options.refresh) do
+        range_options.each do |to|
+          #expected position
+          ep = @hunter_target.kalman_predicted_mu(to)
+          puts "expected position after #{to}sec #{ep.inspect}"
+          epc = Coord.new(ep[0], e[3])
+
+          #figure out how long the bullet has to travel
+          d = @tank.to_coord.vector_to(epc).length
+          eta = d/bv
+
+          #figure out how long we have to turn for
+          diff = hunter_calc_diff(epc)
+          ett = 2*diff #fudge factor meaning it will take us twice as long to get there as we think
+          
+          if (ett + eta) < to then
+            @hunter_range = to
+            @state = :hunter_hone_angle
+            hunter_hone_angle
+            return
+          end
+        end
+      end
+      @state = :huntc
+    end
+
+    def hunter_hone_angle
+      #bullet velocity
+      bv = 100.0
+      refresh($options.refresh) do
+        ep = @hunter_target.kalman_predicted_mu(@hunter_range)
+        epc = Coord.new(ep[0], ep[3])
+
+        d = @tank.to_coord.vector_to(epc).length
+        eta = d/bv
+
+        diff = hunter_calc_diff(epc)
+
+        if diff < $options.refresh then
+          angvel (diff.neg?)?-1:1
+          EventMachine::Timer.new(diff) do 
+            shoot
+          end
+        else
+          if (eta + diff) > @range then
+            
+          else
+
+          end
+        end
+      end
+    end
+
+    def hunter_wait_for_shot
+      if @tank.shots_available == 0 then
+        puts "no shots available - I must have fired"
+        @state = :dummy_do_nothing
+      end
+    end
+
+    def hunter_calc_diff(p)
+      #perfect angle to shoot
+      pas = Math.atan2(p.y - @tank.y, p.x - @tank.x)
+
+      if pas < 0.0  then
+        pas += 2*Math::PI
+      elsif pas > (2*Math::PI) then
+        pas -= 2*Math::PI
+      end
+
+      #difference of my angle and perfect angle
+      diff = pas - @tank.angle
+      if diff < -1 * Math::PI or diff > Math::PI then
+        diff = @tank.angle - pas
       end
     end
   end

@@ -11,7 +11,8 @@ module BraveZealot
     
     def start
       @agents = []                # Current BraveZealot::Agent objects
-      @world_time = 0.0           # Last communicated world time
+      @world_time = -1.0           # Last communicated world time
+      @clock = Time.mktime(1970)  # set the clock to be old-school
       @message_times = {}         # Last time we received a message (in Time.now units)
       
       install_signal_trap
@@ -118,7 +119,7 @@ module BraveZealot
       @clock = Time.now
       @world_time = r.time
       @message_times[r.command.to_sym] = r.time
-      
+
       # Update the kalman filter for this object, if available
       if prev_clock and r.respond_to?(:kalman_next)
         r.kalman_next(@clock - prev_clock)
