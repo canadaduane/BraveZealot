@@ -40,7 +40,7 @@ module BraveZealot
 
     def hunter_find_range
       #these are the ranges we will check
-      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00]
+      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 3.50, 4.00, 5.00, 6.00]
       #bullet velocity
       bv = 100.0
       refresh($options.refresh) do
@@ -49,19 +49,21 @@ module BraveZealot
           ep = @hunter_target.kalman_predicted_mu(to)
           #puts "expected position after #{to}sec #{ep.inspect}"
           epc = Coord.new(ep[0], ep[3])
-          puts "expecting enemy to be at #{epc.inspect} in #{to}sec"
+          #puts "expecting enemy to be at #{epc.inspect} in #{to}sec"
 
           #figure out how long the bullet has to travel
           d = @tank.to_coord.vector_to(epc).length
-          puts "distance from me #{@tank.to_coord.inspect} is #{d}"
+          #puts "distance from me #{@tank.to_coord.inspect} is #{d}"
           eta = d / bv
-          puts "eta = #{eta}"
+          #puts "eta = #{eta}"
 
           #figure out how long we have to turn for
           diff = hunter_calc_diff(epc)
           #puts "diff=#{diff}"
-          ett = 2*diff #fudge factor meaning it will take us twice as long to get there as we think
+          ett = 1.3*diff #fudge factor meaning it will take us twice as long to get there as we think
           
+          puts "total estimated time for kill = #{ett.abs + eta}"
+
           if (ett.abs + eta) < to then
             @hunter_range = to
             @state = :hunter_hone_angle

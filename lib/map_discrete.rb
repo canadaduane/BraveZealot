@@ -5,8 +5,8 @@ module BraveZealot
   class MapDiscrete < Map
     attr_reader :map, :astar
     
-    def initialize(world_size, granularity = 10)
-      super(world_size)
+    def initialize(world_size, my_color, granularity = 10)
+      super(world_size, my_color)
       @granularity = granularity
       @side_length = (@world_size / @granularity).ceil
       @map = Array.new(@side_length ** 2, 0)

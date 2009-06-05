@@ -6,9 +6,10 @@ require 'pdf/writer'
 module BraveZealot
   class Map
     attr_accessor :world_size, :bases, :obstacles, :flags
-    attr_accessor :mytanks, :othertanks
+    attr_accessor :mytanks, :othertanks, :my_color
     
-    def initialize(world_size)
+    def initialize(world_size, my_color)
+      @my_color = my_color
       raise ArgumentError, "World size cannot be nil or zero" if world_size.nil? or world_size == 0
       @world_size = world_size
       @bases      = []
@@ -95,5 +96,39 @@ module BraveZealot
       pdf
     end
   end
+
+  #make an observation about mytanks
+  def observe_mytanks(response)
+    if @mytanks.empty? then
+      @mytanks = response.mytanks
+      @mytanks.each do |my|
+        my_mu = NMatrix.float(1, 6).fill(0.0)
+        my_mu[0] = my_base.center.x
+        my_mu[3] = my_base.center.y
+        my.kalman_initialize(my_mu)
+      end
+    else
+      if @mytanks.size != r.mytanks.size then
+        raise ArgumentError, "list of mytanks from response object is different size #{r.mytanks.size} than my list #{@mytanks.size}"
+      end
+
+      @mytanks.each_with_index do |my, idx|
+        my.observed_x = r.mytanks[idx].observed_x
+        my.observed_y = r.mytanks[idx].observed_y
+        my.kalman_next(r.time)
+      end
+    end
+  end
   
+  def my_base
+    if @my_base.nil? then
+      bases.each do |b|
+        if b.color == my_color then
+          @my_base = b
+        end
+      end
+    end
+    @my_base
+  end
+
 end
