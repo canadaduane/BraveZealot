@@ -105,7 +105,7 @@ module BraveZealot
           my_mu[0] = my_base.center.x
           my_mu[3] = my_base.center.y
           my_sigma = NMatrix.float(6,6).diagonal([50, 0.1, 0.1, 50, 0.1, 0.1])
-          my_sigma_x = NMatrix.float(6,6).diagonal([25, 1.0, 25, 25, 1.0, 25])
+          my_sigma_x = NMatrix.float(6,6).diagonal([0.001, 0.01, 0.10, 0.001, 0.01, 0.10])
           my.kalman_initialize(my_mu, my_sigma, my_sigma_x)
         end
       else
@@ -135,7 +135,7 @@ module BraveZealot
           ot_mu[0] = ob.center.x
           ot_mu[3] = ob.center.y
           my_sigma = NMatrix.float(6,6).diagonal([50, 0.1, 0.1, 50, 0.1, 0.1])
-          my_sigma_x = NMatrix.float(6,6).diagonal([25, 1.0, 25, 25, 1.0, 25])
+          my_sigma_x = NMatrix.float(6,6).diagonal([0.001, 0.01, 0.10, 0.001, 0.01, 0.10])
           tank.kalman_initialize(ot_mu, my_sigma, my_sigma_x)
         end
       else

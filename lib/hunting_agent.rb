@@ -7,19 +7,20 @@ module BraveZealot
       refresh($options.refresh) do
         if @tank.shots_available == 0 then
           puts "Waiting for Ammo"
-          return
-        end
-        angvel 0
-        speed 0
-        myc = @tank.to_coord
-        @hunter_target = nil
-        distance = 100000
-        @hq.map.othertanks.each do |et|
-          if et.alive? then
-            dt = myc.vector_to(et.to_coord).length
-            if ( dt < distance ) then
-              distance = dt
-              @hunter_target = et
+          @target = nil
+        else
+          angvel 0
+          speed 0
+          myc = @tank.to_coord
+          @hunter_target = nil
+          distance = 100000
+          @hq.map.othertanks.each do |et|
+            if et.alive? then
+              dt = myc.vector_to(et.to_coord).length
+              if ( dt < distance ) then
+                distance = dt
+                @hunter_target = et
+              end
             end
           end
         end
@@ -40,7 +41,7 @@ module BraveZealot
 
     def hunter_find_range
       #these are the ranges we will check
-      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00, 2.50, 3.00, 3.50, 4.00, 5.00, 6.00]
+      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00, 2.50]
       #bullet velocity
       bv = 100.0
       refresh($options.refresh) do
@@ -94,7 +95,10 @@ module BraveZealot
             #puts "Taking the shot - turn for #{diff}sec and then shoot - eta=#{eta}"
             angvel (diff < 0.0)?-1:1
             EventMachine::Timer.new(diff) do 
-              shoot
+              angvel 0
+              EventMachine::Timer.new(@hunter_range-diff-eta) do
+                shoot
+              end
             end
             @state = :huntc
           else
