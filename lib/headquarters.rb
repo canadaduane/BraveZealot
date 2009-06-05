@@ -26,7 +26,7 @@ module BraveZealot
           when 'worldsize' then world_size = c.value.to_f
           end
         end
-        @map = BraveZealot::MapDiscrete.new(world_size)
+        @map = BraveZealot::MapDiscrete.new(world_size, @my_color)
         
         bases do |r|
           obstacles do |r|
@@ -119,24 +119,6 @@ module BraveZealot
       @clock = Time.now
       @world_time = r.time
       @message_times[r.command.to_sym] = r.time
-
-      # Update the kalman filter for this object, if available
-      if prev_clock and r.value.respond_to?(:kalman_next)
-        #puts "calling kalman_next on #{r.class}"
-        r.value.kalman_next(@clock - prev_clock)
-      else
-        if r.value.is_a?(Array) then
-          r.value.map do |o| 
-            if o.respond_to?(:kalman_next) then
-              o.kalman_next(@clock - prev_clock) 
-              #puts "called kalman_next on #{o.class}"
-            end
-          end
-        else
-          #puts "#{r.value.class} does not respond to kalman_next @ #{prev_clock}"
-        end
-      end
-      #p r; puts
     end
     
     # If our most recent data is older than 'freshness', call command and get

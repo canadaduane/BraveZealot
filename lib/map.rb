@@ -36,7 +36,7 @@ module BraveZealot
     end
     
     def get_othertank(callsign)
-      @othertanks.find{ |t| t.callsign == src_tank.callsign }
+      @othertanks.find{ |t| t.callsign == callsign }
     end
     
     def observe_othertanks(response)
@@ -95,40 +95,39 @@ module BraveZealot
       
       pdf
     end
-  end
 
-  #make an observation about mytanks
-  def observe_mytanks(response)
-    if @mytanks.empty? then
-      @mytanks = response.mytanks
-      @mytanks.each do |my|
-        my_mu = NMatrix.float(1, 6).fill(0.0)
-        my_mu[0] = my_base.center.x
-        my_mu[3] = my_base.center.y
-        my.kalman_initialize(my_mu)
-      end
-    else
-      if @mytanks.size != r.mytanks.size then
-        raise ArgumentError, "list of mytanks from response object is different size #{r.mytanks.size} than my list #{@mytanks.size}"
-      end
+    #make an observation about mytanks
+    def observe_mytanks(r)
+      if @mytanks.empty? then
+        @mytanks = r.mytanks
+        @mytanks.each do |my|
+          my_mu = NMatrix.float(1, 6).fill(0.0)
+          my_mu[0] = my_base.center.x
+          my_mu[3] = my_base.center.y
+          my.kalman_initialize(my_mu)
+        end
+      else
+        if @mytanks.size != r.mytanks.size then
+          raise ArgumentError, "list of mytanks from response object is different size #{r.mytanks.size} than my list #{@mytanks.size}"
+        end
 
-      @mytanks.each_with_index do |my, idx|
-        my.observed_x = r.mytanks[idx].observed_x
-        my.observed_y = r.mytanks[idx].observed_y
-        my.kalman_next(r.time)
-      end
-    end
-  end
-  
-  def my_base
-    if @my_base.nil? then
-      bases.each do |b|
-        if b.color == my_color then
-          @my_base = b
+        @mytanks.each_with_index do |my, idx|
+          my.observed_x = r.mytanks[idx].observed_x
+          my.observed_y = r.mytanks[idx].observed_y
+          my.kalman_next(r.time)
         end
       end
     end
-    @my_base
+    
+    def my_base
+      if @my_base.nil? then
+        bases.each do |b|
+          if b.color == my_color then
+            @my_base = b
+          end
+        end
+      end
+      @my_base
+    end
   end
-
 end

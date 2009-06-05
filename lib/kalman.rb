@@ -52,6 +52,7 @@ module BraveZealot
     end
     
     def kalman_next(time)
+      @last_time ||= 0.0
       dt = time - @last_time
       @last_time = time
       
