@@ -43,6 +43,7 @@ module BraveZealot
       if @othertanks.empty?
         @othertanks = response.othertanks
         @othertanks.each do |tank|
+          
           tank.kalman_initialize
         end
       else
@@ -104,7 +105,9 @@ module BraveZealot
           my_mu = NMatrix.float(1, 6).fill(0.0)
           my_mu[0] = my_base.center.x
           my_mu[3] = my_base.center.y
-          my.kalman_initialize(my_mu)
+          my_sigma = NMatrix.float(6,6).diagonal([50, 0.1, 0.1, 50, 0.1, 0.1])
+          my_sigma_x = NMatrix.float(6,6).diagonal([25, 1.0, 25, 25, 1.0, 25])
+          my.kalman_initialize(my_mu, my_sigma, my_sigma_x)
         end
       else
         if @mytanks.size != r.mytanks.size then
@@ -114,6 +117,7 @@ module BraveZealot
         @mytanks.each_with_index do |my, idx|
           my.observed_x = r.mytanks[idx].observed_x
           my.observed_y = r.mytanks[idx].observed_y
+          my.angle = r.mytanks[idx].angle
           my.kalman_next(r.time)
         end
       end
