@@ -15,6 +15,28 @@ module BraveZealot
     def vector_to(p)
       return Vector.new(p.x - x, p.y - y, self)
     end
+
+    # return a coord with the two elements reversed
+    def reverse
+      Coord.new(y,x)
+    end
+
+    #compute the dot product
+    def dot(c)
+      ( (c.x * x) + (cy * y) )
+    end
+
+    def normal
+      Coord.new(-y,x)
+    end
+
+    def neg
+      Coord.new(-x,-y)
+    end
+
+    def minus(c)
+      Coord.new(x - c.x, y - c.y)
+    end
   end
 
   #The vector class has x and y componenets like a coordinate, but they represent

@@ -1,4 +1,5 @@
 bzrequire 'lib/communicator'
+bzrequire 'lib/hunting_agent'
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -43,6 +44,10 @@ module BraveZealot
     def dummy_accel_once
       @state = :wait
       sleep(1.5) { @state = :dummy_forward }
+    end
+
+    def dummy_do_nothing
+      sleep(1.5)
     end
   end
   
@@ -217,6 +222,19 @@ module BraveZealot
 	end
 
 	module SniperStates
+    def test_shot
+      shoot do |shot|
+        10.times do |idx|
+          shots do |response|
+            response.value.each do |s|
+              puts "#{idx} -> #{s.inspect}"
+            end
+          end
+        end
+      end
+      @state = :dummy
+    end
+
 		def sniper
 			@state = sniper_move_to_start_position
 		end
@@ -428,6 +446,7 @@ module BraveZealot
     include SmartStates
 		include DecoyStates
 		include SniperStates
+    include HuntingStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)
@@ -492,7 +511,11 @@ module BraveZealot
     # Forward certain messages to headquarters, with our tank index
     def method_missing(m, *args, &block)
       if Communicator::COMMANDS.keys.include?(m.to_sym)
-        @hq.send(m, @tank.index, *args, &block)
+        if m.to_sym == :shots then
+          @hq.send(m, &block)
+        else
+          @hq.send(m, @tank.index, *args, &block)
+        end
       else
         puts "Failed to find method '#{m}'"
         raise NameError
