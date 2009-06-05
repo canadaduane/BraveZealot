@@ -35,8 +35,18 @@ def server_running?
   !(`ps auxww|grep bzfs|grep -v grep`).empty?
 end
 
-def start_server(bzfs, world)
-  shell "#{bzfs} -c -d -set _inertiaLinear 1 -set _inertiaAngular 1 -set _tankAngVel 0.5 -set _rejoinTime 0 -set _grabOwnFlag 0 #{world ? "-world " + File.expand_path(world) : ""} >server.log 2>server.log"
+def start_server(bzfs, world, noise = false)
+  cmd =
+    "#{bzfs} -c -d " +
+    "-set _inertiaLinear 1 " +
+    "-set _inertiaAngular 1 " +
+    "-set _tankAngVel 0.5 " +
+    "-set _rejoinTime 0 " +
+    "-set _grabOwnFlag 0 " +
+    (world ? "-world #{File.expand_path(world)} " : "") +
+    (noise ? "-posnoise 5 " : "") +
+    ">server.log 2>server.log"
+  shell cmd
 end
 
 def kill_server!
@@ -148,6 +158,10 @@ opts = OptionParser.new do |opts|
   opts.on("-d", "--debug", "Make brave.rb show debug info in log file") do |d|
     $options.debug = true
   end
+
+  opts.on("-n", "--noise", "Turn Normal noise on") do |d|
+    $options.noise = true
+  end
 end
 
 opts.parse!(ARGV)
@@ -223,7 +237,7 @@ when "server" then
     puts "Server already running."
   else
     puts "Starting server..."
-    start_server($options.bzfs, $options.world)
+    start_server($options.bzfs, $options.world, $options.noise)
   end
 when "robot" then
   if $options.force_restart

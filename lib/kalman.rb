@@ -4,24 +4,26 @@ module BraveZealot
   module Kalman
     def self.included(base)
       base.module_eval do
-        alias_method :observed_x,  :x  if base.method_defined?(:x)
-        alias_method :observed_y,  :y  if base.method_defined?(:y)
-        alias_method :observed_vx, :vx if base.method_defined?(:vx)
-        alias_method :observed_vy, :vy if base.method_defined?(:vy)
-        alias_method :observed_ax, :ax if base.method_defined?(:ax)
-        alias_method :observed_ay, :ay if base.method_defined?(:ay)
-        define_method(:observed_x)  { nil } unless base.method_defined?(:observed_x)
-        define_method(:observed_y)  { nil } unless base.method_defined?(:observed_y)
-        define_method(:observed_vx) { nil } unless base.method_defined?(:observed_vx)
-        define_method(:observed_vy) { nil } unless base.method_defined?(:observed_vy)
-        define_method(:observed_ax) { nil } unless base.method_defined?(:observed_ax)
-        define_method(:observed_ay) { nil } unless base.method_defined?(:observed_ay)
-        define_method(:x)  { @kalman_mu[0, 0] rescue 0 }
-        define_method(:y)  { @kalman_mu[0, 3] rescue 0 }
-        define_method(:vx) { @kalman_mu[0, 1] rescue 0 }
-        define_method(:vy) { @kalman_mu[0, 4] rescue 0 }
-        define_method(:ax) { @kalman_mu[0, 2] rescue 0 }
-        define_method(:ay) { @kalman_mu[0, 5] rescue 0 }
+        alias_method :observed_x,   :x   if base.method_defined?(:x)
+        alias_method :observed_y,   :y   if base.method_defined?(:y)
+        alias_method :observed_vx,  :vx  if base.method_defined?(:vx)
+        alias_method :observed_vy,  :vy  if base.method_defined?(:vy)
+        alias_method :observed_ax,  :ax  if base.method_defined?(:ax)
+        alias_method :observed_ay,  :ay  if base.method_defined?(:ay)
+        
+        alias_method :observed_x=,  :x=  if base.method_defined?(:x=)
+        alias_method :observed_y=,  :y=  if base.method_defined?(:y=)
+        alias_method :observed_vx=, :vx= if base.method_defined?(:vx=)
+        alias_method :observed_vy=, :vy= if base.method_defined?(:vy=)
+        alias_method :observed_ax=, :ax= if base.method_defined?(:ax=)
+        alias_method :observed_ay=, :ay= if base.method_defined?(:ay=)
+        
+        define_method(:x)  { @kalman_mu[0, 0] }
+        define_method(:y)  { @kalman_mu[0, 3] }
+        define_method(:vx) { @kalman_mu[0, 1] }
+        define_method(:vy) { @kalman_mu[0, 4] }
+        define_method(:ax) { @kalman_mu[0, 2] }
+        define_method(:ay) { @kalman_mu[0, 5] }
       end
     end
     
@@ -49,7 +51,10 @@ module BraveZealot
       @kalman_id = NMatrix.float(6, 6).diagonal(1)
     end
     
-    def kalman_next(t = 1.0)
+    def kalman_next(time)
+      dt = time - @last_time
+      @last_time = time
+      
       # Current observed position values
       z = NMatrix.float(1, 2)
       z[0, 0] = observed_x
@@ -58,7 +63,7 @@ module BraveZealot
       kalman_initialize if @kalman_mu.nil? or @kalman_sigma.nil?
       
       # re-used values
-      f = kalman_transition_matrix(t)
+      f = kalman_transition_matrix(dt)
       fsum = f * @kalman_sigma * f.transpose + @kalman_sigma_x
       
       @kalman_k     = fsum * @kalman_h_t * (@kalman_h * fsum * @kalman_h_t + @kalman_sigma_z).inverse
@@ -66,9 +71,8 @@ module BraveZealot
       @kalman_mu    = f * @kalman_mu + @kalman_k * (z - @kalman_h * f * @kalman_mu)
     end
     
-    def kalman_predicted_mu(t)
-      kalman_initialize if @kalman_mu.nil?
-      f = kalman_transition_matrix(t)
+    def kalman_predicted_mu(dt)
+      f = kalman_transition_matrix(dt)
       f * @kalman_mu
     end
     
@@ -89,14 +93,14 @@ module BraveZealot
 
   protected
     
-    def kalman_transition_matrix(t, c = 0)
+    def kalman_transition_matrix(dt, c = 0)
       f = NMatrix.float(6, 6).diagonal(1.0)
-      f[1, 0] = t
-      f[2, 1] = t
-      f[4, 3] = t
-      f[5, 4] = t
-      f[2, 0] = 0.5 * t ** 2
-      f[5, 3] = 0.5 * t ** 2
+      f[1, 0] = dt
+      f[2, 1] = dt
+      f[4, 3] = dt
+      f[5, 4] = dt
+      f[2, 0] = 0.5 * dt ** 2
+      f[5, 3] = 0.5 * dt ** 2
       f[1, 2] = -c
       f[4, 5] = -c
       f

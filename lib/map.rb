@@ -34,6 +34,27 @@ module BraveZealot
       @world_y_max ||=  @world_size / 2
     end
     
+    def get_othertank(callsign)
+      @othertanks.find{ |t| t.callsign == src_tank.callsign }
+    end
+    
+    def observe_othertanks(response)
+      if @othertanks.empty?
+        @othertanks = response.othertanks
+        @othertanks.each do |tank|
+          tank.kalman_initialize
+        end
+      else
+        response.othertanks.each do |src_tank|
+          unless (dst_tank = get_othertank(src_tank.callsign)).nil?
+            dst_tank.observed_x = src_tank.observed_x
+            dst_tank.observed_y = src_tank.observed_y
+            dst_tank.kalman_next(response.time)
+          end
+        end
+      end
+    end
+    
     def to_pdf(pdf = nil, options = {})
       options = {
         :obstacles  => obstacles,
