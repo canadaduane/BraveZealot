@@ -2,22 +2,31 @@ require 'narray'
 
 module BraveZealot
   module Kalman
-    
-    def kalman_transition_matrix(t, c = 0)
-      f = NMatrix.float(6, 6).diagonal(1.0)
-      f[1, 0] = t
-      f[2, 1] = t
-      f[4, 3] = t
-      f[5, 4] = t
-      f[2, 0] = 0.5 * t ** 2
-      f[5, 3] = 0.5 * t ** 2
-      f[1, 2] = -c
-      f[4, 5] = -c
-      f
+    def self.included(base)
+      base.module_eval do
+        alias_method :observed_x,  :x  if base.method_defined?(:x)
+        alias_method :observed_y,  :y  if base.method_defined?(:y)
+        alias_method :observed_vx, :vx if base.method_defined?(:vx)
+        alias_method :observed_vy, :vy if base.method_defined?(:vy)
+        alias_method :observed_ax, :ax if base.method_defined?(:ax)
+        alias_method :observed_ay, :ay if base.method_defined?(:ay)
+        define_method(:observed_x)  { nil } unless base.method_defined?(:observed_x)
+        define_method(:observed_y)  { nil } unless base.method_defined?(:observed_y)
+        define_method(:observed_vx) { nil } unless base.method_defined?(:observed_vx)
+        define_method(:observed_vy) { nil } unless base.method_defined?(:observed_vy)
+        define_method(:observed_ax) { nil } unless base.method_defined?(:observed_ax)
+        define_method(:observed_ay) { nil } unless base.method_defined?(:observed_ay)
+        define_method(:x)  { @kalman_mu[0, 0] }
+        define_method(:y)  { @kalman_mu[0, 3] }
+        define_method(:vx) { @kalman_mu[0, 1] }
+        define_method(:vy) { @kalman_mu[0, 4] }
+        define_method(:ax) { @kalman_mu[0, 2] }
+        define_method(:ay) { @kalman_mu[0, 5] }
+      end
     end
     
     def kalman_initialize(mu = nil, sigma = nil, sigma_x = nil)
-      # mean estimate 6x1 matrix
+      # mean estimate (6 rows x 1 col matrix)
       @kalman_mu = mu || NMatrix.float(1, 6)
       
       # variance estimate 6x6 matrix
@@ -40,9 +49,13 @@ module BraveZealot
       @kalman_id = NMatrix.float(6, 6).diagonal(1)
     end
     
-    def kalman_next_state(x, y, t = 1.0)
+    def kalman_next(t = 1.0)
       # Current observed position values
-      z = NMatrix.new('float', x, y).reshape(1, 2)
+      z = NMatrix.float(1, 2)
+      z[0, 0] = observed_x
+      z[0, 1] = observed_y
+      
+      kalman_initialize if @kalman_mu.nil? or @kalman_sigma.nil?
       
       # re-used values
       f = kalman_transition_matrix(t)
@@ -56,6 +69,29 @@ module BraveZealot
     def kalman_predicted_mu(t)
       f = kalman_transition_matrix(t)
       f * @kalman_mu
+    end
+    
+    def kalman_mu
+      @kalman_mu
+    end
+    
+    def kalman_sigma
+      @kalman_sigma
+    end
+
+  protected
+    
+    def kalman_transition_matrix(t, c = 0)
+      f = NMatrix.float(6, 6).diagonal(1.0)
+      f[1, 0] = t
+      f[2, 1] = t
+      f[4, 3] = t
+      f[5, 4] = t
+      f[2, 0] = 0.5 * t ** 2
+      f[5, 3] = 0.5 * t ** 2
+      f[1, 2] = -c
+      f[4, 5] = -c
+      f
     end
     
   end
