@@ -2,6 +2,7 @@ bzrequire 'lib/team_colors'
 
 module BraveZealot
   class Flag < Struct.new(:color, :possession, :x, :y)
+    include Kalman
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
       

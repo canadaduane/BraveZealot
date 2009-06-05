@@ -33,7 +33,7 @@ module BraveZealot
         assert_equal @y, @kf.observed_y
       end
       
-      should "Keep define unaliased methods as nil" do
+      should "Define unaliased methods as nil" do
         assert_nil @kf.observed_vx
         assert_nil @kf.observed_vy
         assert_nil @kf.observed_ax

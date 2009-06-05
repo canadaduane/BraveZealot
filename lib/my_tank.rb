@@ -3,6 +3,8 @@ module BraveZealot
                             :shots_available, :time_to_reload,
                             :flag, :x, :y, :angle, :vx, :vy, :angvel)
 
+    include Kalman
+    
     def to_coord
       Coord.new(x,y)
     end
