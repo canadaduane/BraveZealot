@@ -34,29 +34,7 @@ module BraveZealot
     def world_y_max
       @world_y_max ||=  @world_size / 2
     end
-    
-    def get_othertank(callsign)
-      @othertanks.find{ |t| t.callsign == callsign }
-    end
-    
-    def observe_othertanks(response)
-      if @othertanks.empty?
-        @othertanks = response.othertanks
-        @othertanks.each do |tank|
-          
-          tank.kalman_initialize
-        end
-      else
-        response.othertanks.each do |src_tank|
-          unless (dst_tank = get_othertank(src_tank.callsign)).nil?
-            dst_tank.observed_x = src_tank.observed_x
-            dst_tank.observed_y = src_tank.observed_y
-            dst_tank.kalman_next(response.time)
-          end
-        end
-      end
-    end
-    
+
     def to_pdf(pdf = nil, options = {})
       options = {
         :obstacles  => obstacles,
@@ -96,7 +74,28 @@ module BraveZealot
       
       pdf
     end
-
+    
+    def get_othertank(callsign)
+      @othertanks.find{ |t| t.callsign == callsign }
+    end
+    
+    def observe_othertanks(response)
+      if @othertanks.empty?
+        @othertanks = response.othertanks
+        @othertanks.each do |tank|
+          tank.kalman_initialize
+        end
+      else
+        response.othertanks.each do |src_tank|
+          unless (dst_tank = get_othertank(src_tank.callsign)).nil?
+            dst_tank.observed_x = src_tank.observed_x
+            dst_tank.observed_y = src_tank.observed_y
+            dst_tank.kalman_next(response.time)
+          end
+        end
+      end
+    end
+    
     #make an observation about mytanks
     def observe_mytanks(r)
       if @mytanks.empty? then
@@ -119,6 +118,28 @@ module BraveZealot
           my.observed_y = r.mytanks[idx].observed_y
           my.angle = r.mytanks[idx].angle
           my.kalman_next(r.time)
+        end
+      end
+    end
+
+    def get_othertank(callsign)
+      @othertanks.find{ |t| t.callsign == callsign }
+    end
+    
+    def observe_othertanks(response)
+      if @othertanks.empty?
+        @othertanks = response.othertanks
+        @othertanks.each do |tank|
+          
+          tank.kalman_initialize
+        end
+      else
+        response.othertanks.each do |src_tank|
+          unless (dst_tank = get_othertank(src_tank.callsign)).nil?
+            dst_tank.observed_x = src_tank.observed_x
+            dst_tank.observed_y = src_tank.observed_y
+            dst_tank.kalman_next(response.time)
+          end
         end
       end
     end
