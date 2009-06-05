@@ -67,6 +67,7 @@ module BraveZealot
     end
     
     def kalman_predicted_mu(t)
+      kalman_initialize if @kalman_mu.nil?
       f = kalman_transition_matrix(t)
       f * @kalman_mu
     end

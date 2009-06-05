@@ -121,8 +121,20 @@ module BraveZealot
       @message_times[r.command.to_sym] = r.time
 
       # Update the kalman filter for this object, if available
-      if prev_clock and r.respond_to?(:kalman_next)
-        r.kalman_next(@clock - prev_clock)
+      if prev_clock and r.value.respond_to?(:kalman_next)
+        #puts "calling kalman_next on #{r.class}"
+        r.value.kalman_next(@clock - prev_clock)
+      else
+        if r.value.is_a?(Array) then
+          r.value.map do |o| 
+            if o.respond_to?(:kalman_next) then
+              o.kalman_next(@clock - prev_clock) 
+              #puts "called kalman_next on #{o.class}"
+            end
+          end
+        else
+          #puts "#{r.value.class} does not respond to kalman_next @ #{prev_clock}"
+        end
       end
       #p r; puts
     end
@@ -136,9 +148,10 @@ module BraveZealot
         # have a chance to update data before the following block.call
         ignore_arg = Proc.new { |r| block.call if block }
 
-
+        puts "refreshing #{command.to_s}"
         send(command, &ignore_arg)
       else
+        puts "calling secondary block for #{command.to_s}"
         block.call if block
       end
     end
