@@ -130,10 +130,10 @@ module BraveZealot
         # have a chance to update data before the following block.call
         ignore_arg = Proc.new { |r| block.call if block }
 
-        puts "refreshing #{command.to_s}"
+        #puts "refreshing #{command.to_s}"
         send(command, &ignore_arg)
       else
-        puts "calling secondary block for #{command.to_s}"
+        #puts "calling secondary block for #{command.to_s}"
         block.call if block
       end
     end
