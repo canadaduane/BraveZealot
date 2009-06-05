@@ -168,6 +168,11 @@ module BraveZealot
       @map.observe_othertanks(r)
     end
     
+    def disconnect
+      EventMachine::stop_event_loop
+      exit(0)
+    end
+    
     def install_signal_trap
       trap("INT") do
         if File.exist?($options.config_file)
@@ -180,7 +185,9 @@ module BraveZealot
             file.sub!(".", "#{@pdf_count += 1}.")
             puts "\nWriting map to pdf: #{file}\n"
             distributions = []
-            @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
+            # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
+            @map.mytanks.each{ |t| distributions << t.kalman_distribution }
+            @map.othertanks.each{ |t| distributions << t.kalman_distribution }
             paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
             @map.to_pdf(nil,
               :my_color      => my_color,
@@ -194,13 +201,9 @@ module BraveZealot
             # Update the agent states
             @agents.each_with_index { |a, i| a.state = states[i] }
           end
-          if $options.abort_on_int
-            EventMachine::stop_event_loop
-            exit(0)
-          end
+          disconnect if $options.abort_on_int
         else
-          EventMachine::stop_event_loop
-          exit(0)
+          disconnect
         end
       end
     end

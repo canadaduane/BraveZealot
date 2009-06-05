@@ -58,10 +58,16 @@ module BraveZealot
       end
       
       if options.has_key?(:distributions)
-        pdf.stroke_style(PDF::Writer::StrokeStyle.new(3))
-        pdf.stroke_color(Color::RGB.from_fraction(0.8, 0.3, 0.1))
+        pdf.stroke_color(Color::RGB.from_fraction(1.0, 0.9, 0.1))
+        pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
         options[:distributions].each do |x, y, sx, sy, rho|
-          pdf.ellipse_at(x, y, sx, sy).stroke
+          3.times.each do |t|
+            r = 2 + (10-t*3)
+            pdf.ellipse_at(x, y, sx * r, sy * r).stroke
+            pdf.stroke_style(PDF::Writer::StrokeStyle.new(3))
+          end
+          pdf.ellipse_at(x, y, 2, 2).stroke
+          pdf.stroke_style(PDF::Writer::StrokeStyle.new(5))
         end if options[:distributions].is_a?(Array)
       end
       

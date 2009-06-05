@@ -35,7 +35,7 @@ def server_running?
   !(`ps auxww|grep bzfs|grep -v grep`).empty?
 end
 
-def start_server(bzfs, world, noise = false)
+def start_server(bzfs, world)
   cmd =
     "#{bzfs} -c -d " +
     "-set _inertiaLinear 1 " +
@@ -44,7 +44,6 @@ def start_server(bzfs, world, noise = false)
     "-set _rejoinTime 0 " +
     "-set _grabOwnFlag 0 " +
     (world ? "-world #{File.expand_path(world)} " : "") +
-    (noise ? "-posnoise 5 " : "") +
     ">server.log 2>server.log"
   shell cmd
 end
@@ -58,7 +57,15 @@ def robot_running?
 end
 
 def start_robot(options)
-  shell "#{options.bzrobots} -team #{options.team} -solo #{options.members} -p #{options.robot_port} #{options.callsign}@#{options.server}:#{options.server_port} >robot_#{options.team}.log 2>robot_#{options.team}.log"
+  cmd = "#{options.bzrobots} " +
+    (options.noise ? "-posnoise 5 " : "") +
+    "-team #{options.team} " +
+    "-solo #{options.members} " +
+    "-p #{options.robot_port} " +
+    "#{options.callsign}@#{options.server}:#{options.server_port} " +
+    ">robot_#{options.team}.log 2>robot_#{options.team}.log"
+  
+  shell cmd
 end
 
 def kill_robot!(team)
@@ -237,7 +244,7 @@ when "server" then
     puts "Server already running."
   else
     puts "Starting server..."
-    start_server($options.bzfs, $options.world, $options.noise)
+    start_server($options.bzfs, $options.world)
   end
 when "robot" then
   if $options.force_restart

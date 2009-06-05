@@ -3,7 +3,7 @@ bzrequire 'lib/kalman'
 
 module BraveZealot
   class Flag < Struct.new(:color, :possession, :x, :y)
-    include Kalman
+    # include Kalman
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
       
