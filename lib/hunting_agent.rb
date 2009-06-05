@@ -46,10 +46,11 @@ module BraveZealot
       refresh($options.refresh) do
         range_options.each do |to|
           #expected position
+          #puts "Step 4: epx=#{@hunter_target.x}, epy=#{@hunter_target.y}"
           ep = @hunter_target.kalman_predicted_mu(to)
           #puts "expected position after #{to}sec #{ep.inspect}"
           epc = Coord.new(ep[0], ep[3])
-          puts "expecting enemy to be at #{epc.inspect} in #{to}sec"
+          #puts "Step 5: to=#{to} epx=#{epc.x}, epy=#{epc.y}"
 
           #figure out how long the bullet has to travel
           d = @tank.to_coord.vector_to(epc).length
@@ -90,7 +91,7 @@ module BraveZealot
           #puts "I need to travel through #{diff} radians to get my optimal angle"
 
           if diff.abs < $options.refresh then
-            puts "Taking the shot - turn for #{diff}sec and then shoot - eta=#{eta}"
+            #puts "Taking the shot - turn for #{diff}sec and then shoot - eta=#{eta}"
             angvel (diff < 0.0)?-1:1
             EventMachine::Timer.new(diff) do 
               shoot
@@ -98,7 +99,7 @@ module BraveZealot
             @state = :huntc
           else
             if (eta + diff) > @hunter_range then
-              puts "going back to find range - I thought I could shoot them in #{@hunter_range}, but not I expect to turn for #{diff} and my bullet to travel for #{eta}"
+              #puts "going back to find range - I thought I could shoot them in #{@hunter_range}, but not I expect to turn for #{diff} and my bullet to travel for #{eta}"
               @state = :hunter_find_range
             else
               n = diff / (2*$options.refresh)
@@ -112,13 +113,13 @@ module BraveZealot
 
     def hunter_wait_for_shot
       if @tank.shots_available == 0 then
-        puts "no shots available - I must have fired"
+        #puts "no shots available - I must have fired"
         @state = :huntc
       end
     end
 
     def hunter_calc_diff(p)
-      puts "my=#{@tank.to_coord.inspect} @ #{@tank.angle} pointing at #{p.x},#{p.y}"
+      puts "my=#{@tank.to_coord.inspect} pointing at #{p.x},#{p.y}"
       #perfect angle to shoot
       pas = Math.atan2(p.y - @tank.y, p.x - @tank.x)
 

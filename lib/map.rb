@@ -130,15 +130,23 @@ module BraveZealot
       if @othertanks.empty?
         @othertanks = response.othertanks
         @othertanks.each do |tank|
-          
-          tank.kalman_initialize
+          ob = get_base(tank.color)
+          ot_mu = NMatrix.float(1, 6).fill(0.0)
+          ot_mu[0] = ob.center.x
+          ot_mu[3] = ob.center.y
+          my_sigma = NMatrix.float(6,6).diagonal([50, 0.1, 0.1, 50, 0.1, 0.1])
+          my_sigma_x = NMatrix.float(6,6).diagonal([25, 1.0, 25, 25, 1.0, 25])
+          tank.kalman_initialize(ot_mu, my_sigma, my_sigma_x)
         end
       else
         response.othertanks.each do |src_tank|
           unless (dst_tank = get_othertank(src_tank.callsign)).nil?
+            #puts "Step 1: x=#{dst_tank.x},y=#{dst_tank.y}"
             dst_tank.observed_x = src_tank.observed_x
             dst_tank.observed_y = src_tank.observed_y
+            #puts "Step 2: observed_x=#{src_tank.observed_x},observed_y=#{src_tank.observed_y}"
             dst_tank.kalman_next(response.time)
+            #puts "Step 3: x=#{dst_tank.x},y=#{dst_tank.y}"
           end
         end
       end
@@ -153,6 +161,10 @@ module BraveZealot
         end
       end
       @my_base
+    end
+
+    def get_base(color)
+      bases.find { |b| b.color == color }
     end
   end
 end
