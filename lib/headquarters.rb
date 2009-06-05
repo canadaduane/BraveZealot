@@ -161,10 +161,11 @@ module BraveZealot
     end
     
     def on_mytanks(r)
-      @map.mytanks = r.mytanks
-      r.mytanks.each do |t|
-        @agents[t.index].tank = t if @agents.size > t.index
-      end
+      @map.observe_mytanks(r)
+      #@map.mytanks = r.mytanks
+      #r.mytanks.each do |t|
+      #  @agents[t.index].tank = t if @agents.size > t.index
+      #end
     end
     
     def on_flags(r)
