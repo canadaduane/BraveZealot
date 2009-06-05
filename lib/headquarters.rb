@@ -114,9 +114,15 @@ module BraveZealot
     
     # Catch-all callback, called on EVERY message to EVERY tank
     def on_any(r)
+      prev_clock = @clock
       @clock = Time.now
       @world_time = r.time
       @message_times[r.command.to_sym] = r.time
+      
+      # Update the kalman filter for this object, if available
+      if prev_clock and r.respond_to?(:kalman_next)
+        r.kalman_next(@clock - prev_clock)
+      end
       #p r; puts
     end
     
@@ -175,9 +181,13 @@ module BraveZealot
             file = $options.pdf_file || "map.pdf"
             file.sub!(".", "#{@pdf_count += 1}.")
             puts "\nWriting map to pdf: #{file}\n"
+            distributions = []
+            @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } }
+            paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
             @map.to_pdf(nil,
-              :my_color => my_color,
-              :paths    => @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+              :my_color      => my_color,
+              :paths         => paths,
+              :distributions => distributions
             ).save_as(file)
           end
           if $options.state

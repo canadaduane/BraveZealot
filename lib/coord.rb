@@ -1,3 +1,5 @@
+bzrequire 'lib/kalman'
+
 module BraveZealot
   
   class Coord

@@ -71,6 +71,13 @@ module BraveZealot
       f * @kalman_mu
     end
     
+    def kalman_distribution
+      sx = Math.sqrt(@kalman_sigma[0, 0])
+      sy = Math.sqrt(@kalman_sigma[3, 3])
+      rho = @kalman_sigma[3, 0] / (sx * sy)
+      [x, y, sx, sy, rho]
+    end
+    
     def kalman_mu
       @kalman_mu
     end

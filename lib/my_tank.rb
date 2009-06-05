@@ -1,3 +1,5 @@
+bzrequire 'lib/kalman'
+
 module BraveZealot
   class MyTank < Struct.new(:index, :callsign, :status,
                             :shots_available, :time_to_reload,

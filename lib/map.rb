@@ -56,6 +56,14 @@ module BraveZealot
         end if items
       end
       
+      if options.has_key?(:distributions)
+        pdf.stroke_style(PDF::Writer::StrokeStyle.new(3))
+        pdf.stroke_color(Color::RGB.from_fraction(0.8, 0.3, 0.1))
+        options[:distributions].each do |x, y, sx, sy, rho|
+          pdf.ellipse_at(x, y, sx, sy).stroke
+        end if options[:distributions].is_a?(Array)
+      end
+      
       yield pdf if block_given?
       
       # Draw surrounding wall

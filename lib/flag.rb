@@ -1,4 +1,5 @@
 bzrequire 'lib/team_colors'
+bzrequire 'lib/kalman'
 
 module BraveZealot
   class Flag < Struct.new(:color, :possession, :x, :y)
