@@ -1,16 +1,15 @@
 \chapter{Experiences and Time Spent}\label{chap:exp}
 \section{Duane's Summary}
-The majority of my time this week was spent optimizing our $A^*$ algorithm.  Our original implementation was entirely in Ruby, but it turned out to be too slow for discretization below 40 meters or so.  The new code is a Ruby extension written in C, and performs much better (1/2 second compared with 45 seconds on a $1000\times 1000$ grid).
+My assignment for this project was primarily to implement the Kalman filter and to show its output in PDF form for the report.  It was actually quite fun to turn the Kalman math into code using Ruby's NArray gem.  Because Ruby supports operator overloading, the matrix math was nearly as easy to code up as any algebraic equation.  We had to tweak the timing variable a bit so that our $t+1$ matrices properly represented the ``next iteration'' of the cycle.
 \par
-I also refactored our agent code to use state transitions for this lab.  Rather than using several different Agent classes for each task (e.g. a `dummy' agent vs a `smart' agent), we unified our code into a single agent that could make decisions regarding states.  Once this refactoring was in place, Jon Brandenburg specialized our agents for sniper and decoy capabilities.
+The ``screenshots'' in this report were produced using PDF output.  Part of my contribution was to generate the non-Kalman and Kalman paths for this output.
 \par
-I spent about 18 hours on this project, divided as follows:
+I spent about 11 hours on this project, divided as follows:
 \begin{itemize}
-    \item 8 hours implementing a fast $A^*$ algorithm in C
-    \item 3 hours refactoring our agents to use state information
-    \item 3 hours building a new Phttp://narray.rubyforge.org/DF output of our map with tank and flag positions
-    \item 2 hours debugging and passing off with another team in the CS Sports lab.
-    \item 2 hours writing this report and formatting it in \LaTeX
+    \item 5 hours implementing the Kalman Filter in Ruby
+    \item 3 hours merging code with Michael and passing off with another team in the lab
+    \item 2 hours writing new PDF output with kalman paths
+    \item 1 hour taking screenshots of the kalman paths
 \end{itemize}
 
 \section{Michael's Summary}

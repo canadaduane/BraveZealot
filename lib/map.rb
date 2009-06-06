@@ -1,5 +1,6 @@
 bzrequire 'lib/obstacle.rb'
 bzrequire 'lib/indent'
+bzrequire 'lib/team_colors'
 
 require 'pdf/writer'
 
@@ -58,11 +59,37 @@ module BraveZealot
       end
       
       if options.has_key?(:distributions)
-        pdf.stroke_style(PDF::Writer::StrokeStyle.new(3))
-        pdf.stroke_color(Color::RGB.from_fraction(0.8, 0.3, 0.1))
+        pdf.stroke_color(Color::RGB.from_fraction(1.0, 0.9, 0.1))
         options[:distributions].each do |x, y, sx, sy, rho|
-          pdf.ellipse_at(x, y, sx, sy).stroke
+          3.times.each do |t|
+            r = 2 + (10-t*3)
+            pdf.stroke_style(PDF::Writer::StrokeStyle.new(t+1))
+            pdf.ellipse_at(x, y, sx * r, sy * r).stroke
+          end
+          pdf.stroke_style(PDF::Writer::StrokeStyle.new(5))
+          pdf.ellipse_at(x, y, 2, 2).stroke
         end if options[:distributions].is_a?(Array)
+        pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
+      end
+      
+      if @kalman_paths
+        puts "Writing kalman paths: #{@kalman_paths.inspect}"
+        @kalman_paths.each_pair do |callsign, path|
+          pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
+          pdf.stroke_color(Color::RGB::Red)
+          observed  = pdf.move_to(path[0][0], path[0][1])
+          path[1..-1].each do |observed_x, observed_y, x, y|
+            observed.line_to(observed_x, observed_y)
+          end
+          observed.stroke
+
+          pdf.stroke_color(Color::RGB::Green)
+          estimated = pdf.move_to(path[0][2], path[0][3])
+          path[1..-1].each do |observed_x, observed_y, x, y|
+            estimated.line_to(x, y)
+          end
+          estimated.stroke
+        end
       end
       
       yield pdf if block_given?
@@ -73,27 +100,6 @@ module BraveZealot
       pdf.rectangle(-400, -400, 800, 800).close_stroke
       
       pdf
-    end
-    
-    def get_othertank(callsign)
-      @othertanks.find{ |t| t.callsign == callsign }
-    end
-    
-    def observe_othertanks(response)
-      if @othertanks.empty?
-        @othertanks = response.othertanks
-        @othertanks.each do |tank|
-          tank.kalman_initialize
-        end
-      else
-        response.othertanks.each do |src_tank|
-          unless (dst_tank = get_othertank(src_tank.callsign)).nil?
-            dst_tank.observed_x = src_tank.observed_x
-            dst_tank.observed_y = src_tank.observed_y
-            dst_tank.kalman_next(response.time)
-          end
-        end
-      end
     end
     
     #make an observation about mytanks
@@ -147,6 +153,10 @@ module BraveZealot
             #puts "Step 2: observed_x=#{src_tank.observed_x},observed_y=#{src_tank.observed_y}"
             dst_tank.kalman_next(response.time)
             #puts "Step 3: x=#{dst_tank.x},y=#{dst_tank.y}"
+
+            @kalman_paths ||= {}
+            @kalman_paths[src_tank.callsign] ||= []
+            @kalman_paths[src_tank.callsign] << [src_tank.observed_x, src_tank.observed_y, dst_tank.x, dst_tank.y]
           end
         end
       end
