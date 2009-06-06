@@ -1,0 +1,40 @@
+\chapter{Experiences and Time Spent}\label{chap:exp}
+\section{Duane's Summary}
+The majority of my time this week was spent optimizing our $A^*$ algorithm.  Our original implementation was entirely in Ruby, but it turned out to be too slow for discretization below 40 meters or so.  The new code is a Ruby extension written in C, and performs much better (1/2 second compared with 45 seconds on a $1000\times 1000$ grid).
+\par
+I also refactored our agent code to use state transitions for this lab.  Rather than using several different Agent classes for each task (e.g. a `dummy' agent vs a `smart' agent), we unified our code into a single agent that could make decisions regarding states.  Once this refactoring was in place, Jon Brandenburg specialized our agents for sniper and decoy capabilities.
+\par
+I spent about 18 hours on this project, divided as follows:
+\begin{itemize}
+    \item 8 hours implementing a fast $A^*$ algorithm in C
+    \item 3 hours refactoring our agents to use state information
+    \item 3 hours building a new Phttp://narray.rubyforge.org/DF output of our map with tank and flag positions
+    \item 2 hours debugging and passing off with another team in the CS Sports lab.
+    \item 2 hours writing this report and formatting it in \LaTeX
+\end{itemize}
+
+\section{Michael's Summary}
+This week I started off trying to debug why our agents from the last lab kept getting stuck after capturing the enemy flag. I spent part of Sunday and Monday night tracing the problem through our code
+and finally found it late Monday night.  The problem turned out to be related to caching the search path
+and not re-calculating it when we had purposely cleared the cached search path.
+\par
+Later in the week I got to work on fixing up our PD controller to be more accurate for following paths.  This task - like the task above - was not directly related to the passof for this lab, but was a necessary step to making sure our team would be ready for the final lab.
+\par
+Finally towards the latter part of the week I spent my time on the aiming/shooting code.  I investigated 6 different methods of calculating the intersection of vectors.  I tried several different methods of treating the vectors as parametric equations as well as solving the problem as a system of linear equations and even some trigonometry.  In the end the a simple iterative approach proved to be the fastest while maintaining the same level of accuracy as the others.
+\par
+At the end of the week I had spent a total of 28 hours in the following areas:
+\begin{itemize}
+    \item 4 hours fixing the bug from last lab.
+    \item 4 hours working on the PD controller to get better path following.
+    \item 6 hours researching vector intersection methods
+    \item 8 hours implementing several aim/shoot ideas
+    \item 4 hours meeting with the team to passoff the lab
+    \item 2 hours compiling report materials
+\end{itemize}
+
+\section{Jon's Summary}
+
+I worked on the sniper/decoy code.  The difficult part of this lab was transitioning to another team's code base.  I got a late start since it took  longer than anticipated to finish up the previous lab which left me with little time to work on completing this lab.
+
+In terms of time I spent somewhere between 15-20 hours on the project with about ten of those hours being spent writing/tweaking code, the rest being spent writing the report, thinking about it, demonstrating/observing, emails and team meetings.
+

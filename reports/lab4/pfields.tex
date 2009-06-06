@@ -1,0 +1,102 @@
+\chapter{Implementation of Potential Fields}\label{chap:pf}
+Our implementation of \textsl{potential fields} started out by trying to make the \textsl{potential fields} directly suggest an angular velocity and a speed.  This proved problematic right away when we started trying to sum multiple potential fields and also when trying to create the \texttt{gnuplot} file.  
+\par
+After going back and splitting the logic for our \textsl{potential fields} into two methods we took an approach that more directly correlated to the PDF about \textsl{potential fields} from the class wiki. For our attraction fields we follow the algorithm described below.
+\par
+$$d = \sqrt{(X_g - X)^2 + (Y_g - Y)^2}$$
+
+$$\theta = atan_2 (Y_g - Y, X_g - X)$$
+
+% \[if ( $d$ < radius ) \left\{ 
+% \begin{array}{l l}
+%   dX = \theta & \quad \mbox{}\\
+%   dY = \theta & \quad \mbox{if( distance < (radius + spread) )}\\
+% \end{array} \right. \]
+
+\[\mbox{if} ( d < radius ) \left\{  
+\begin{array}{l l}
+  dX = 0 \quad\quad\quad &\\
+  dY = 0 &\\ \end{array} \right. \]
+
+\[\mbox{if} (distance < (radius + spread)) \left\{  
+\begin{array}{l l}
+  dX = \alpha (distance\:-\:radius) \cos\theta &\\
+  dY = \alpha (distance\:-\:radius) \sin\theta &\\ \end{array} \right. \]
+
+\[\quad\quad\quad\quad\ \ \ \ \mbox{otherwise} \left\{  
+\begin{array}{l l}
+  dX = \alpha\cdot spread\cdot\cos\theta &\\
+  dY = \alpha\cdot spread\cdot\sin\theta &\\ \end{array} \right. \]
+
+\par
+Our algorithm for the repulsion field is very similar and only differs in the sense that instead of getting stronger further away it gets weaker as the distance increases.  The tangential field is different in that it takes $\theta$ and substracts $\pi/2$ so that our angle is always perpendicular to the attraction or repulsion fields. The overall field sums up the individual $dX$, $dY$ components and then divides by the number of fields on the map to average the overall effect.  No matter how we calculate the $dX$, $dY$ we convert them into a suggested speed and angular velocity the same way.  In the algorithm below $\theta_g$ represents the goal angle and $\theta_c$ represents the current angle. 
+
+$$\theta_g = atan_2 (dX, dY)$$
+
+$$d = \sqrt{dX^2 + dY^2}$$
+
+$$a = \theta_g - \theta_c$$
+
+\[\mbox{if}\:a > \pi\:\mbox{or}\:a < -\pi \left\{ 
+\begin{array}{l l}
+  a += 2\pi & \quad \mbox{if}\:a < 0\\
+  a -= 2\pi & \quad \mbox{otherwise}\\ \end{array} \right. \]
+
+$$speed = 2d$$
+
+$$angvel = 2a$$
+
+
+\par
+If the speed turns out to be zero at this point then we also suggest an angular velocity of 0.  Finally:
+$$\mbox{speed}\:=\:\mbox{speed}\cdot\frac{\lvert \pi - \lvert a\rvert \rvert}{\pi}$$
+
+\par
+As you can see we decrease the speed the further we are away from our goal angle which should stop us from wasting time moving in the wrong direction.  So when we finally put this all together and got our code generating GNU Plot files we were ready to start tuning the way we place the \textsl{potential fields} on the map.
+\par
+First we made a pretty simple approach to adding fields to the map.  We added an attraction field to the enemy flag and a repulsion field at each corner and a repulsion field at the center of each obstacle.  The resulting overall field looked something like this:
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{first.png}
+\end{center}
+
+\par
+This looked obviously wrong and having a circular potential field try to encompass rectangualr objects seemed like it would cause us to run into a lot of edges so we tried putting a repulsion field at each corner of each object.  We also added a repulsion field between each corner along the walls.  The resulting field looked something like this:
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{second.png}
+\end{center}
+
+\par
+This looked even worse than our first attempt so we decided to try a hybrid of the two.  We scaled back the size and strength of the corner fields and added a tangential field to the center of each obstacle to try to help our tanks \lq ease\rq around the corners.  The resulting field looked something like this:
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{third.png}
+\end{center}
+
+\par
+Next we tried to create a stronger attraction to the flag and removed all the repulsion fields from the edge of the map.  We also removed all of the corner fields around our obstacles and instead increased the spread of each center field on the obstacles.  Now our field looked like this:
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{fourth.png}
+\end{center}
+
+\par
+Now that is the kind of field I would want if I were an artificially intelligent tank.
+\par
+With a final strategy chosen, we started tuning the relative size and strength of each field being placed on the map to help optimize our path.  We were assuming that the other intelligent agents we would face off against would not be shooting accurately or at all, so our best chance of winning the race to capture the ﬂag was to get the ﬂag as quickly as possible and race back to our base.  When we finally tuned the size and strength of our map's fields, the \textsl{potential fields} looked like this:
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{fifth.png}
+\end{center}
+
+\par
+
+\begin{center}
+\includegraphics[width=\textwidth]{sixth.png}
+\end{center}

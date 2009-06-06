@@ -1,0 +1,48 @@
+\documentclass[letterpaper,12pt]{report}
+%
+%--------------------   start of the 'preamble'
+%
+\usepackage{graphicx,amssymb,amstext,amsmath,url}
+%
+%%    homebrew commands -- to save typing
+\newcommand\etc{\textsl{etc}}
+\newcommand\eg{\textsl{eg.}\ }
+\newcommand\etal{\textsl{et al.}}
+\newcommand\Quote[1]{\lq\textsl{#1}\rq}
+\newcommand\fr[2]{{\textstyle\frac{#1}{#2}}}
+\newcommand\miktex{\textsl{MikTeX}}
+\newcommand\comp{\textsl{The Companion}}
+\newcommand\nss{\textsl{Not so Short}}
+%
+%---------------------   end of the 'preamble'
+%
+
+\begin{document}
+%-----------------------------------------------------------
+\title{Kalman Filter Lab \\
+{\large \textbf{CS 470 Lab 3}}}
+\author{Duane Johnson, Michael Ries and Jon Brandenburg}
+\maketitle
+%-----------------------------------------------------------
+\begin{abstract}
+This lab is focused on learning the basics of implementing a Kalman filter.  The participants
+had to rely on 'noisy' sensors which added normally distributed noise to each dimension independently.
+\end{abstract}
+%-----------------------------------------------------------
+\tableofcontents
+%-----------------------------------------------------------
+\include{labcontext}
+\include{experiences}
+\include{details}
+%-----------------------------------------------------------
+% \addcontentsline{toc}{chapter}{\numberline{}Bibliography}
+%\include{biblio}
+%-----------------------------------------------------------
+\appendix
+\include{rubycode}
+%\include{app1}
+%\include{app2}
+%\include{app5}
+%\include{app3}
+%-----------------------------------------------------------
+\end{document}

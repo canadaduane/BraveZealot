@@ -1,0 +1,22 @@
+\chapter{Lab Context}\label{chap:context}
+\section{Summary}
+The authors each developed and ran the software below on laptops.  The laptops were unix-based systems; however, these results should be easily duplicated on a Windows machine.
+
+\section{Hardware}
+\begin{itemize}
+    \item Macbook Pro (32 bit) / 2.4 GHz Intel Core 2 Duo / 2 GB RAM
+    \item Lenovo T400 (32 bit) / 2.2 GHz Intel Core 2 Duo / 2 GB RAM
+    \item HP Pavilion (64 bit) / 2.5 GHz Intel Core 2 Duo / 4 GB RAM
+\end{itemize}
+
+\section{Software}
+\begin{itemize}
+    \item Mac OS X 10.5
+    \item Ubuntu 9.04
+    \item bzFlag 2.0.7 with patched bzrobots client\footnote{Supplied by CS470 in \textsl{Install Instructions}}
+    \item Ruby Interpreter, version 1.8.7 (or 1.9.1)
+    \item EventMachine Library\footnote{\url{http://rubyeventmachine.com/}} for Ruby
+    \item PDF-Writer Library\footnote{\url{http://ruby-pdf.rubyforge.org/pdf-writer/}} for Ruby
+    \item Rake Library\footnote{\url{http://rake.rubyforge.org/}} for Ruby Unit Tests
+    \item NArray and NMatrix \footnote{\url{http://narray.rubyforge.org/}}
+\end{itemize}
