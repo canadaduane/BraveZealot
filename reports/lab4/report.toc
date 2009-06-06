@@ -5,17 +5,13 @@
 \contentsline {chapter}{\numberline {2}Experiences and Time Spent}{4}
 \contentsline {section}{\numberline {2.1}Duane's Summary}{4}
 \contentsline {section}{\numberline {2.2}Michael's Summary}{5}
-\contentsline {section}{\numberline {2.3}Jon's Summary}{6}
-\contentsline {chapter}{\numberline {3}Details}{7}
-\contentsline {section}{\numberline {3.1}Path Following and Potential Fields}{7}
-\contentsline {section}{\numberline {3.2}Schizophrenic Agents}{8}
-\contentsline {subsection}{\numberline {3.2.1}Agent Design}{8}
-\contentsline {section}{\numberline {3.3}Agent Behavior}{9}
-\contentsline {subsection}{\numberline {3.3.1}Decoy}{9}
-\contentsline {subsection}{\numberline {3.3.2}Sniper}{11}
-\contentsline {subsection}{\numberline {3.3.3}Looking to the Future}{11}
-\contentsline {section}{\numberline {3.4}Tests with Another Group}{15}
-\contentsline {subsection}{\numberline {3.4.1}Our Tests}{15}
-\contentsline {subsection}{\numberline {3.4.2}Michael Hansen and Daniel Nelson}{15}
-\contentsline {subsection}{\numberline {3.4.3}Kendall Clement et. al.}{17}
-\contentsline {chapter}{\numberline {A}Ruby Code}{18}
+\contentsline {section}{\numberline {2.3}Jon's Summary}{5}
+\contentsline {chapter}{\numberline {3}Details}{6}
+\contentsline {section}{\numberline {3.1}Kalman Filter}{6}
+\contentsline {section}{\numberline {3.2}Clay Pigeons}{7}
+\contentsline {subsection}{\numberline {3.2.1}Conforming Pigeons}{7}
+\contentsline {subsection}{\numberline {3.2.2}Non-Conforming Pigeon}{7}
+\contentsline {section}{\numberline {3.3}Tests with Another Group}{12}
+\contentsline {subsection}{\numberline {3.3.1}Our Tests}{12}
+\contentsline {subsection}{\numberline {3.3.2}The Other Team}{15}
+\contentsline {chapter}{\numberline {A}Ruby Code}{17}

@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2009.5.20)  5 JUN 2009 16:56
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2009.5.20)  5 JUN 2009 22:39
 entering extended mode
  %&-line parsing enabled.
 **report.tex
@@ -121,8 +121,8 @@ LaTeX Info: Redefining \] on input line 2667.
 (/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
 \Urlmuskip=\muskip11
 Package: url 2005/06/27  ver 3.2  Verb mode for urls, etc.
-)
-No file report.aux.
+) (./report.aux
+(./labcontext.aux) (./experiences.aux) (./details.aux) (./rubycode.aux))
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
@@ -137,6 +137,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 20.
 LaTeX Font Info:    ... okay on input line 20.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 20.
 LaTeX Font Info:    ... okay on input line 20.
+
 (/usr/share/texmf/tex/context/base/supp-pdf.tex
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count101
@@ -160,12 +161,11 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 25.
 File: umsb.fd 2002/01/19 v2.2g AMS font definitions
 ) [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1]
-No file report.toc.
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [1] (./report.toc)
 \tf@toc=\write3
 \openout3 = `report.toc'.
 
-[1
+ [1
 
 ]
 \openout2 = `labcontext.aux'.
@@ -186,84 +186,76 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 
  (./experiences.tex
 Chapter 2.
-
-Overfull \hbox (1.44965pt too wide) in paragraph at lines 5--6
-\OT1/cmr/m/n/12 Rather than us-ing sev-eral dif-fer-ent Agent classes for each 
-task (e.g. a `dummy'
- []
-
 [4
 
 
 
-]
-Overfull \hbox (1.14038pt too wide) in paragraph at lines 26--27
-[]\OT1/cmr/m/n/12 4 hours op-ti-miz-ing the path-following al-go-rithm and tun-
-ing the strength
- []
-
-[5]) [6]
+]) [5]
 \openout2 = `details.aux'.
 
  (./details.tex
 Chapter 3.
-[7
+[6
 
 
 
-] [8] <01paths.png, id=44, 668.4975pt x 719.68875pt>
-File: 01paths.png Graphic file (type png)
- <use 01paths.png>
-<04decoy.png, id=45, 664.4825pt x 723.70375pt>
-File: 04decoy.png Graphic file (type png)
- <use 04decoy.png> [9] [10 <./01paths.png>] <05kill.png, id=54, 663.47874pt x 7
-21.69624pt>
-File: 05kill.png Graphic file (type png)
- <use 05kill.png>
-<06capture.png, id=55, 661.47125pt x 719.68875pt>
-File: 06capture.png Graphic file (type png)
- <use 06capture.png> [11]
-[12 <./04decoy.png>] [13 <./05kill.png>] [14 <./06capture.png>]
-<07re-evaluate-path.png, id=72, 650.43pt x 719.68875pt>
-File: 07re-evaluate-path.png Graphic file (type png)
+] <wackyworld.png, id=38, 809.424pt x 805.0878pt>
+File: wackyworld.png Graphic file (type png)
+ <use wackyworld.png>
+<kalman-path-cv1.png, id=39, 805.0878pt x 832.5504pt>
+File: kalman-path-cv1.png Graphic file (type png)
 
-<use 07re-evaluate-path.png> [15] [16 <./07re-evaluate-path.png>]) [17]
+<use kalman-path-cv1.png>
+<kalman-path-ca1.png, id=40, 805.0878pt x 805.0878pt>
+File: kalman-path-ca1.png Graphic file (type png)
+
+<use kalman-path-ca1.png>
+<kalman-path-ca2.png, id=41, 805.0878pt x 805.0878pt>
+File: kalman-path-ca2.png Graphic file (type png)
+
+<use kalman-path-ca2.png> [7] [8 <./wackyworld.png (PNG copy)>] [9 <./kalman-pa
+th-cv1.png (PNG copy)>] [10 <./kalman-path-ca1.png (PNG copy)>] [11 <./kalman-p
+ath-ca2.png (PNG copy)>]
+<kalman-path-wild1.png, id=58, 805.0878pt x 805.0878pt>
+File: kalman-path-wild1.png Graphic file (type png)
+
+<use kalman-path-wild1.png>
+<kalman-path-wild2.png, id=59, 805.0878pt x 805.0878pt>
+File: kalman-path-wild2.png Graphic file (type png)
+
+<use kalman-path-wild2.png> [12] [13 <./kalman-path-wild1.png (PNG copy)>]
+[14 <./kalman-path-wild2.png (PNG copy)>] [15]) [16]
 \openout2 = `rubycode.aux'.
 
-
-(./rubycode.tex
+ (./rubycode.tex
 Appendix A.
-) [18
+) [17
 
 
 
 ] (./report.aux (./labcontext.aux) (./experiences.aux) (./details.aux)
-(./rubycode.aux))
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+(./rubycode.aux)) ) 
 Here is how much of TeX's memory you used:
- 1958 strings out of 94834
- 23043 string characters out of 1179181
- 73703 words of memory out of 1500000
- 5117 multiletter control sequences out of 10000+50000
+ 1970 strings out of 94834
+ 23390 string characters out of 1179181
+ 72818 words of memory out of 1500000
+ 5116 multiletter control sequences out of 10000+50000
  14531 words of font info for 56 fonts, out of 1200000 for 2000
  212 hyphenation exceptions out of 8191
- 28i,10n,24p,893b,310s stack positions out of 5000i,500n,6000p,200000b,5000s
-</usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf
--texlive/fonts/type1/bluesky/cm/cmmi12.pfb></usr/share/texmf-texlive/fonts/type
-1/bluesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr12.p
-fb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf
--texlive/fonts/type1/bluesky/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/
-bluesky/cm/cmr8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsl10.pfb
-></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-
-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/
-bluesky/cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.p
-fb>
-Output written on report.pdf (20 pages, 204325 bytes).
+ 27i,8n,24p,1122b,310s stack positions out of 5000i,500n,6000p,200000b,5000s
+</usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx12.pfb>
+</usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi12.pfb></usr/share/texmf-t
+exlive/fonts/type1/bluesky/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts/type1/b
+luesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr12.pfb>
+</usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-te
+xlive/fonts/type1/bluesky/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/blu
+esky/cm/cmr8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsl10.pfb></
+usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-tex
+live/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bl
+uesky/cm/cmtt10.pfb>
+Output written on report.pdf (19 pages, 156748 bytes).
 PDF statistics:
- 125 PDF objects out of 1000 (max. 8388607)
+ 118 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
