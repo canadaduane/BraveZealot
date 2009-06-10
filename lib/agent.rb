@@ -37,22 +37,15 @@ module BraveZealot
     include SmartStates
     include DecoyStates
     include SniperStates
+    include HuntingStates
+    # Conforming Pigeons
     include SittingDuckStates
     include ConstantVelocityStates
     include ConstantAccelerationStates
     include GaussianAccelerationStates
-    include WildStates
-    include HuntingStates
-
-    # Conforming Pigeons
-    include SittingDuck
-    include ConstantVelocity
-    include ConstantAcceleration
-    include GaussianAcceleration
-    
     # Non-conforming Pigeons
-    include WildPigeon
-    
+    include WildStates
+
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)
       @hq, @tank = hq, tank
