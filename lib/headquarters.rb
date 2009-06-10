@@ -55,14 +55,13 @@ module BraveZealot
     end
     
     def periodic_update
-			puts "periodic update"
+      # puts "periodic update"
       # Spread out our information gathering over time so we don't
       # constantly overwhelm the network.
-      EventMachine::PeriodicTimer.new(0.4) do
-        sleep(0.1) { flags      }
-        sleep(0.03) { mytanks    }
-        sleep(0.03) { othertanks }
-        sleep(0.4) { shots      }
+      EventMachine::PeriodicTimer.new(0.3) do
+        sleep(0.1) { flags                  }
+        sleep(0.2) { mytanks; othertanks    }
+        sleep(0.3) { shots                  }
       end
     end
     
@@ -142,14 +141,6 @@ module BraveZealot
       EventMachine::Timer.new(time, &block)
     end
     
-    def on_mytanks(r)
-      @map.observe_mytanks(r)
-      #@map.mytanks = r.mytanks
-      #r.mytanks.each do |t|
-      #  @agents[t.index].tank = t if @agents.size > t.index
-      #end
-    end
-    
     def on_flags(r)
       @map.flags = r.flags
     end
@@ -168,6 +159,14 @@ module BraveZealot
       @map.observe_othertanks(r)
     end
     
+    def on_mytanks(r)
+      @map.observe_mytanks(r)
+      #@map.mytanks = r.mytanks
+      #r.mytanks.each do |t|
+      #  @agents[t.index].tank = t if @agents.size > t.index
+      #end
+    end
+
     def disconnect
       EventMachine::stop_event_loop
       exit(0)
