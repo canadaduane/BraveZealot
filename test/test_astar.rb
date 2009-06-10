@@ -9,9 +9,10 @@ class AstarTest < Test::Unit::TestCase
   end
   
   def test_arg_errors
-    assert_raise(ArgumentError) { Astar.new([], 2) }
-    assert_raise(ArgumentError) { Astar.new([0,0,0], 2) }
-    assert_nothing_raised { Astar.new([0,0,0,0], 2) }
+    assert_raise(ArgumentError) { Astar.new(0) }
+    assert_raise(ArgumentError) { Astar.new(0, 0) }
+    assert_nothing_raised { Astar.new(1, 1) }
+    assert_nothing_raised { Astar.new(5, 5, 0) }
   end
   
   def test_obstacle

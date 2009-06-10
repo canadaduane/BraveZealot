@@ -57,8 +57,8 @@ void show_int_queue(PriorityQueue* queue)
 VALUE Astar = Qnil;
 
 // The Astar#initialize method
-static VALUE astar_init(VALUE self, VALUE rb_width, VALUE rb_height, VALUE rb_initial) {
-    double initial = INT2DBL(rb_initial);
+static VALUE astar_init(int argc, VALUE* argv, VALUE self) {
+    double initial = NUM2DBL(rb_initial);
     int width      = INT2NUM(rb_width);
     int height     = INT2NUM(rb_height);
     long i, len    = width * height;
@@ -307,7 +307,7 @@ static VALUE astar_add_poly(VALUE self, VALUE rb_ary_coords, VALUE rb_weight)
 // The initialization method for this module; Ruby calls this for us
 void Init_astar() {
     Astar = rb_define_class("Astar", rb_cObject);
-    rb_define_method(Astar, "initialize", astar_init, 2);
+    rb_define_method(Astar, "initialize", astar_init, -1);
     rb_define_method(Astar, "search", astar_search, 4);
     rb_define_method(Astar, "map", astar_get_map, 0);
     rb_define_method(Astar, "add_rect", astar_add_rect, 5);
