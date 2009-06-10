@@ -54,11 +54,33 @@ module BraveZealot
       periodic_update
     end
     
+    # Calls an action immediately and sets up a timer to periodically call the action again.
+    # If +maximum+ is set to an integer value, then the action will be called at most +maximum+
+    # times.
+    def periodic_action(period = 0.5, maximum = nil, &action)
+      count = 0
+      timer = EventMachine::PeriodicTimer.new(period, &(action_wrapper = proc do
+        if maximum.nil? or (count += 1) <= maximum
+          action.call
+        else
+          timer.cancel
+        end
+      end))
+      # Do it immediately
+      action_wrapper.call
+    end
+    
     def periodic_update
       # puts "periodic update"
+      
+      # Get up to 10 samples of the obstacles
+      periodic_action(0.5, 10) do
+        obstacles
+      end
+      
       # Spread out our information gathering over time so we don't
       # constantly overwhelm the network.
-      EventMachine::PeriodicTimer.new(0.3) do
+      periodic_action(0.3) do
         sleep(0.1) { flags                  }
         sleep(0.2) { mytanks; othertanks    }
         sleep(0.3) { shots                  }
