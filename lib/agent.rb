@@ -130,98 +130,98 @@ module BraveZealot
     end
   end
 
-	module DecoyStates
-		# need to determine whether the enemy is in a corner or in the middle, since the position will dictate the decoy path.
-		def decoy()
-			set_decoy_goal_point
-		end
+  module DecoyStates
+    # need to determine whether the enemy is in a corner or in the middle, since the position will dictate the decoy path.
+    def decoy()
+      set_decoy_goal_point
+    end
 
-		def decoy_move_to_start
+    def decoy_move_to_start
       unless enemy_tanks_alive then
         @state = :dummy
         return
       end
 
       set_decoy_starting_point
-		end
+    end
 
-		def decoy_move_to_goal
+    def decoy_move_to_goal
 
-			# determine whether we've reached the goal, if so, transition
-			unless enemy_tanks_alive() then
-				# transition to the next state
-			 	@state = :dummy
-				return
-			end
+      # determine whether we've reached the goal, if so, transition
+      unless enemy_tanks_alive() then
+        # transition to the next state
+        @state = :dummy
+        return
+      end
       set_decoy_goal_point
-		end
-		
-		#
-		#
-		#
-		# NOTE: the following methods do not represent states
-		#
-		#
-		#
-		def goal_reached(threshold = 5)
+    end
+    
+    #
+    #
+    #
+    # NOTE: the following methods do not represent states
+    #
+    #
+    #
+    def goal_reached(threshold = 5)
       dist = calc_dist(@tank,@goal)
 #       #puts "Distance to goal = #{dist}"
-			return dist < threshold
-		end
+      return dist < threshold
+    end
 
-		def tank_moving()
-			return (@tank.vx == 0 and @tank.vy == 0)
-		end
+    def tank_moving()
+      return (@tank.vx == 0 and @tank.vy == 0)
+    end
 
-		def calculate_decoy_starting_point()
-			# figure out where the flag is
-			# should give us back x, y coordinates, then
-			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
-			# 
-			# I'll hard code everything for this map just to do a proof of concept
-			
-			x = 100
-			y = -395
-			return x, y
-		end
+    def calculate_decoy_starting_point()
+      # figure out where the flag is
+      # should give us back x, y coordinates, then
+      # figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+      # 
+      # I'll hard code everything for this map just to do a proof of concept
+      
+      x = 100
+      y = -395
+      return x, y
+    end
 
-		def calculate_decoy_ending_point()
-			x = 100
-			y = 395
+    def calculate_decoy_ending_point()
+      x = 100
+      y = 395
 
-			return x, y
-		end
+      return x, y
+    end
 
-		def set_decoy_starting_point
-				# reset the potential fields group
-	      @group = PfGroup.new(false)
+    def set_decoy_starting_point
+        # reset the potential fields group
+        @group = PfGroup.new(false)
 
-				# calculate a new destination
-				x, y = calculate_decoy_starting_point()
-	      @goal = Coord.new(x, y)
-	      #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+        # calculate a new destination
+        x, y = calculate_decoy_starting_point()
+        @goal = Coord.new(x, y)
+        #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
 
-				# transition to the next state
+        # transition to the next state
         push_next_state(:smart, :decoy_move_to_goal)
-			 	@state = :smart
-		end
-
-		def set_decoy_goal_point
-				# reset the potential fields group
-	      @group = PfGroup.new(false)
-
-				# calculate a new destination
-				x, y = calculate_decoy_ending_point()
-	      @goal = Coord.new(x, y)
-	      #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
-
-				# transition to the next state
-			 	push_next_state(:smart, :decoy_move_to_start)
         @state = :smart
-		end
-	end
+    end
 
-	module SniperStates
+    def set_decoy_goal_point
+        # reset the potential fields group
+        @group = PfGroup.new(false)
+
+        # calculate a new destination
+        x, y = calculate_decoy_ending_point()
+        @goal = Coord.new(x, y)
+        #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
+
+        # transition to the next state
+        push_next_state(:smart, :decoy_move_to_start)
+        @state = :smart
+    end
+  end
+
+  module SniperStates
     def test_shot
       shoot do |shot|
         10.times do |idx|
@@ -235,50 +235,50 @@ module BraveZealot
       @state = :dummy
     end
 
-		def sniper
-			@state = sniper_move_to_start_position
-		end
+    def sniper
+      @state = sniper_move_to_start_position
+    end
 
-		def sniper_move_to_start_position
-			puts "snipe_move_to_start_position"
+    def sniper_move_to_start_position
+      puts "snipe_move_to_start_position"
       set_sniper_starting_point
-		end
+    end
 
-		def sniper_move_to_attack_position
-			puts "snipe_move_to_attack_position"
-			speed(0)
+    def sniper_move_to_attack_position
+      puts "snipe_move_to_attack_position"
+      speed(0)
       if decoy_is_closer()
         set_sniper_attacking_point
       end
-		end
+    end
 
-		def log_move(move)
-			#puts "input     : tank.x, tank.y, tank.angle = #{@tank.x}, #{tank.y}, #{tank.angle}"
-			#puts "suggestion: speed, angvel = #{move.speed}, #{move.angvel}"
-			puts "in: (#{@tank.x}, #{tank.y}, #{tank.angle}), out: (#{move.speed}, #{move.angvel})"
-		end
+    def log_move(move)
+      #puts "input     : tank.x, tank.y, tank.angle = #{@tank.x}, #{tank.y}, #{tank.angle}"
+      #puts "suggestion: speed, angvel = #{move.speed}, #{move.angvel}"
+      puts "in: (#{@tank.x}, #{tank.y}, #{tank.angle}), out: (#{move.speed}, #{move.angvel})"
+    end
 
-		def sniper_attack
-			puts "sniper attack"
-			if enemy_tanks_alive()
-				puts "enemy tanks are alive"
-				if enemy_targeted()
-					angvel(0)
-					speed(0)
-					puts "shot fired"
-					shoot()
-				else
-					puts "targeting enemy"
-					target_enemy()
-				end
-			else
-				push_next_state(:smart, :sniper_flag_captured)
+    def sniper_attack
+      puts "sniper attack"
+      if enemy_tanks_alive()
+        puts "enemy tanks are alive"
+        if enemy_targeted()
+          angvel(0)
+          speed(0)
+          puts "shot fired"
+          shoot()
+        else
+          puts "targeting enemy"
+          target_enemy()
+        end
+      else
+        push_next_state(:smart, :sniper_flag_captured)
         f = hq.enemy_flags.first
         puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
         @goal = Coord.new(f.x, f.y)
         @state = :smart
-			end
-		end
+      end
+    end
 
     def sniper_flag_captured
       puts "got the enemy flag - going to my home base baby!"
@@ -286,158 +286,158 @@ module BraveZealot
       @state = :smart_return_home
     end
 
-		#
-		# NOTE:  The following methods are not considered states
-		#
-		def enemy_tanks_alive()
-			@hq.map.othertanks.each do |enemy_tank|
-				if enemy_tank.status != 'dead'
-					return true
-				end
-			end
+    #
+    # NOTE:  The following methods are not considered states
+    #
+    def enemy_tanks_alive()
+      @hq.map.othertanks.each do |enemy_tank|
+        if enemy_tank.status != 'dead'
+          return true
+        end
+      end
 
-			return false
-		end
+      return false
+    end
 
-		def enemy_targeted
-			# if tank is directly pointing at other tank..
-			# we'll just turn firing on.. not a good idea for the final solution, but should work.
-			puts "@tank.angle = #{@tank.angle}"
+    def enemy_targeted
+      # if tank is directly pointing at other tank..
+      # we'll just turn firing on.. not a good idea for the final solution, but should work.
+      puts "@tank.angle = #{@tank.angle}"
 
-			best_enemy = select_target()
-			puts "distance to best enemy = #{calc_dist(best_enemy, @tank)}"
+      best_enemy = select_target()
+      puts "distance to best enemy = #{calc_dist(best_enemy, @tank)}"
       target_angle = Math.atan2(best_enemy.y - @tank.y,
               best_enemy.x - @tank.x)
       relative_angle = normalize_angle(target_angle - @tank.angle)
 
-			puts "target_angle = #{target_angle}"
-			return ((relative_angle).abs < 0.001)
-		end
+      puts "target_angle = #{target_angle}"
+      return ((relative_angle).abs < 0.001)
+    end
 
-		def select_target()
-			world_size = 800
+    def select_target()
+      world_size = 800
       best_enemy = nil
       best_dist = 2.0 * world_size
       @hq.map.othertanks.each do |enemy|
 
         if enemy.status != 'normal'
           next
-				end
+        end
 
         dist = calc_dist(enemy, @tank)
 
         if dist < best_dist
           best_dist = dist
           best_enemy = enemy
-				end
-			end
+        end
+      end
 
-			return best_enemy
-		end
+      return best_enemy
+    end
 
-		def calc_dist(p1, p2)
-			return (Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2))
-		end
+    def calc_dist(p1, p2)
+      return (Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2))
+    end
 
-		def target_enemy
-			# the actual angle needs to be calculated..
-			# this is where a PD controller would be really nice to have.
-			# in addition i really must have the info updated every time it is called 
-			# and it should be called continuously at this point.. or it should be 
-			# more efficient and predict how long it will be before it rotates into
-			# position and sleep until that time
+    def target_enemy
+      # the actual angle needs to be calculated..
+      # this is where a PD controller would be really nice to have.
+      # in addition i really must have the info updated every time it is called 
+      # and it should be called continuously at this point.. or it should be 
+      # more efficient and predict how long it will be before it rotates into
+      # position and sleep until that time
 
-			best_enemy = select_target()
+      best_enemy = select_target()
       target_angle = Math.atan2(best_enemy.y - @tank.y,
               best_enemy.x - @tank.x)
       relative_angle = normalize_angle(target_angle - @tank.angle)
 
-			puts "target, tank, relative = #{target_angle}, #{@tank.angle}, #{relative_angle}"			
-			puts "angvel = #{2 * relative_angle}"
-			angvel(2 * relative_angle)
-		end
+      puts "target, tank, relative = #{target_angle}, #{@tank.angle}, #{relative_angle}"      
+      puts "angvel = #{2 * relative_angle}"
+      angvel(2 * relative_angle)
+    end
 
-		def normalize_angle(angle)
-			# Make any angle be between +/- pi.
-			angle -= 2 * Math::PI * (angle / (2 * Math::PI)).to_i
+    def normalize_angle(angle)
+      # Make any angle be between +/- pi.
+      angle -= 2 * Math::PI * (angle / (2 * Math::PI)).to_i
 
-			if angle <= -Math::PI
-				angle += 2 * Math::PI
-			elsif angle > Math::PI
-				angle -= 2 * Math::PI
-			end
+      if angle <= -Math::PI
+        angle += 2 * Math::PI
+      elsif angle > Math::PI
+        angle -= 2 * Math::PI
+      end
 
-			return angle
-		end
+      return angle
+    end
 
-		def decoy_is_closer
-			# make an assumption we only have two tanks, this will
-			# need to be modified for future labs when we start adding in more tanks
+    def decoy_is_closer
+      # make an assumption we only have two tanks, this will
+      # need to be modified for future labs when we start adding in more tanks
 
-			decoy_tank = nil
+      decoy_tank = nil
 
-			if @tank.index == 0
-				decoy_tank = @hq.agents[1].tank
-			else
-				decoy_tank = @hq.agents[0].tank
-			end
-			
-			@hq.map.othertanks.each do |enemy_tank|
-				if calc_dist(decoy_tank, enemy_tank) > calc_dist(@tank, enemy_tank)
-					return false
-				end
-			end
+      if @tank.index == 0
+        decoy_tank = @hq.agents[1].tank
+      else
+        decoy_tank = @hq.agents[0].tank
+      end
+      
+      @hq.map.othertanks.each do |enemy_tank|
+        if calc_dist(decoy_tank, enemy_tank) > calc_dist(@tank, enemy_tank)
+          return false
+        end
+      end
 
-			return true
-		end
+      return true
+    end
 
-		def calculate_sniper_starting_position()
-			# figure out where the flag is
-			# should give us back x, y coordinates, then
-			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
-			# 
-			# I'll hard code everything for this map just to do a proof of concept
-			x = 115
-			y = 325
-			return x, y
-		end
+    def calculate_sniper_starting_position()
+      # figure out where the flag is
+      # should give us back x, y coordinates, then
+      # figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+      # 
+      # I'll hard code everything for this map just to do a proof of concept
+      x = 115
+      y = 325
+      return x, y
+    end
 
-		def calculate_sniper_attacking_position()
-			# figure out where the flag is
-			# should give us back x, y coordinates, then
-			# figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
-			# 
-			# I'll hard code everything for this map just to do a proof of concept
-			x = 150
-			y = 270
-			return x, y
-		end
+    def calculate_sniper_attacking_position()
+      # figure out where the flag is
+      # should give us back x, y coordinates, then
+      # figure out the orientation (ie which which part of the map is open.. (since it could easily be rotated)
+      # 
+      # I'll hard code everything for this map just to do a proof of concept
+      x = 150
+      y = 270
+      return x, y
+    end
 
-		def set_sniper_starting_point()
-			x, y = calculate_sniper_starting_position()
+    def set_sniper_starting_point()
+      x, y = calculate_sniper_starting_position()
       @goal = Coord.new(x, y)
 
       # transition to the next state
       push_next_state(:smart, :sniper_move_to_attack_position)
       @state = :smart
-		end
+    end
 
-		def set_sniper_attacking_point()
-			x, y = calculate_sniper_attacking_position()
+    def set_sniper_attacking_point()
+      x, y = calculate_sniper_attacking_position()
       @goal = Coord.new(x, y)
 
       # transition to the next state
       push_next_state(:smart, :sniper_attack)
       @state = :smart
-		end
-	end
+    end
+  end
 
   module SittingDuck
     def duck
       # do nothing
-			@state = :duck
-			speed(0)
-			angvel(0)
+      @state = :duck
+      speed(0)
+      angvel(0)
     end
   end
 
@@ -445,108 +445,108 @@ module BraveZealot
     def cv
       @state = :cv
 
-			#puts "cv - iteration"
-			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
-			speed(0.5)
-			angvel(0)
+      #puts "cv - iteration"
+      #puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+      speed(0.5)
+      angvel(0)
     end
   end
 
   module ConstantAcceleration
 
-		@@current_accel = 0
+    @@current_accel = 0
 
     def ca
       @state = :ca
 
-			#puts "ca - iteration"
-			#puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
-			#puts "\ttank.status = #{@tank.status}"
-			if @tank.status == 'dead'
-				@@current_accel = 0
-				angvel(0)
-			else
-				@@current_accel = @@current_accel + 0.001
-			end
+      #puts "ca - iteration"
+      #puts "\ttank.vx, tank.vy = #{tank.vx}, #{tank.vy}"
+      #puts "\ttank.status = #{@tank.status}"
+      if @tank.status == 'dead'
+        @@current_accel = 0
+        angvel(0)
+      else
+        @@current_accel = @@current_accel + 0.001
+      end
 
-			speed(@@current_accel)
-			angvel(@@current_accel)
+      speed(@@current_accel)
+      angvel(@@current_accel)
     end
   end
 
   module GaussianAcceleration
 
-		current_accel = 0
+    current_accel = 0
 
 
     def ga
       @state = :ga_run
-			@E = 2.71828182845904523536
-			@a = 1.0
-			@b = 0.0
-			@c = 1.0
+      @E = 2.71828182845904523536
+      @a = 1.0
+      @b = 0.0
+      @c = 1.0
     end
 
-		def ga_run
-			# this needs to be done..
+    def ga_run
+      # this needs to be done..
 
-			x = rand(200)
-			#puts "rand = #{x}"
-			x = (x - 100) / 100.0
-			#puts "x = #{x}"
+      x = rand(200)
+      #puts "rand = #{x}"
+      x = (x - 100) / 100.0
+      #puts "x = #{x}"
 
-			# function pulled from:
-			# http://en.wikipedia.org/wiki/Gaussian_function
-			gf = (@a * @E) * - ((x - @b)**2 / (2 * @c**2))
-			#puts "gf = #{gf}"
-			speed(-1 * gf)
-			angvel(rand_sign() * gf)
-		end
+      # function pulled from:
+      # http://en.wikipedia.org/wiki/Gaussian_function
+      gf = (@a * @E) * - ((x - @b)**2 / (2 * @c**2))
+      #puts "gf = #{gf}"
+      speed(-1 * gf)
+      angvel(rand_sign() * gf)
+    end
 
-		def rand_sign()
-			if rand(2) == 1
-				return 1
-			else
-				return -1
-			end
-		end
+    def rand_sign()
+      if rand(2) == 1
+        return 1
+      else
+        return -1
+      end
+    end
   end
 
   module WildPigeon
 
-		#	algorithm description
-		# ways to fool the filter..
-		#
-		# random period of time
-		# random acceleration
-		# random angle/direction
+    # algorithm description
+    # ways to fool the filter..
+    #
+    # random period of time
+    # random acceleration
+    # random angle/direction
 
 
     def wild
-			@state = :wild_run
-			@speed_timer = 1
-			@angvel_timer = 1
-			@max_period = 25.0
+      @state = :wild_run
+      @speed_timer = 1
+      @angvel_timer = 1
+      @max_period = 25.0
     end
 
-		def wild_run
-			@speed_timer -= 1
-			@angvel_timer -= 1
-			
-			if @speed_timer == 0
-				@speed_timer = rand(@max_period.to_i) + 1
-				velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
-				speed(velocity)
-				puts "speed_timer, velocity = #{@speed_timer}, #{velocity}"
-			end
+    def wild_run
+      @speed_timer -= 1
+      @angvel_timer -= 1
+      
+      if @speed_timer == 0
+        @speed_timer = rand(@max_period.to_i) + 1
+        velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+        speed(velocity)
+        puts "speed_timer, velocity = #{@speed_timer}, #{velocity}"
+      end
 
-			if @angvel_timer == 0
-				@angvel_timer = rand(@max_period.to_i) + 1
-				angular_velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
-				angvel(angular_velocity)
-				puts "angvel_timer, angular_velocity = #{@angvel_timer}, #{angular_velocity}"
-			end
-		end
+      if @angvel_timer == 0
+        @angvel_timer = rand(@max_period.to_i) + 1
+        angular_velocity = (rand(2 * @max_period.to_i) - @max_period) / @max_period
+        angvel(angular_velocity)
+        puts "angvel_timer, angular_velocity = #{@angvel_timer}, #{angular_velocity}"
+      end
+    end
   end
 
   class Agent
@@ -557,22 +557,22 @@ module BraveZealot
     # state :: Symbol  -> :capture_flag, :home
     # goal :: Coord   -> Coordinate indicating where the agent is headed
     attr_accessor :state, :goal
-		attr_accessor :group
+    attr_accessor :group
     
     include DummyStates
     include SmartStates
-		include DecoyStates
-		include SniperStates
+    include DecoyStates
+    include SniperStates
     include HuntingStates
 
-		# Conforming Pigeons
-		include SittingDuck
-		include ConstantVelocity
-		include ConstantAcceleration
-		include GaussianAcceleration
-		
-		# Non-conforming Pigeons
-		include WildPigeon
+    # Conforming Pigeons
+    include SittingDuck
+    include ConstantVelocity
+    include ConstantAcceleration
+    include GaussianAcceleration
+    
+    # Non-conforming Pigeons
+    include WildPigeon
     
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)
