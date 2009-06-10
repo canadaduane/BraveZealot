@@ -172,28 +172,29 @@ module BraveZealot
       exit(0)
     end
     
+    def write_pdf
+      @pdf_count ||= 0
+      file = $options.pdf_file || "map.pdf"
+      file.sub!(".", "#{@pdf_count += 1}.")
+      puts "\nWriting map to pdf: #{file}\n"
+      distributions = []
+      # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
+      @map.mytanks.each{ |t| distributions << t.kalman_distribution }
+      @map.othertanks.each{ |t| distributions << t.kalman_distribution }
+      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
+      @map.to_pdf(nil,
+        :my_color      => my_color,
+        :paths         => paths,
+        :distributions => distributions
+      ).save_as(file)
+    end
+    
     def install_signal_trap
       trap("INT") do
         if File.exist?($options.config_file)
-          $options = OpenStruct.new(
-            $options.instance_variable_get("@table").merge(
-              YAML.load(IO.read($options.config_file))))
-          if $options.pdf_file
-            @pdf_count ||= 0
-            file = $options.pdf_file || "map.pdf"
-            file.sub!(".", "#{@pdf_count += 1}.")
-            puts "\nWriting map to pdf: #{file}\n"
-            distributions = []
-            # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
-            @map.mytanks.each{ |t| distributions << t.kalman_distribution }
-            @map.othertanks.each{ |t| distributions << t.kalman_distribution }
-            paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
-            @map.to_pdf(nil,
-              :my_color      => my_color,
-              :paths         => paths,
-              :distributions => distributions
-            ).save_as(file)
-          end
+          config = YAML.load(IO.read($options.config_file))
+          $options.instance_variable_get("@table").merge! config
+          write_pdf if $options.pdf_file
           if $options.state
             # Convert a comma-delimited list into states array
             states = state_list($options.state)
