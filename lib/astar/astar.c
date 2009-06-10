@@ -4,6 +4,7 @@
 #include <float.h>
 #include "priorityqueue.h"
 
+#define DEFAULT_WEIGHT 0.0
 #define QUEUE_MAX 100000
 #define AT(x, y) ((y)*width+(x))
 
@@ -56,11 +57,20 @@ void show_int_queue(PriorityQueue* queue)
 // A global reference to the Astar class
 VALUE Astar = Qnil;
 
-// The Astar#initialize method
-static VALUE astar_init(int argc, VALUE* argv, VALUE self) {
-    double initial = NUM2DBL(rb_initial);
-    int width      = INT2NUM(rb_width);
-    int height     = INT2NUM(rb_height);
+static VALUE astar_new(int argc, VALUE* argv, VALUE class) {
+    double initial_weight = DEFAULT_WEIGHT;
+
+    if (argc < 2)
+        rb_raise(rb_eArgError, "Expecting width and height arguments");
+    if (!rb_obj_is_kind_of(argv[0], rb_cNumeric))
+        rb_raise(rb_eArgError, "Width must be numeric");
+    if (!rb_obj_is_kind_of(argv[1], rb_cNumeric))
+        rb_raise(rb_eArgError, "Height must be numeric");
+    if (argc == 3)
+        initial_weight = NUM2DBL(argv[2]);
+    
+    int width      = INT2NUM(argv[0]);
+    int height     = INT2NUM(argv[1]);
     long i, len    = width * height;
 
     // Create a discretized map of Chunks
@@ -70,17 +80,68 @@ static VALUE astar_init(int argc, VALUE* argv, VALUE self) {
     {
         map[i].x = i % width;
         map[i].y = i / width;
-        map[i].g = FLT_MAX;
-        map[i].h = 0;
         map[i].weight = initial;
-        map[i].prev_chunk = NULL;
         // rb_warn("init %d: x: %d, y: %d, weight: %f", i, map[i].x, map[i].y, map[i].weight);
     }
     
-    rb_iv_set(self, "@map", Data_Wrap_Struct(self, 0, free, map));
+    return Data_Wrap_Struct(self, 0, free, map);
+}
+
+// The Astar#initialize method
+static VALUE astar_init(int argc, VALUE* argv, VALUE self)
+{
+    double initial = 0.0;
+    
+    
+    int width      = INT2NUM(argv[0]);
+    int height     = INT2NUM(argv[1]);
+    long i, len    = width * height;
+
     rb_iv_set(self, "@width", width);
     rb_iv_set(self, "@height", height);
     return self;
+}
+
+static VALUE astar_reset(VALUE self)
+{
+    int width   = NUM2INT(rb_iv_get(self, "@width"));
+    int height  = NUM2INT(rb_iv_get(self, "@height"));
+    long i, len = width * height;
+    
+    for( i = 0; i < len; i++ )
+    {
+        map[i].g = FLT_MAX;
+        map[i].h = 0;
+        map[i].prev_chunk = NULL;
+    }
+    
+    return self;
+}
+
+static VALUE astar_clear(int argc, VALUE* argv, VALUE self)
+{
+    int width   = NUM2INT(rb_iv_get(self, "@width"));
+    int height  = NUM2INT(rb_iv_get(self, "@height"));
+    long i, len = width * height;
+    double weight = DEFAULT_WEIGHT;
+    
+    if (argc == 1)
+    {
+        Need_Float(argv[0]);
+        weight = NUM2DBL(argv[0]);
+    }
+    
+    if (argc <= 1)
+    {
+        for( i = 0; i < len; i++ )
+        {
+            map[i].weight = weight;
+        }
+    }
+    else
+    {
+        rb_raise(rb_eArgError, "expects 0..1 argument");
+    }
 }
 
 static void explore(
@@ -307,6 +368,7 @@ static VALUE astar_add_poly(VALUE self, VALUE rb_ary_coords, VALUE rb_weight)
 // The initialization method for this module; Ruby calls this for us
 void Init_astar() {
     Astar = rb_define_class("Astar", rb_cObject);
+    rb_define_singleton_method(Astar, "new", astar_new, -1);
     rb_define_method(Astar, "initialize", astar_init, -1);
     rb_define_method(Astar, "search", astar_search, 4);
     rb_define_method(Astar, "map", astar_get_map, 0);
