@@ -3,23 +3,13 @@
 #include <math.h>
 #include <float.h>
 #include "priorityqueue.h"
-
-#define DEFAULT_WEIGHT 0.0
-#define QUEUE_MAX 100000
-#define AT(x, y) ((y)*width+(x))
+#include "astar.h"
 
 double unitdist[] = {1.4142135623731, 1.0000000000000, 1.4142135623731,
                      1.0000000000000, 0.0000000000000, 1.0000000000000,
                      1.4142135623731, 1.0000000000000, 1.4142135623731};
 
-typedef struct Chunk {
-    int x;
-    int y;
-    double g; // distance so far
-    double h; // heuristic disance to go
-    double weight;
-    void* prev_chunk;
-} Chunk;
+
 
 bool chunk_less_than(const void *p1, const void *p2)
 {
@@ -75,30 +65,27 @@ static VALUE astar_new(int argc, VALUE* argv, VALUE class) {
 
     // Create a discretized map of Chunks
     Chunk* map = ALLOC_N(Chunk, len);
-    
     for( i = 0; i < len; i++)
     {
         map[i].x = i % width;
         map[i].y = i / width;
-        map[i].weight = initial;
-        // rb_warn("init %d: x: %d, y: %d, weight: %f", i, map[i].x, map[i].y, map[i].weight);
+        map[i].weight = initial_weight;
     }
     
-    return Data_Wrap_Struct(self, 0, free, map);
+    return Data_Wrap_Struct(class, 0, free, map);
 }
 
 // The Astar#initialize method
 static VALUE astar_init(int argc, VALUE* argv, VALUE self)
 {
-    double initial = 0.0;
+    double initial_weight = (argc == 3 ? NUM2DBL(argv[2]) : 0.0);
     
+    rb_iv_set(self, "@width", argv[0]);
+    rb_iv_set(self, "@height", argv[1]);
+    rb_iv_set(self, "@initial_weight", DBL2NUM(initial_weight));
     
-    int width      = INT2NUM(argv[0]);
-    int height     = INT2NUM(argv[1]);
-    long i, len    = width * height;
-
-    rb_iv_set(self, "@width", width);
-    rb_iv_set(self, "@height", height);
+    astar_reset(self);
+    
     return self;
 }
 
@@ -108,6 +95,9 @@ static VALUE astar_reset(VALUE self)
     int height  = NUM2INT(rb_iv_get(self, "@height"));
     long i, len = width * height;
     
+    Chunk* map;
+    Data_Get_Struct(self, Chunk, map);
+
     for( i = 0; i < len; i++ )
     {
         map[i].g = FLT_MAX;
@@ -133,6 +123,9 @@ static VALUE astar_clear(int argc, VALUE* argv, VALUE self)
     
     if (argc <= 1)
     {
+        Chunk* map;
+        Data_Get_Struct(self, Chunk, map);
+        
         for( i = 0; i < len; i++ )
         {
             map[i].weight = weight;
@@ -144,7 +137,7 @@ static VALUE astar_clear(int argc, VALUE* argv, VALUE self)
     }
 }
 
-static void explore(
+static void astar_explore(
     Chunk* map, int* closed, PriorityQueue* queue, Chunk* curr_chunk,
     int width, int height,
     int end_x, int end_y,
@@ -247,14 +240,14 @@ static VALUE astar_search(
         
         // printf("curr_chunk | x: %d, y: %d, f: %f, g: %f, h: %f\n", curr_chunk->x, curr_chunk->y, (curr_chunk->g + curr_chunk->h), curr_chunk->g, curr_chunk->h);
         // Add 8 neighbors if they are not in the closed list
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1, -1);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1,  0);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1, +1);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y,  0, -1);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y,  0, +1);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1, -1);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1,  0);
-        explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1, +1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1, -1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1,  0);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, -1, +1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y,  0, -1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y,  0, +1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1, -1);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1,  0);
+        astar_explore(map, closed, queue, curr_chunk, width, height, end_x, end_y, +1, +1);
 
     }
     
@@ -279,11 +272,6 @@ static VALUE astar_search(
     
     pq_free(queue);
     return trace;
-}
-
-static VALUE astar_get_map(VALUE self)
-{
-    return rb_iv_get(self, "@map");
 }
 
 static VALUE astar_add_rect(
@@ -371,7 +359,6 @@ void Init_astar() {
     rb_define_singleton_method(Astar, "new", astar_new, -1);
     rb_define_method(Astar, "initialize", astar_init, -1);
     rb_define_method(Astar, "search", astar_search, 4);
-    rb_define_method(Astar, "map", astar_get_map, 0);
     rb_define_method(Astar, "add_rect", astar_add_rect, 5);
     rb_define_method(Astar, "add_poly", astar_add_poly, 2);
 }
