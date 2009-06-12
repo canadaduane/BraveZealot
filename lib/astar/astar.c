@@ -336,7 +336,7 @@ static VALUE astar_set(VALUE self, VALUE rb_x, VALUE rb_y, VALUE rb_weight)
     return self;
 }
 
-static Triangle astar_triangle_sort(
+static Triangle astar_triangle_vertex_sort(
     VALUE rb_x1, VALUE rb_y1,
     VALUE rb_x2, VALUE rb_y2,
     VALUE rb_x3, VALUE rb_y3)
@@ -401,8 +401,10 @@ static VALUE astar_triangle(
     VALUE rb_x3, VALUE rb_y3,
     VALUE rb_weight)
 {
+    Check_Type(rb_weight, T_FLOAT);
+    
     int x, y;
-    Triangle t = astar_triangle_sort(rb_x1, rb_y1, rb_x2, rb_y2, rb_x3, rb_y3);
+    Triangle t = astar_triangle_vertex_sort(rb_x1, rb_y1, rb_x2, rb_y2, rb_x3, rb_y3);
     
     int width     = NUM2INT(rb_iv_get(self, "@width"));
     int height    = NUM2INT(rb_iv_get(self, "@height"));
@@ -516,6 +518,8 @@ static VALUE astar_rectangle(
     VALUE rb_max_x, VALUE rb_max_y,
     VALUE rb_weight)
 {
+    Check_Type(rb_weight, T_FLOAT);
+    
     int x, y;
     int min_x     = NUM2INT(rb_min_x);
     int min_y     = NUM2INT(rb_min_y);
@@ -524,7 +528,7 @@ static VALUE astar_rectangle(
     int width     = NUM2INT(rb_iv_get(self, "@width"));
     int height    = NUM2INT(rb_iv_get(self, "@height"));
     double weight = NUM2DBL(rb_weight);
-
+    
     Chunk* map;
     Data_Get_Struct(self, Chunk, map);
     
@@ -533,9 +537,10 @@ static VALUE astar_rectangle(
     
     for( y = min_y; y <= max_y; y++ )
     {
+        int pos = AT(min_x, y);
         for( x = min_x; x <= max_x; x++ )
         {
-            map[AT(x, y)].weight = weight;
+            map[pos++].weight = weight;
         }
     }
     

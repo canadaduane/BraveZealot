@@ -41,6 +41,10 @@ static VALUE astar_search(
     VALUE rb_end_x, VALUE rb_end_y);
 static VALUE astar_get(VALUE self, VALUE rb_x, VALUE rb_y);
 static VALUE astar_set(VALUE self, VALUE rb_x, VALUE rb_y, VALUE rb_weight);
+static Triangle astar_triangle_vertex_sort(
+    VALUE rb_x1, VALUE rb_y1,
+    VALUE rb_x2, VALUE rb_y2,
+    VALUE rb_x3, VALUE rb_y3);
 static VALUE astar_triangle(
     VALUE self,
     VALUE rb_x1, VALUE rb_y1,

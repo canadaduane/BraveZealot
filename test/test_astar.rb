@@ -14,6 +14,15 @@ class Astar
     end
     string
   end
+  
+  def from_array(array)
+    for y in 0...height
+      for x in 0...width
+        self[x, y] = array[y][x].to_f
+      end
+    end
+    self
+  end
 end
 
 class AstarTest < Test::Unit::TestCase
@@ -108,15 +117,37 @@ class AstarTest < Test::Unit::TestCase
     assert_grid_equal(perfect.transpose, grid)
   end
   
-  def test_triangle
-    grid = Astar.new(10, 10)
-    # grid.triangle(0, 0, 0, 3, 3, 3, 1.0)
-    # grid.triangle(0, 0, 3, 3, 0, 3, 1.0)
-    # grid.triangle(0, 3, 0, 0, 3, 3, 1.0)
-    # grid.triangle(0, 3, 3, 3, 0, 0, 1.0)
-    # grid.triangle(3, 3, 0, 0, 0, 3, 1.0)
-    # grid.triangle(3, 3, 0, 3, 0, 0, 1.0)
-    grid.triangle(1, 9,  5, 1,  8, 0,  1.0)
+  def test_triangle_vertex_sort
+    grid = Astar.new(4, 4)
+    grid.clear
+    grid.triangle(0,0,  0,3,  3,3,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+
+    grid.clear
+    grid.triangle(0,0,  3,3,  0,3,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+
+    grid.clear
+    grid.triangle(0,3,  0,0,  3,3,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+
+    grid.clear
+    grid.triangle(0,3,  3,3,  0,0,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+
+    grid.clear
+    grid.triangle(3,3,  0,0,  0,3,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+
+    grid.clear
+    grid.triangle(3,3,  0,3,  0,0,  1.0)
+    assert_grid_equal([[1,0,0,0],[1,1,0,0],[1,1,1,0],[1,1,1,1]], grid)
+  end
+  
+  def test_rectangle
+    grid = Astar.new(4, 4)
+    grid.rectangle(1,1,  2,2,  1.0)
+    assert_grid_equal([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], grid)
   end
   
   def test_obstacle
@@ -130,65 +161,54 @@ class AstarTest < Test::Unit::TestCase
   end
   
   def test_subtle_obstacle
-    arr = [
-       0,   0,   0,  0,
-       0, 200, 200,  0,
-       0, 200, 200,  0,
-       0,   0,   0,  0
-    ]
-    subtle = Astar.new(arr, 4)
-    tb = subtle.search(0,1, 3,2)
+    grid = Astar.new(4, 4)
+    grid.rectangle(1,1,  2,2,  2.0)
+    tb = grid.search(0,1, 3,2)
     assert_equal [[0, 1], [0, 2], [1, 3], [2, 3], [3, 2]], tb
   end
   
   def test_winding_small
     arr = [
-       0,  0,  0,  0,
-       5, -1,  0,  5,
-       0,  0,  1,  4,
-       0,  2, -1,  1
+       [0,  0,  0,  0],
+       [5, -1,  0,  5],
+       [0,  0,  1,  4],
+       [0,  2, -1,  1]
     ]
-    winding = Astar.new(arr, 4)
-    tb = winding.search(0,0, 3,3)
+    grid = Astar.new(4, 4).from_array(arr)
+    tb = grid.search(0,0, 3,3)
     assert_equal [[0,0], [1,0], [2,1], [2,2], [3,3]], tb
   end
   
   def test_indent
     arr = [
-       0, -1, -1,  0,  0,
-       0,  0, -1,  0,  0,
-       0,  0, -1,  0,  0,
-       0, -1, -1,  0,  0,
-       0,  0,  0,  0,  0
+       [0, -1, -1,  0,  0],
+       [0,  0, -1,  0,  0],
+       [0,  0, -1,  0,  0],
+       [0, -1, -1,  0,  0],
+       [0,  0,  0,  0,  0]
     ]
-    map = Astar.new(arr, 5)
-    tb = map.search(0,0, 4,4)
+    grid = Astar.new(5, 5).from_array(arr)
+    tb = grid.search(0,0, 4,4)
     assert_equal [[0,0], [0,1], [0,2], [0,3], [1,4], [2,4], [3,4], [4,4]], tb
   end
   
   def test_no_solution
-    none = Astar.new([-1] * 16, 4)
+    none = Astar.new(4, 4, -1.0)
     assert_nil none.search(0,0, 3,3)
   end
   
-  def test_random_large
-    @arr = []
-    1000000.times{ @arr << (rand*1000).to_int }
-    @random = Astar.new(@arr, 1000)
-    # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
-    # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
-    # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
-    @tb = @random.search(0,0, 999,999)
-    assert @tb.size >= 1000
-    assert @tb.size <= 2000
-    # @arr.each_slice(100) { |slice| p slice }
-  end
-  
-  def test_add_rect
-    four = Astar.new(4, 4)
-    four.add_rect(1,1,  2,1,  -1);
-    assert_equal([0,0,0,0, 0,-1,-1,0, 0,0,0,0, 0,0,0,0], four.map)
-  end
+  # def test_random_large
+  #   @arr = []
+  #   1000000.times{ @arr << (rand*1000).to_int }
+  #   @random = Astar.new(@arr, 1000)
+  #   # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
+  #   # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
+  #   # puts Benchmark.measure{ @tb = @random.search(0,0, 999,999) }
+  #   @tb = @random.search(0,0, 999,999)
+  #   assert @tb.size >= 1000
+  #   assert @tb.size <= 2000
+  #   # @arr.each_slice(100) { |slice| p slice }
+  # end
   
   def benchmark_large
     Benchmark.bm(10) do |x|
