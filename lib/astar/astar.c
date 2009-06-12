@@ -388,7 +388,8 @@ static Triangle astar_triangle_sort(
     // vertex 1 -> vertex 3 is the first "short edge"
     // vertex 3 -> vertex 2 is the second "short edge"
     
-    printf("y1: %d, y2: %d, y3: %d\n", t.y1, t.y2, t.y3);
+    // printf("x1: %d, x2: %d, x3: %d\n", t.x1, t.x2, t.x3);
+    // printf("y1: %d, y2: %d, y3: %d\n", t.y1, t.y2, t.y3);
     
     return t;
 }
@@ -410,20 +411,43 @@ static VALUE astar_triangle(
     Chunk* map;
     Data_Get_Struct(self, Chunk, map);
     
-    int e_long   = t.y2 - t.y1;
-    int e_short1 = t.y3 - t.y1;
-    int e_short2 = t.y2 - t.y3;
+    int e_y_long   = t.y2 - t.y1;
+    int e_y_short1 = t.y3 - t.y1;
+    int e_y_short2 = t.y2 - t.y3;
     
-    if (e_short1 + e_short2 != e_long)
-        rb_raise(rb_eException, "Long edge should equal sum of both short edges");
+    int e_x_long   = t.x2 - t.x1;
+    int e_x_short1 = t.x3 - t.x1;
+    int e_x_short2 = t.x2 - t.x3;
     
-    printf("el: %d, es1: %d, es2: %d\n", e_long, e_short1, e_short2);
+    if (abs(e_x_long) > abs(e_y_long))
+    {
+        e_x_long += (t.x2 == t.x1 ? 0 : (t.x2 > t.x1 ? 1 : -1));
+        e_y_long++;
+    }
+
+    if (abs(e_x_short1) > abs(e_y_short1))
+    {
+        e_x_short1 += (t.x3 == t.x1 ? 0 : (t.x3 > t.x1 ? 1 : -1));
+        e_y_short1++;
+    }
+
+    if (abs(e_x_short2) > abs(e_y_short2))
+    {
+        e_x_short2 += (t.x2 == t.x3 ? 0 : (t.x2 > t.x3 ? 1 : -1));
+        e_y_short2++;
+    }
     
-    float e_long_rate   = (float)(t.x2 - t.x1) / e_long;
-    float e_short1_rate = (float)(t.x3 - t.x1) / (e_short1);
-    float e_short2_rate = (float)(t.x2 - t.x3) / (e_short2 + 1);
+    // if (e_short1 + e_short2 != e_long)
+    // rb_raise(rb_eException, "Long edge should equal sum of both short edges");
     
-    printf("elr: %f, es1r: %f, es2r: %f\n", e_long_rate, e_short1_rate, e_short2_rate);
+    // printf("exl: %d, exs1: %d, exs2: %d\n", e_x_long, e_x_short1, e_x_short2);
+    // printf("eyl: %d, eys1: %d, eys2: %d\n", e_y_long, e_y_short1, e_y_short2);
+    
+    float e_long_rate   = (float)(e_x_long)   / e_y_long;
+    float e_short1_rate = (float)(e_x_short1) / e_y_short1;
+    float e_short2_rate = (float)(e_x_short2) / e_y_short2;
+    
+    // printf("elr: %f, es1r: %f, es2r: %f\n", e_long_rate, e_short1_rate, e_short2_rate);
     
     // Calculate rate of change for left and right sides of triangle
     float left_rate  = e_long_rate;
@@ -432,18 +456,20 @@ static VALUE astar_triangle(
     if (right_rate < left_rate)
     {
         float rate = left_rate;
-        left_rate = right_rate;
+        left_rate  = right_rate;
         right_rate = rate;
     }
     
     float left_x = t.x1 + 0.5, right_x = t.x1 + 0.5;
-
+    
+    if (e_short1_rate < 0) left_x  += (e_short1_rate + 1);
+    if (e_short1_rate > 0) right_x += (e_short1_rate - 1);
     // printf("left_x: %f, right_x: %f\nleft_rate: %f, right_rate: %f\n", left_x, right_x, left_rate, right_rate);
     
     // Draw the upper part of the triangle
     for (y = t.y1; y < t.y3; y++)
     {
-        printf("y: %d, lx: %f, rx: %f\n", y, left_x, right_x);
+        // printf("up y: %d, lx: %f, rx: %f\n", y, left_x, right_x);
         int int_left_x = (int)left_x;
         int pos = AT(int_left_x, y);
         for (x = (int)left_x; x <= (int)right_x; x++)
@@ -470,7 +496,7 @@ static VALUE astar_triangle(
     // Draw the lower part of the triangle
     for (y = t.y3; y <= t.y2; y++)
     {
-        printf("y: %d, lx: %f, rx: %f\n", y, left_x, right_x);
+        // printf("lw y: %d, lx: %f, rx: %f\n", y, left_x, right_x);
         int int_left_x = (int)left_x;
         int pos = AT(int_left_x, y);
         for (x = (int)left_x; x <= (int)right_x; x++)
