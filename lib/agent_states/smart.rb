@@ -1,15 +1,21 @@
 module BraveZealot
   module SmartStates
     attr_accessor :path
+    
     def smart
-      #puts "in the smart state"
+      @path = hq.map.search(@tank, @goal)
+      @state = :smart_follow_path
+    end
+    
+    def smart_follow_path
+      # puts "in the smart state"
       @idx ||= 0
       unless goal_reached(8)#@goal
         
-        #puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        new_path = check(:search, 1000* $options.refresh, @path, (@path.nil? or @path.empty?)){ hq.map.search(@tank, @goal) }
+        # puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
+        # new_path = check(:search, 1000* $options.refresh, @path, (@path.nil? or @path.empty?)){ hq.map.search(@tank, @goal) }
         #puts "I am done searching!!!"
-        @path = new_path || @path || []
+        # @path = new_path || @path || []
         @group ||= PfGroup.new
         @dest ||= [@tank.x, @tank.y]
         

@@ -9,6 +9,7 @@ bzrequire 'lib/agent_states/constant_acceleration'
 bzrequire 'lib/agent_states/gaussian_acceleration'
 bzrequire 'lib/agent_states/wild'
 bzrequire 'lib/agent_states/hunting'
+bzrequire 'lib/agent_states/random_search'
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -38,6 +39,7 @@ module BraveZealot
     include DecoyStates
     include SniperStates
     include HuntingStates
+    include RandomSearchStates
     # Conforming Pigeons
     include SittingDuckStates
     include ConstantVelocityStates
@@ -45,7 +47,7 @@ module BraveZealot
     include GaussianAccelerationStates
     # Non-conforming Pigeons
     include WildStates
-
+    
     # See above for definitions of hq and tank
     def initialize(hq, tank, initial_state = nil)
       @hq, @tank = hq, tank

@@ -32,31 +32,33 @@ module BraveZealot
           obstacles do |r|
             flags do |r|
               othertanks do |r|
-
-                #f = File.new($options.gnuplot_file, 'w')
-                #f.write(@map.to_gnuplot)
-                #f.close
-
                 # Initialize each of our tanks
                 mytanks do |r|
                   r.mytanks.each do |t|
-                    # Tell each agent about this Headquarters, its own +t+ index, and its initial state
+                    # Tell each agent about this Headquarters, its own +t+ index,
+                    # and its initial state.
                     agent = Agent.new(self, t, $options.initial_state[t.index])
                     @agents[t.index] = agent
                   end
                   
+                  # BEGIN!
+                  
+                  # Periodically take PDF snapshots of the world
+                  periodic_snapshot(0.2, 10)
+
+                  # Update obstacles, flags, tanks, shots
+                  periodic_update
                 end
               end
             end
           end
         end
       end
-      periodic_update
     end
     
-    # Calls an action immediately and sets up a timer to periodically call the action again.
-    # If +maximum+ is set to an integer value, then the action will be called at most +maximum+
-    # times.
+    # Calls an action immediately and sets up a timer to periodically call the
+    # action again. If +maximum+ is set to an integer value, then the action
+    # will be called at most +maximum+ times.
     def periodic_action(period = 0.5, maximum = nil, &action)
       count = 0
       timer = EventMachine::PeriodicTimer.new(period, &(action_wrapper = proc do
@@ -70,20 +72,27 @@ module BraveZealot
       action_wrapper.call
     end
     
-    def periodic_update
+    def periodic_snapshot(period = 0.5, maximum = nil)
+      periodic_action(period, maximum) do
+        write_pdf
+      end
+    end
+
+    def periodic_update(period = 0.3)
       # puts "periodic update"
       
       # Get up to 10 samples of the obstacles
-      periodic_action(0.5, 10) do
+      periodic_action(period * 1.5, 10) do
         obstacles
       end
       
       # Spread out our information gathering over time so we don't
       # constantly overwhelm the network.
-      periodic_action(0.3) do
-        sleep(0.1) { flags                  }
-        sleep(0.2) { mytanks; othertanks    }
-        sleep(0.3) { shots                  }
+      third = period / 3.0
+      periodic_action(period) do
+        sleep(third * 1.0) { flags                  }
+        sleep(third * 2.0) { mytanks; othertanks    }
+        sleep(third * 3.0) { shots                  }
       end
     end
     
@@ -197,7 +206,7 @@ module BraveZealot
     def write_pdf
       @pdf_count ||= 0
       file = $options.pdf_file || "map.pdf"
-      file.sub!(".", "#{@pdf_count += 1}.")
+      file.sub!(/\d*\./, "#{@pdf_count += 1}.")
       puts "\nWriting map to pdf: #{file}\n"
       distributions = []
       # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles

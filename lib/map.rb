@@ -128,10 +128,6 @@ module BraveZealot
       end
     end
 
-    def get_othertank(callsign)
-      @othertanks.find{ |t| t.callsign == callsign }
-    end
-    
     def observe_othertanks(response)
       if @othertanks.empty?
         @othertanks = response.othertanks
@@ -172,9 +168,14 @@ module BraveZealot
             src_coord = src_obstacle.coords[j]
             dst_coord.observed_x = src_coord.observed_x
             dst_coord.observed_y = src_coord.observed_y
+            dst_coord.kalman_next(response.time)
           end
         end
       end
+    end
+    
+    def get_othertank(callsign)
+      @othertanks.find{ |t| t.callsign == callsign }
     end
     
     def my_base

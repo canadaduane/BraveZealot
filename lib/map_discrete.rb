@@ -58,6 +58,19 @@ module BraveZealot
       @astar.search(s[0], s[1], g[0], g[1])
     end
     
+    # Find a random place on the map that isn't blocked by an obstacle
+    def random_spot
+      25.times do
+        x = ((rand * @world_size) - (@world_size / 2)).to_i
+        y = ((rand * @world_size) - (@world_size / 2)).to_i
+        col, row = world_to_array_coordinates(x, y)
+        if @astar[col, row] == @astar.initial_weight
+          return Coord.new(x, y)
+        end
+      end
+      return nil
+    end
+    
     def to_pdf(pdf = nil, options = {})
       super do |pdf|
         
