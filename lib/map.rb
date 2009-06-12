@@ -73,7 +73,7 @@ module BraveZealot
       end
       
       if @kalman_paths
-        puts "Writing kalman paths: #{@kalman_paths.inspect}"
+        # puts "Writing kalman paths: #{@kalman_paths.inspect}"
         @kalman_paths.each_pair do |callsign, path|
           pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
           pdf.stroke_color(Color::RGB::Red)
@@ -157,6 +157,21 @@ module BraveZealot
             @kalman_paths ||= {}
             @kalman_paths[src_tank.callsign] ||= []
             @kalman_paths[src_tank.callsign] << [src_tank.observed_x, src_tank.observed_y, dst_tank.x, dst_tank.y]
+          end
+        end
+      end
+    end
+    
+    def observe_obstacles(response)
+      if @obstacles.empty?
+        @obstacles = response.obstacles
+      else
+        @obstacles.each_with_index do |dst_obstacle, i|
+          src_obstacle = response.obstacles[i]
+          dst_obstacle.coords.each_with_index do |dst_coord, j|
+            src_coord = src_obstacle.coords[j]
+            dst_coord.observed_x = src_coord.observed_x
+            dst_coord.observed_y = src_coord.observed_y
           end
         end
       end

@@ -40,8 +40,9 @@ module BraveZealot
       y * @side_length + x
     end
     
-    def obstacles=(obstacles)
-      @obstacles = obstacles
+    def observe_obstacles(response)
+      super
+      
       # Clear the A* search grid
       @astar.clear
       # "Draw" the obstacles onto the search grid

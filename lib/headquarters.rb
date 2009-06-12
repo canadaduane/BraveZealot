@@ -173,7 +173,7 @@ module BraveZealot
     end
     
     def on_obstacles(r)
-      @map.obstacles = r.obstacles
+      @map.observe_obstacles(r)
     end
 
     def on_othertanks(r)
