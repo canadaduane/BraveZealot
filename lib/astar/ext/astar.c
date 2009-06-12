@@ -464,8 +464,8 @@ static VALUE astar_triangle(
     
     float left_x = t.x1 + 0.5, right_x = t.x1 + 0.5;
     
-    if (e_short1_rate < 0) left_x  += (e_short1_rate + 1);
-    if (e_short1_rate > 0) right_x += (e_short1_rate - 1);
+    if (e_short1_rate < -1) left_x  += (e_short1_rate + 1);
+    if (e_short1_rate >  1) right_x += (e_short1_rate - 1);
     // printf("left_x: %f, right_x: %f\nleft_rate: %f, right_rate: %f\n", left_x, right_x, left_rate, right_rate);
     
     // Draw the upper part of the triangle

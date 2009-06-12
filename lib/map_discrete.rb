@@ -3,14 +3,14 @@ bzrequire 'lib/astar/astar'
 
 module BraveZealot
   class MapDiscrete < Map
-    attr_reader :map, :astar
+    attr_reader :astar
     
     def initialize(world_size, my_color, granularity = 10)
       super(world_size, my_color)
       @granularity = granularity
       @side_length = (@world_size / @granularity).ceil
-      @map = Array.new(@side_length ** 2, 0)
-      @astar = Astar.new(@map, @side_length)
+      # @map = Array.new(@side_length ** 2, 0)
+      @astar = Astar.new(@side_length, @side_length)
     end
     
     # the coordinates generated from this put the item directly in the center of
@@ -42,13 +42,14 @@ module BraveZealot
     
     def obstacles=(obstacles)
       @obstacles = obstacles
-      # instead of asking each location if its center is in any of
-      # of the obstacles, we can ask each obstacle which locations it
-      # blocks
+      # Clear the A* search grid
+      @astar.clear
+      # "Draw" the obstacles onto the search grid
       obstacles.each do |o|
-        o.locations_blocked(self).each do |c|
-          @map[coord_to_index(c.x,c.y)] = -1
-        end
+        @astar.quad(o.coords)
+        # o.locations_blocked(self).each do |c|
+        #   @map[coord_to_index(c.x,c.y)] = -1
+        # end
       end
     end
     

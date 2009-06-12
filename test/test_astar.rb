@@ -2,28 +2,7 @@ require(File.join(File.dirname(__FILE__), "helper"))
 bzrequire 'lib/astar/astar'
 require 'benchmark'
 
-class Astar
-  def inspect
-    string = ""
-    for y in 0...height
-      for x in 0...width
-        value = self[x, y]
-        string << (value == 0 ? '- ' : 'x ')
-      end
-      string << "\n"
-    end
-    string
-  end
-  
-  def from_array(array)
-    for y in 0...height
-      for x in 0...width
-        self[x, y] = array[y][x].to_f
-      end
-    end
-    self
-  end
-end
+Coord = Struct.new(:x, :y)
 
 class AstarTest < Test::Unit::TestCase
   def test_search
@@ -148,6 +127,14 @@ class AstarTest < Test::Unit::TestCase
     grid = Astar.new(4, 4)
     grid.rectangle(1,1,  2,2,  1.0)
     assert_grid_equal([[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]], grid)
+  end
+  
+  def test_quad
+    grid = Astar.new(6, 6)
+    grid.quad([Coord.new(1, 1), Coord.new(4, 2),
+               Coord.new(5, 5), Coord.new(0, 5)], 1.0)
+    assert_grid_equal([[0,0,0,0,0,0],[0,1,1,0,0,0],[0,1,1,1,1,0],
+                       [0,1,1,1,1,0],[1,1,1,1,1,1],[1,1,1,1,1,1]], grid)
   end
   
   def test_obstacle
