@@ -2,8 +2,6 @@ require(File.join(File.dirname(__FILE__), "helper"))
 bzrequire 'lib/astar/astar'
 require 'benchmark'
 
-Coord = Struct.new(:x, :y)
-
 class AstarTest < Test::Unit::TestCase
   def test_search
     four = Astar.new(2, 2)
@@ -131,8 +129,8 @@ class AstarTest < Test::Unit::TestCase
   
   def test_quad
     grid = Astar.new(6, 6)
-    grid.quad([Coord.new(1, 1), Coord.new(4, 2),
-               Coord.new(5, 5), Coord.new(0, 5)], 1.0)
+    grid.quad([[1, 1], [4, 2],
+               [5, 5], [0, 5]], 1.0)
     assert_grid_equal([[0,0,0,0,0,0],[0,1,1,0,0,0],[0,1,1,1,1,0],
                        [0,1,1,1,1,0],[1,1,1,1,1,1],[1,1,1,1,1,1]], grid)
   end

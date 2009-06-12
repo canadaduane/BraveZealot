@@ -15,15 +15,15 @@ class Astar
   
   def quad(coords, weight)
     triangle(
-      coords[0].x, coords[0].y,
-      coords[1].x, coords[1].y,
-      coords[2].x, coords[2].y,
+      coords[0][0], coords[0][1],
+      coords[1][0], coords[1][1],
+      coords[2][0], coords[2][1],
       weight
     )
     triangle(
-      coords[0].x, coords[0].y,
-      coords[2].x, coords[2].y,
-      coords[3].x, coords[3].y,
+      coords[0][0], coords[0][1],
+      coords[2][0], coords[2][1],
+      coords[3][0], coords[3][1],
       weight
     )
   end

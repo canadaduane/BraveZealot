@@ -46,10 +46,8 @@ module BraveZealot
       @astar.clear
       # "Draw" the obstacles onto the search grid
       obstacles.each do |o|
-        @astar.quad(o.coords)
-        # o.locations_blocked(self).each do |c|
-        #   @map[coord_to_index(c.x,c.y)] = -1
-        # end
+        vertices = o.coords.map{ |c| world_to_array_coordinates(c.x, c.y) }
+        @astar.quad(vertices, -1.0)
       end
     end
     
