@@ -2,9 +2,23 @@ require(File.join(File.dirname(__FILE__), "helper"))
 bzrequire 'lib/astar/astar'
 require 'benchmark'
 
+class Astar
+  def inspect
+    string = ""
+    for y in 0...height
+      for x in 0...width
+        value = self[x, y]
+        string << (value == 0 ? '- ' : 'x ')
+      end
+      string << "\n"
+    end
+    string
+  end
+end
+
 class AstarTest < Test::Unit::TestCase
   def test_search
-    four = Astar.new([0,0,0,0], 2)
+    four = Astar.new(2, 2)
     assert_equal [[0,0], [1,1]], four.search(0,0,1,1)
   end
   
@@ -15,14 +29,77 @@ class AstarTest < Test::Unit::TestCase
     assert_nothing_raised { Astar.new(5, 5, 0) }
   end
   
+  def test_get_set
+    # Initialize a blank 2d map
+    grid = Astar.new(2, 2)
+    assert_grid_uniformly_equal(0.0, grid)
+    
+    for x in 0..1
+      for y in 0..1
+        grid[x, y] = 1.0
+      end
+    end
+    assert_grid_uniformly_equal(1.0, grid)
+    
+    for x in 0..1
+      for y in 0..1
+        grid.set(x, y, 2.0)
+      end
+    end
+    assert_grid_uniformly_equal(2.0, grid)
+  end
+  
+  def test_clear
+    # Initialize a blank 2d map
+    grid = Astar.new(2, 2, 5.0)
+    assert_grid_uniformly_equal(5.0, grid)
+    
+    # Can specify a 'clear' weight
+    grid.clear(-1.0)
+    assert_grid_uniformly_equal(-1.0, grid)
+    
+    # Should use default weight of 5.0 from initialize method
+    grid.clear
+    assert_grid_uniformly_equal(5.0, grid)
+  end
+  
+  def test_pixel_perfect_triangle
+    grid = Astar.new(4, 4)
+    perfect =
+      [[0, 1, 0, 0],
+       [0, 1, 1, 0],
+       [1, 1, 1, 1],
+       [1, 1, 0, 0]]
+    
+    grid.triangle(1,0,  3,2,  0,3,  1.0)
+    p grid
+    # assert_grid_equal(perfect, grid)
+    
+    grid.clear
+    grid.triangle(3,0,  0,1,  2,3,  1.0)
+    p grid
+    assert_grid_equal(perfect.transpose, grid)
+  end
+  
+  def test_triangle
+    grid = Astar.new(10, 10)
+    # grid.triangle(0, 0, 0, 3, 3, 3, 1.0)
+    # grid.triangle(0, 0, 3, 3, 0, 3, 1.0)
+    # grid.triangle(0, 3, 0, 0, 3, 3, 1.0)
+    # grid.triangle(0, 3, 3, 3, 0, 0, 1.0)
+    # grid.triangle(3, 3, 0, 0, 0, 3, 1.0)
+    # grid.triangle(3, 3, 0, 3, 0, 0, 1.0)
+    grid.triangle(1, 9,  5, 1,  8, 0,  1.0)
+  end
+  
   def test_obstacle
     # Without an obstacle, the traceback should go straight through the middle
-    nine = Astar.new([0,0,0, 0,0,0, 0,0,0], 3)
+    nine = Astar.new(3, 3)
     assert_equal [[0, 0], [1, 1], [2, 2]], nine.search(0,0, 2,2)
     
     # With an obstacle in the center, we should have to go around
-    nine_obs = Astar.new([0,0,0, 0,-1,0, 0,0,0], 3)
-    assert_equal [[0, 0], [0, 1], [1, 2], [2, 2]], nine_obs.search(0,0, 2,2)
+    nine[1, 1] = -1.0
+    assert_equal [[0, 0], [0, 1], [1, 2], [2, 2]], nine.search(0,0, 2,2)
   end
   
   def test_subtle_obstacle
@@ -81,7 +158,7 @@ class AstarTest < Test::Unit::TestCase
   end
   
   def test_add_rect
-    four = Astar.new([0] * 16, 4)
+    four = Astar.new(4, 4)
     four.add_rect(1,1,  2,1,  -1);
     assert_equal([0,0,0,0, 0,-1,-1,0, 0,0,0,0, 0,0,0,0], four.map)
   end
@@ -90,6 +167,23 @@ class AstarTest < Test::Unit::TestCase
     Benchmark.bm(10) do |x|
       x.report("init @large")   { @large = Astar.new([0] * 1_000_000, 1000) }
       x.report("search @large") { @large.search(0,0,999,999) }
+    end
+  end
+  
+  def assert_grid_uniformly_equal(value, grid)
+    for x in 0..1
+      for y in 0..1
+        assert_equal value, grid.get(x, y)
+        assert_equal value, grid[x, y]
+      end
+    end
+  end
+  
+  def assert_grid_equal(array, grid)
+    array.each_with_index do |rows, y|
+      rows.each_with_index do |value, x|
+        assert_equal value, grid[x, y], "x: #{x}, y: #{y}"
+      end
     end
   end
 end
