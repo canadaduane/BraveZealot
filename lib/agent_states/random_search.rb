@@ -42,53 +42,65 @@ module BraveZealot
       push_next_state(:smart_follow_path, :rsr_choose_destination)
       @path = hq.map.search(@tank, @goal)
       # puts "RSR Path Before: #{@path.inspect}"
+      randomize_path!(@path)
       # puts "RSR Path After: #{@path.inspect}"
       transition(:rsr_choose_destination, :smart_follow_path)
     end
     
     protected
     
-    def randomize_path(path, wander_variance = 5, frequency = 7)
-      segsize = Rubystats::NormalDistribution.new(frequency, frequency/2)
+    def randomize_path!(path, wander_variance = 40)
+      # segsize = Rubystats::NormalDistribution.new(frequency, frequency/2)
       wander  = Rubystats::NormalDistribution.new(0, wander_variance)
       
-      junctions = [path[0]]
-      i = 0
-      begin
-        skip = segsize.rng.to_i
-        skip = 1 if skip < 1
-        
-        i += skip
-        i = path.size - 1 if i >= path.size
-        
-        junctions << path[i]
-      end while i < path.size - 1
-      
-      # puts "Junctions:"
-      # p junctions
-      
-      middle = junctions[1..-2].map do |col, row|
+      path[1..-2].each do |coord|
         begin
-          pos = hq.map.constrain_array_coordinates(col + wander.rng.to_i, row + wander.rng.to_i)
-        end while hq.map.astar[*pos] != hq.map.astar.initial_weight
-        pos
+          wx, wy = wander.rng, wander.rng
+          check_coord = Coord.new(coord.x + wx, coord.y + wy)
+        end while !hq.map.in_world_space?(check_coord)
+        
+        coord.x = check_coord.x
+        coord.y = check_coord.y
       end
       
-      # puts "Middle:"
-      # p middle
+      hq.map.smoothen_path!(path, 5)
+      
+      # junctions = [path[0]]
+      # i = 0
+      # begin
+      #   skip = segsize.rng.to_i
+      #   skip = 1 if skip < 1
+      #   
+      #   i += skip
+      #   i = path.size - 1 if i >= path.size
+      #   
+      #   junctions << path[i]
+      # end while i < path.size - 1
+      
+      # # puts "Junctions:"
+      # # p junctions
       # 
-      newpath = []
-      ([junctions[0]] + middle + [junctions[-1]]).enum_cons(2) do |head, tail|
-        hcol, hrow = head
-        tcol, trow = tail
-        path = hq.map.astar.search(hcol, hrow, tcol, trow)
-        newpath += path
-      end
-      
-      # puts "New Path:"
-      # p newpath
-      
-      newpath
+      # middle = junctions[1..-2].map do |coord|
+      #   begin
+      #     new_coord = Coord.new(coord.x + wander.rng, coord.y + wander.rng.to_i)
+      #     pos = hq.map.world_to_array_coordinates(new_coord.x, new_coord.y)
+      #   end while hq.map.astar[*pos] != hq.map.astar.initial_weight
+      #   new_coord
+      # end
+      # 
+      # # puts "Middle:"
+      # # p middle
+      # # 
+      # newpath = []
+      # ([junctions[0]] + middle + [junctions[-1]]).enum_cons(2) do |head, tail|
+      #   path = hq.map.astar.search(head.x, head.y, tcol, trow)
+      #   newpath += path
+      # end
+      # 
+      # # puts "New Path:"
+      # # p newpath
+      # 
+      # newpath
     end
     
   end

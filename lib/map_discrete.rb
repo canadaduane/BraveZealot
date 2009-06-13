@@ -28,11 +28,17 @@ module BraveZealot
       constrain_array_coordinates(*coords)
     end
     
+    # Returns true if the coordinate is in the world, and not on an obstacle
+    def in_world_space?(coord)
+      ax, ay = world_to_array_coordinates(coord.x, coord.y)
+      in_world_range?(coord) && @astar[ax, ay] == @astar.initial_weight
+    end
+    
     def constrain_array_coordinates(*coords)
       coords.map do |v|
         if    v < 0                then 0
         elsif v > (@side_length-1) then @side_length - 1
-        else                            v
+        else  v
         end
       end
     end

@@ -35,6 +35,11 @@ module BraveZealot
     def world_y_max
       @world_y_max ||=  @world_size / 2
     end
+    
+    def in_world_range?(coord)
+      coord.x >= world_x_min && coord.x <= world_x_max &&
+      coord.y >= world_y_min && coord.y <= world_y_max
+    end
 
     def to_pdf(pdf = nil, options = {})
       options = {
