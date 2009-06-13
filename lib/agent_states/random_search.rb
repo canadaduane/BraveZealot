@@ -40,13 +40,24 @@ module BraveZealot
       puts "Random destination chosen: #{@goal.x}, #{@goal.y}"
       puts "Current location: #{@tank.x}, #{@tank.y}"
       push_next_state(:smart_follow_path, :rsr_choose_destination)
-      @path = randomize_path(hq.map.search(@tank, @goal))
+      @path = hq.map.search(@tank, @goal)
       # puts "RSR Path Before: #{@path.inspect}"
+      smoothen_path!(@path)
       # puts "RSR Path After: #{@path.inspect}"
-      transition(:rsr_choose_destination, :smart_follow_path)
+      # transition(:rsr_choose_destination, :smart_follow_path)
     end
     
     protected
+    
+    def smoothen_path!(path, iters = 3)
+      iters.times do
+        path.enum_cons(3).each do |a, b, c|
+          b.x = (a.x + b.x + c.x) / 3.0
+          b.y = (a.y + b.y + c.y) / 3.0
+        end
+      end
+      path
+    end
     
     def randomize_path(path, wander_variance = 5, frequency = 7)
       segsize = Rubystats::NormalDistribution.new(frequency, frequency/2)

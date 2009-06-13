@@ -92,11 +92,10 @@ module BraveZealot
           # p options[:paths]
           options[:paths].each do |path|
             if path and path.size > 1
-              x, y = array_to_world_coordinates(path[0][0], path[0][1])
+              x, y = path[0].x, path[0].y
               shape = pdf.move_to(x, y)
-              path[1..-1].each do |ax, ay|
-                x, y = array_to_world_coordinates(ax, ay)
-                shape.line_to(x, y)
+              path[1..-1].each do |coord|
+                shape.line_to(coord.x, coord.y)
               end
               shape.stroke
             end
