@@ -3,8 +3,11 @@ module BraveZealot
     attr_accessor :path
     
     def smart
-      @path = hq.map.search(@tank, @goal)
-      @state = :smart_follow_path
+      # hq.periodic_action(2.5, 5) do
+        @path = hq.map.search(@tank, @goal)
+      # end
+      # transition(:smart, :smart_follow_path)
+      smart_follow_path
     end
     
     def smart_follow_path
@@ -49,7 +52,7 @@ module BraveZealot
           @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 0.5))
         end
         move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-        # speed(move.speed < 0.5 ? move.speed : 1.0)
+        # speed(move.speed < 0.7 ? move.speed : 1.0)
         speed move.speed
         angvel move.angvel unless @pause_smart_angvel
       else
@@ -58,7 +61,7 @@ module BraveZealot
         @idx = 0
         @group = nil
         puts "transitioning out of smart state because I reached #{@goal.inspect} I am at #{@tank.x},#{@tank.y}"
-        transition(:smart, :smart_look_for_enemy_flag)
+        transition(:smart_follow_path, :smart_look_for_enemy_flag)
       end
     end
     

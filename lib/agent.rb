@@ -33,6 +33,7 @@ module BraveZealot
     # goal :: Coord   -> Coordinate indicating where the agent is headed
     attr_accessor :state, :goal
     attr_accessor :group
+    attr_accessor :path
     
     include DummyStates
     include SmartStates
@@ -49,20 +50,22 @@ module BraveZealot
     include WildStates
     
     # See above for definitions of hq and tank
-    def initialize(hq, tank, initial_state = nil)
+    def initialize(hq, tank)
       @hq, @tank = hq, tank
-      @state = initial_state || :dummy
       @goal = nil
       
       puts "\nStarting agent #{@tank.index}: #{@state}"
-      
+    end
+    
+    def begin_state_loop(initial_state = nil)
+      @state = initial_state || :dummy
       # Change state up to every +refresh+ seconds
       EventMachine::PeriodicTimer.new($options.refresh) do
         #puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
     end
-
+    
     # Check if we have fresh enough data, otherwise execute the block
     def check(symbol, freshness, default, force_check)
       if ((Time.now - last_checked(symbol)) > freshness) or force_check then

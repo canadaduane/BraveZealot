@@ -50,7 +50,7 @@ module BraveZealot
           target_enemy()
         end
       else
-        push_next_state(:smart, :sniper_flag_captured)
+        push_next_state(:smart_follow_path, :sniper_flag_captured)
         f = hq.enemy_flags.first
         puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
         @goal = Coord.new(f.x, f.y)
@@ -196,7 +196,7 @@ module BraveZealot
       @goal = Coord.new(x, y)
 
       # transition to the next state
-      push_next_state(:smart, :sniper_move_to_attack_position)
+      push_next_state(:smart_follow_path, :sniper_move_to_attack_position)
       @state = :smart
     end
 
@@ -205,7 +205,7 @@ module BraveZealot
       @goal = Coord.new(x, y)
 
       # transition to the next state
-      push_next_state(:smart, :sniper_attack)
+      push_next_state(:smart_follow_path, :sniper_attack)
       @state = :smart
     end
   end

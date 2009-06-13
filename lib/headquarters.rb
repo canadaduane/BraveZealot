@@ -37,11 +37,17 @@ module BraveZealot
                   r.mytanks.each do |t|
                     # Tell each agent about this Headquarters, its own +t+ index,
                     # and its initial state.
-                    agent = Agent.new(self, t, $options.initial_state[t.index])
+                    agent = Agent.new(self, t)
                     @agents[t.index] = agent
                   end
                   
+                  @map.observe_mytanks(r)
+                  
                   # BEGIN!
+                  @agents.each_with_index do |a, i|
+                    initial_state = $options.initial_state[i]
+                    a.begin_state_loop(initial_state)
+                  end
                   
                   # Periodically take PDF snapshots of the world
                   periodic_snapshot(2, 30)
@@ -210,9 +216,9 @@ module BraveZealot
       puts "\nWriting map to pdf: #{file}\n"
       distributions = []
       # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
-      @map.mytanks.each{ |t| distributions << t.kalman_distribution }
-      @map.othertanks.each{ |t| distributions << t.kalman_distribution }
-      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
+      # @map.mytanks.each{ |t| distributions << t.kalman_distribution }
+      # @map.othertanks.each{ |t| distributions << t.kalman_distribution }
+      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
       @map.to_pdf(nil,
         :my_color      => my_color,
         :paths         => paths,

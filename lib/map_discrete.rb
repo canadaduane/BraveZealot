@@ -25,13 +25,14 @@ module BraveZealot
     def world_to_array_coordinates(x, y)
       coords = [((x - world_x_min) / @granularity).to_i, 
              ((world_y_max - y) / @granularity).to_i]
-      final = coords.map do |v|
-        if v < 0 then 
-          0
-        elsif v > (@side_length-1) then
-          (@side_length-1)
-        else 
-          v
+      constrain_array_coordinates(*coords)
+    end
+    
+    def constrain_array_coordinates(*coords)
+      coords.map do |v|
+        if    v < 0                then 0
+        elsif v > (@side_length-1) then @side_length - 1
+        else                            v
         end
       end
     end
