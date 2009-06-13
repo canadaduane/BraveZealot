@@ -23,7 +23,6 @@ class Array
 end
 
 module BraveZealot
-  
   class Agent
     # hq   :: Headquarters  -> The headquarters object
     # tank :: Tank          -> Data object

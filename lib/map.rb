@@ -128,6 +128,10 @@ module BraveZealot
           my.observed_x = r.mytanks[idx].observed_x
           my.observed_y = r.mytanks[idx].observed_y
           my.angle = r.mytanks[idx].angle
+          my.shots_available = r.mytanks[idx].shots_available
+          my.time_to_reload = r.mytanks[idx].time_to_reload
+          my.flag = r.mytanks[idx].flag
+          my.status = r.mytanks[idx].status
           my.kalman_next(r.time)
         end
       end
