@@ -74,7 +74,7 @@ module BraveZealot
     
     def kalman_predicted_mu(dt)
       f = kalman_transition_matrix(dt)
-      puts "dt=#{dt} mu=#{@kalman_mu.inspect}"
+      #puts "dt=#{dt} mu=#{@kalman_mu.inspect}"
       f * @kalman_mu
     end
     

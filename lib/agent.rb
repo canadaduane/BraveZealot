@@ -49,6 +49,13 @@ module BraveZealot
     def dummy_do_nothing
       sleep(1.5)
     end
+
+    def dummy_turn
+      angvel 1
+      refresh($options.refresh) do
+        puts "#{@tank.angle} <- #{Time.now().to_f}"
+      end
+    end
   end
   
   module SmartStates
