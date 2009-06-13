@@ -195,10 +195,19 @@ class AstarTest < Test::Unit::TestCase
   #   # @arr.each_slice(100) { |slice| p slice }
   # end
   
-  def benchmark_large
-    Benchmark.bm(10) do |x|
-      x.report("init @large")   { @large = Astar.new([0] * 1_000_000, 1000) }
-      x.report("search @large") { @large.search(0,0,999,999) }
+  def test_benchmark_large
+    Benchmark.bm(100) do |x|
+      x.report("Initialize a 1,000,000 node graph") do
+        @large = Astar.new(1000, 1000)
+      end
+      x.report("Search a 1,000,000 node graph") do
+        @large.search(0,0,999,999)
+      end
+      x.report("Draw 500 obstacles of size 500x500") do
+        500.times do
+          @large.triangle(0,0,  500,500,  0,500,  1.0)
+        end
+      end
     end
   end
   

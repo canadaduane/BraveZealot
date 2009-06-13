@@ -7,6 +7,10 @@ module BraveZealot
 
     include Kalman
     
+    def speed
+      Math.sqrt(vx**2 + vy**2)
+    end
+    
     def to_coord
       Coord.new(x,y)
     end

@@ -13,9 +13,6 @@ module BraveZealot
       unless goal_reached(8)#@goal
         
         # puts "Tank at: #{@tank.x}, #{@tank.y} Goal at: #{@goal.x}, #{@goal.y}"
-        # new_path = check(:search, 1000* $options.refresh, @path, (@path.nil? or @path.empty?)){ hq.map.search(@tank, @goal) }
-        #puts "I am done searching!!!"
-        # @path = new_path || @path || []
         @group ||= PfGroup.new
         @dest ||= [@tank.x, @tank.y]
         
@@ -52,8 +49,9 @@ module BraveZealot
           @group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 0.5))
         end
         move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
+        # speed(move.speed < 0.5 ? move.speed : 1.0)
         speed move.speed
-        angvel move.angvel
+        angvel move.angvel unless @pause_smart_angvel
       else
         @dest = nil
         @path = nil

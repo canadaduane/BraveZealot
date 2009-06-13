@@ -74,6 +74,15 @@ module BraveZealot
     def to_pdf(pdf = nil, options = {})
       super do |pdf|
         
+        pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
+        pdf.stroke_color Color::RGB::Red
+        for row in 0..@side_length
+          for col in 0..@side_length
+            x, y = array_to_world_coordinates(col, row)
+            pdf.rectangle(x, y, 1).stroke if @astar[col, row] != @astar.initial_weight
+          end
+        end
+        
         if options[:paths]
           pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
           pdf.stroke_color Color::RGB::Red
