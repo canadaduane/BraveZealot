@@ -1,4 +1,3 @@
-require 'rubystats/normal_distribution'
 
 module BraveZealot
   module RandomSearchStates
@@ -42,28 +41,9 @@ module BraveZealot
       push_next_state(:smart_follow_path, :rsr_choose_destination)
       @path = hq.map.search(@tank, @goal)
       # puts "RSR Path Before: #{@path.inspect}"
-      randomize_path!(@path)
+      # hq.map.randomize_path!(@path)
       # puts "RSR Path After: #{@path.inspect}"
       transition(:rsr_choose_destination, :smart_follow_path)
-    end
-    
-    protected
-    
-    def randomize_path!(path, wander_variance = 40)
-      # segsize = Rubystats::NormalDistribution.new(frequency, frequency/2)
-      wander  = Rubystats::NormalDistribution.new(0, wander_variance)
-      
-      path[1..-2].each do |coord|
-        begin
-          wx, wy = wander.rng, wander.rng
-          check_coord = Coord.new(coord.x + wx, coord.y + wy)
-        end while !hq.map.in_world_space?(check_coord)
-        
-        coord.x = check_coord.x
-        coord.y = check_coord.y
-      end
-      
-      hq.map.smoothen_path!(path, 5)
     end
     
   end

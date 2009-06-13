@@ -11,8 +11,17 @@ module BraveZealot
     end
     
     def smart_follow_path
-      # puts "in the smart state"
+      if @path.nil?
+        @state = :smart
+        return
+      end
+      
       @waypoint ||= @path.first || @tank
+      
+      # parts = @path[0..10].size
+      # avg = @path[0..10].inject(0.0){ |sum, coord| sum + @tank.vector_to(coord).length } / parts
+      # puts "Here: #{@tank.x}, #{@tank.y}"
+      # puts "Average dist from here: #{avg}"
       
       distance = @tank.vector_to(@waypoint).length
       while !@path.empty? and distance < 30
@@ -25,7 +34,7 @@ module BraveZealot
       move = group.suggest_move(@tank.x, @tank.y, @tank.angle)
       
       speed move.speed
-      angvel move.angvel unless @pause_smart_angvel
+      angvel move.angvel
       
       transition(:smart_follow_path, :smart_look_for_enemy_flag) if @path.empty?
     end
