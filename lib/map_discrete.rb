@@ -54,9 +54,11 @@ module BraveZealot
     end
     
     def search(start, goal)
-      s = world_to_array_coordinates(start.x, start.y)
-      g = world_to_array_coordinates(goal.x, goal.y)
-      @astar.search(s[0], s[1], g[0], g[1])
+      sx, sy = world_to_array_coordinates(start.x, start.y)
+      gx, gy = world_to_array_coordinates(goal.x, goal.y)
+      @astar.search(sx, sy, gx, gy).map do |x, y|
+        Coord.new(*array_to_world_coordinates(x, y))
+      end
     end
     
     # Find a random place on the map that isn't blocked by an obstacle
