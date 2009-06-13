@@ -32,37 +32,73 @@ module BraveZealot
           obstacles do |r|
             flags do |r|
               othertanks do |r|
-
-                #f = File.new($options.gnuplot_file, 'w')
-                #f.write(@map.to_gnuplot)
-                #f.close
-
                 # Initialize each of our tanks
                 mytanks do |r|
                   r.mytanks.each do |t|
-                    # Tell each agent about this Headquarters, its own +t+ index, and its initial state
-                    agent = Agent.new(self, t, $options.initial_state[t.index])
+                    # Tell each agent about this Headquarters, its own +t+ index,
+                    # and its initial state.
+                    agent = Agent.new(self, t)
                     @agents[t.index] = agent
                   end
                   
+                  @map.observe_mytanks(r)
+                  
+                  # BEGIN!
+                  @agents.each_with_index do |a, i|
+                    initial_state = $options.initial_state[i]
+                    a.begin_state_loop(initial_state)
+                  end
+                  
+                  # Periodically take PDF snapshots of the world
+                  periodic_snapshot(2, 30)
+
+                  # Update obstacles, flags, tanks, shots
+                  periodic_update
                 end
               end
             end
           end
         end
       end
-      periodic_update
     end
     
-    def periodic_update
-			puts "periodic update"
+    # Calls an action immediately and sets up a timer to periodically call the
+    # action again. If +maximum+ is set to an integer value, then the action
+    # will be called at most +maximum+ times.
+    def periodic_action(period = 0.5, maximum = nil, &action)
+      count = 0
+      timer = EventMachine::PeriodicTimer.new(period, &(action_wrapper = proc do
+        if maximum.nil? or (count += 1) <= maximum
+          action.call
+        else
+          timer.cancel
+        end
+      end))
+      # Do it immediately
+      action_wrapper.call
+    end
+    
+    def periodic_snapshot(period = 0.5, maximum = nil)
+      periodic_action(period, maximum) do
+        write_pdf
+      end
+    end
+
+    def periodic_update(period = 0.3)
+      # puts "periodic update"
+      
+      # Get up to 10 samples of the obstacles
+      periodic_action(period * 1.5, 50) do
+        obstacles
+      end
+      
       # Spread out our information gathering over time so we don't
       # constantly overwhelm the network.
-      EventMachine::PeriodicTimer.new(0.4) do
-        sleep(0.1) { flags      }
-        sleep(0.03) { mytanks    }
-        sleep(0.03) { othertanks }
-        sleep(0.4) { shots      }
+      third = period / 3.0
+      periodic_action(period) do
+        sleep(third * 1.0) { flags                  }
+        sleep(third * 2.0) { mytanks; othertanks    }
+        sleep(third * 3.0) { shots                  }
       end
     end
     
@@ -142,14 +178,6 @@ module BraveZealot
       EventMachine::Timer.new(time, &block)
     end
     
-    def on_mytanks(r)
-      @map.observe_mytanks(r)
-      #@map.mytanks = r.mytanks
-      #r.mytanks.each do |t|
-      #  @agents[t.index].tank = t if @agents.size > t.index
-      #end
-    end
-    
     def on_flags(r)
       @map.flags = r.flags
     end
@@ -160,7 +188,7 @@ module BraveZealot
     end
     
     def on_obstacles(r)
-      @map.obstacles = r.obstacles
+      @map.observe_obstacles(r)
     end
 
     def on_othertanks(r)
@@ -168,33 +196,42 @@ module BraveZealot
       @map.observe_othertanks(r)
     end
     
+    def on_mytanks(r)
+      @map.observe_mytanks(r)
+      #@map.mytanks = r.mytanks
+      #r.mytanks.each do |t|
+      #  @agents[t.index].tank = t if @agents.size > t.index
+      #end
+    end
+
     def disconnect
       EventMachine::stop_event_loop
       exit(0)
     end
     
+    def write_pdf
+      @pdf_count ||= 0
+      file = $options.pdf_file || "map.pdf"
+      file.sub!(/\d*\./, "#{@pdf_count += 1}.")
+      puts "\nWriting map to pdf: #{file}\n"
+      distributions = []
+      # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
+      # @map.mytanks.each{ |t| distributions << t.kalman_distribution }
+      # @map.othertanks.each{ |t| distributions << t.kalman_distribution }
+      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+      @map.to_pdf(nil,
+        :my_color      => my_color,
+        :paths         => paths,
+        :distributions => distributions
+      ).save_as(file)
+    end
+    
     def install_signal_trap
       trap("INT") do
         if File.exist?($options.config_file)
-          $options = OpenStruct.new(
-            $options.instance_variable_get("@table").merge(
-              YAML.load(IO.read($options.config_file))))
-          if $options.pdf_file
-            @pdf_count ||= 0
-            file = $options.pdf_file || "map.pdf"
-            file.sub!(".", "#{@pdf_count += 1}.")
-            puts "\nWriting map to pdf: #{file}\n"
-            distributions = []
-            # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
-            @map.mytanks.each{ |t| distributions << t.kalman_distribution }
-            @map.othertanks.each{ |t| distributions << t.kalman_distribution }
-            paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path },
-            @map.to_pdf(nil,
-              :my_color      => my_color,
-              :paths         => paths,
-              :distributions => distributions
-            ).save_as(file)
-          end
+          config = YAML.load(IO.read($options.config_file))
+          $options.instance_variable_get("@table").merge! config
+          write_pdf if $options.pdf_file
           if $options.state
             # Convert a comma-delimited list into states array
             states = state_list($options.state)

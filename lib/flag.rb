@@ -1,9 +1,13 @@
 bzrequire 'lib/team_colors'
 bzrequire 'lib/kalman'
+bzrequire 'lib/coord'
 
 module BraveZealot
   class Flag < Struct.new(:color, :possession, :x, :y)
+    
     # include Kalman
+    include XYMethods
+    
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
       

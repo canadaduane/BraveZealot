@@ -18,12 +18,12 @@ module BraveZealot
         alias_method :observed_ax=, :ax= if base.method_defined?(:ax=)
         alias_method :observed_ay=, :ay= if base.method_defined?(:ay=)
         
-        define_method(:x)  { @kalman_mu[0, 0] }
-        define_method(:y)  { @kalman_mu[0, 3] }
-        define_method(:vx) { @kalman_mu[0, 1] }
-        define_method(:vy) { @kalman_mu[0, 4] }
-        define_method(:ax) { @kalman_mu[0, 2] }
-        define_method(:ay) { @kalman_mu[0, 5] }
+        define_method(:x)  { @kalman_mu[0, 0] rescue observed_x  }
+        define_method(:y)  { @kalman_mu[0, 3] rescue observed_y  }
+        define_method(:vx) { @kalman_mu[0, 1] rescue observed_vx }
+        define_method(:vy) { @kalman_mu[0, 4] rescue observed_vy }
+        define_method(:ax) { @kalman_mu[0, 2] rescue observed_ax }
+        define_method(:ay) { @kalman_mu[0, 5] rescue observed_ay }
       end
     end
     

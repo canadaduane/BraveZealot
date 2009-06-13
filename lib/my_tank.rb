@@ -1,11 +1,17 @@
 bzrequire 'lib/kalman'
+bzrequire 'lib/coord'
 
 module BraveZealot
   class MyTank < Struct.new(:index, :callsign, :status,
                             :shots_available, :time_to_reload,
                             :flag, :x, :y, :angle, :vx, :vy, :angvel)
-
+    
     include Kalman
+    include XYMethods
+    
+    def speed
+      Math.sqrt(vx**2 + vy**2)
+    end
     
     def to_coord
       Coord.new(x,y)

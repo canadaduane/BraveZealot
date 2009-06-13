@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'ostruct'
 require 'optparse'
 require 'yaml'
@@ -70,9 +72,12 @@ bzrequire 'lib/astar/astar',
   "$ cd lib/astar && ruby extconf.rb && make\n"
 
 puts
+
+# Check that the bzfs server is running on the expected port
 if `netstat -an|grep \.#{$options.port}\s`.empty?
   puts "Warning: unable to connect to port #{$options.port}"
 end
+
 EventMachine.run do
   EventMachine::connect(
     $options.server,

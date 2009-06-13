@@ -35,6 +35,11 @@ module BraveZealot
     def world_y_max
       @world_y_max ||=  @world_size / 2
     end
+    
+    def in_world_range?(coord)
+      coord.x >= world_x_min && coord.x <= world_x_max &&
+      coord.y >= world_y_min && coord.y <= world_y_max
+    end
 
     def to_pdf(pdf = nil, options = {})
       options = {
@@ -73,7 +78,7 @@ module BraveZealot
       end
       
       if @kalman_paths
-        puts "Writing kalman paths: #{@kalman_paths.inspect}"
+        # puts "Writing kalman paths: #{@kalman_paths.inspect}"
         @kalman_paths.each_pair do |callsign, path|
           pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
           pdf.stroke_color(Color::RGB::Red)
@@ -132,10 +137,6 @@ module BraveZealot
       end
     end
 
-    def get_othertank(callsign)
-      @othertanks.find{ |t| t.callsign == callsign }
-    end
-    
     def observe_othertanks(response)
       if @othertanks.empty?
         @othertanks = response.othertanks
@@ -164,6 +165,26 @@ module BraveZealot
           end
         end
       end
+    end
+    
+    def observe_obstacles(response)
+      if @obstacles.empty?
+        @obstacles = response.obstacles
+      else
+        @obstacles.each_with_index do |dst_obstacle, i|
+          src_obstacle = response.obstacles[i]
+          dst_obstacle.coords.each_with_index do |dst_coord, j|
+            src_coord = src_obstacle.coords[j]
+            dst_coord.observed_x = src_coord.observed_x
+            dst_coord.observed_y = src_coord.observed_y
+            dst_coord.kalman_next(response.time)
+          end
+        end
+      end
+    end
+    
+    def get_othertank(callsign)
+      @othertanks.find{ |t| t.callsign == callsign }
     end
     
     def my_base
