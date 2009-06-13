@@ -44,7 +44,7 @@ module BraveZealot
                   # BEGIN!
                   
                   # Periodically take PDF snapshots of the world
-                  periodic_snapshot(0.2, 10)
+                  periodic_snapshot(5, 10)
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
