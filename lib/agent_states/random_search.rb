@@ -64,43 +64,6 @@ module BraveZealot
       end
       
       hq.map.smoothen_path!(path, 5)
-      
-      # junctions = [path[0]]
-      # i = 0
-      # begin
-      #   skip = segsize.rng.to_i
-      #   skip = 1 if skip < 1
-      #   
-      #   i += skip
-      #   i = path.size - 1 if i >= path.size
-      #   
-      #   junctions << path[i]
-      # end while i < path.size - 1
-      
-      # # puts "Junctions:"
-      # # p junctions
-      # 
-      # middle = junctions[1..-2].map do |coord|
-      #   begin
-      #     new_coord = Coord.new(coord.x + wander.rng, coord.y + wander.rng.to_i)
-      #     pos = hq.map.world_to_array_coordinates(new_coord.x, new_coord.y)
-      #   end while hq.map.astar[*pos] != hq.map.astar.initial_weight
-      #   new_coord
-      # end
-      # 
-      # # puts "Middle:"
-      # # p middle
-      # # 
-      # newpath = []
-      # ([junctions[0]] + middle + [junctions[-1]]).enum_cons(2) do |head, tail|
-      #   path = hq.map.astar.search(head.x, head.y, tcol, trow)
-      #   newpath += path
-      # end
-      # 
-      # # puts "New Path:"
-      # # p newpath
-      # 
-      # newpath
     end
     
   end
