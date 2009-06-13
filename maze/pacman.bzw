@@ -1,0 +1,468 @@
+#  Map edited by Andrew McNabb to remove teleporters and add bases.
+
+#!name box-0
+box
+position 325 0 0
+rotation 0
+size 75 400 1
+end
+
+#!name box-1
+box
+position -325 0 0
+rotation 0
+size 75 400 1
+end
+
+#!name box-2
+box
+position 0 390 0
+rotation 0
+size 250 10 20
+end
+
+#!name box-3
+box
+position 0 -390 0
+rotation 0
+size 250 10 20
+end
+
+#!name box-4
+box
+position 240 0 0
+rotation 0
+size 10 380 20
+end
+
+#!name box-5
+box
+position -240 0 0
+rotation 0
+size 10 380 20
+end
+
+#!name box-8
+box
+position 120 350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-9
+box
+position 0 350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-10
+box
+position -120 350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-11
+box
+position 180 310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-12
+box
+position 60 310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-13
+box
+position -60 310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-14
+box
+position -180 310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-15
+box
+position 120 250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-16
+box
+position 0 250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-17
+box
+position -120 250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-18
+box
+position 160 230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-19
+box
+position 40 230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-20
+box
+position -80 230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-21
+box
+position -200 230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-22
+box
+position 180 160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-23
+box
+position 60 160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-24
+box
+position -60 160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-25
+box
+position -180 160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-26
+box
+position 120 130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-27
+box
+position 0 130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-28
+box
+position -120 130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-29
+box
+position 200 90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-30
+box
+position 80 90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-31
+box
+position -40 90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-32
+box
+position -160 90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-33
+box
+position 180 0 0
+rotation 0
+size 10 40 20
+end
+
+#!name box-34
+box
+position 120 0 0
+rotation 0
+size 10 40 20
+end
+
+#!name box-35
+box
+position 30 0 0
+rotation 0
+size 40 40 40
+end
+
+#!name box-36
+box
+position -60 0 0
+rotation 0
+size 10 40 20
+end
+
+#!name box-37
+box
+position -120 0 0
+rotation 0
+size 10 40 20
+end
+
+#!name box-38
+box
+position -180 0 0
+rotation 0
+size 10 40 20
+end
+
+#!name box-39
+box
+position 180 -160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-40
+box
+position 60 -160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-41
+box
+position -60 -160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-42
+box
+position -180 -160 0
+rotation 0
+size 10 20 20
+end
+
+#!name box-43
+box
+position 120 -130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-44
+box
+position 0 -130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-45
+box
+position -120 -130 0
+rotation 0
+size 10 50 20
+end
+
+#!name box-46
+box
+position 200 -90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-47
+box
+position 80 -90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-48
+box
+position -40 -90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-49
+box
+position -160 -90 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-50
+box
+position 120 -350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-51
+box
+position 0 -350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-52
+box
+position -120 -350 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-53
+box
+position 180 -310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-54
+box
+position 60 -310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-55
+box
+position -60 -310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-56
+box
+position -180 -310 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-57
+box
+position 120 -250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-58
+box
+position 0 -250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-59
+box
+position -120 -250 0
+rotation 0
+size 10 30 20
+end
+
+#!name box-60
+box
+position 160 -230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-61
+box
+position 40 -230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-62
+box
+position -80 -230 0
+rotation 0
+size 30 10 20
+end
+
+#!name box-63
+box
+position -200 -230 0
+rotation 0
+size 30 10 20
+end
+
+#!name base-62
+base
+position -210 -360 0
+rotation 0
+size 20 20 0
+color 1
+end
+
+#!name base-63
+base
+position 210 360 0
+rotation 0
+size 20 20 0
+color 2
+end
+
+#!name base-64
+base
+position 210 -360 0
+rotation 0
+size 20 20 0
+color 3
+end
+
+#!name base-65
+base
+position -210 360 0
+rotation 0
+size 20 20 0
+color 4
+end
+
