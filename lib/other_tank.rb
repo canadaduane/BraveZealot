@@ -1,8 +1,10 @@
 bzrequire 'lib/kalman'
+bzrequire 'lib/coord'
 
 module BraveZealot
   class OtherTank < Struct.new(:callsign, :color, :status, :flag, :x, :y, :angle)
     include Kalman
+    include XYMethods
     
     def to_coord
       Coord.new(x,y)

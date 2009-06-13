@@ -53,12 +53,23 @@ module BraveZealot
       end
     end
     
-    def search(start, goal)
+    def search(start, goal, smoothness = 3)
       sx, sy = world_to_array_coordinates(start.x, start.y)
       gx, gy = world_to_array_coordinates(goal.x, goal.y)
-      @astar.search(sx, sy, gx, gy).map do |x, y|
+      path = @astar.search(sx, sy, gx, gy).map do |x, y|
         Coord.new(*array_to_world_coordinates(x, y))
       end
+      smoothen_path!(path, smoothness)
+    end
+    
+    def smoothen_path!(path, iters = 3)
+      iters.times do
+        path.enum_cons(3).each do |a, b, c|
+          b.x = (a.x + b.x + c.x) / 3.0
+          b.y = (a.y + b.y + c.y) / 3.0
+        end
+      end
+      path
     end
     
     # Find a random place on the map that isn't blocked by an obstacle
