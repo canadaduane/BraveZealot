@@ -10,6 +10,7 @@ bzrequire 'lib/agent_states/gaussian_acceleration'
 bzrequire 'lib/agent_states/wild'
 bzrequire 'lib/agent_states/hunting'
 bzrequire 'lib/agent_states/random_search'
+bzrequire 'lib/agent_states/defender'
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -47,6 +48,8 @@ module BraveZealot
     include GaussianAccelerationStates
     # Non-conforming Pigeons
     include WildStates
+		# Tourmanet passoff states
+		include DefenderStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank)
