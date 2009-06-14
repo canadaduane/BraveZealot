@@ -157,6 +157,10 @@ module BraveZealot
             dst_tank.observed_y = src_tank.observed_y
             #puts "Step 2: observed_x=#{src_tank.observed_x},observed_y=#{src_tank.observed_y}"
             dst_tank.kalman_next(response.time)
+
+						dst_tank.status = src_tank.status
+						dst_tank.angle = src_tank.angle
+
             #puts "Step 3: x=#{dst_tank.x},y=#{dst_tank.y}"
 
             @kalman_paths ||= {}

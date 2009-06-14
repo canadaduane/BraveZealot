@@ -50,7 +50,7 @@ module BraveZealot
                   end
                   
                   # Periodically take PDF snapshots of the world
-                  periodic_snapshot(2, 30)
+                  periodic_snapshot(2, 240)
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
@@ -134,7 +134,7 @@ module BraveZealot
     def create_home_base_goal
       base_goal = PfGroup.new
       base_goal.add_obstacles(@map.obstacles)
-      base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.size)
+      base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.world_size)
       base_goal
     end
     
