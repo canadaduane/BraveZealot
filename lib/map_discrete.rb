@@ -42,6 +42,10 @@ module BraveZealot
         end
       end
     end
+
+    def update_shadows
+      
+    end
     
     def coord_to_index(x, y)
       y * @side_length + x

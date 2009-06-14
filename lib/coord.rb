@@ -7,6 +7,10 @@ module BraveZealot
     def vector_to(p)
       Vector.new(p.x - self.x, p.y - self.y)
     end
+
+    def segment_to(p)
+      Segment.new(Coord.new(self.x,self.y), vector_to(p))
+    end
     
     # return a coord with the two elements reversed
     def reverse
@@ -42,6 +46,10 @@ module BraveZealot
       sigma_x ||= NMatrix.float(6, 6).diagonal([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
       pre_kalman_initialize(mu, sigma, sigma_x)
     end
+
+    def dot(v)
+      (v.x * x) + (v.y * y)
+    end
     
     def initialize(x, y)
       @x = x.to_f
@@ -65,12 +73,39 @@ module BraveZealot
       (v.y * x) - (v.x * y)
     end
 
-    def dot(v)
-      (v.x * x) + (v.y * y)
+    def unit
+      @unit ||= Vector.new( x / length, y / length )
     end
 
     def length
       @length ||= Math::sqrt( (x**2) + (y**2) )
+    end
+  end
+
+  class Segment
+    attr_accessor :point, :vector
+    def initialize(point, vector)
+      @point = point
+      @vector = vector
+    end
+
+    def intersection(other_segment)
+      if parallel?(other_segment) then
+        return false,Coord.new(0,0)
+      end
+
+      w = point.vector_to(other_segment.point)
+      u = other_segment.vector
+      v = vector
+  
+      t = ( u.normal.dot(w) ) / ( u.normal.dot(v) )
+
+      return true, Coord.new( point.x + (t*vector.x) , point.y + (t*vector.y) )
+    end
+
+    def parallel?(other_segment)
+      ud = vector.unit.dot(other_segment.vector.unit)
+      ( ud.abs == 1.0 )
     end
   end
   
