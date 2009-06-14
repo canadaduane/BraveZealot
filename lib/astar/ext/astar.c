@@ -303,15 +303,16 @@ static VALUE astar_search(
 
 static VALUE astar_get(VALUE self, VALUE rb_x, VALUE rb_y)
 {
-    VALUE rb_width = rb_iv_get(self, "@width");
-    
     Check_Type(rb_x, T_FIXNUM);
     Check_Type(rb_y, T_FIXNUM);
-    Check_Type(rb_width, T_FIXNUM);
 
     int x         = NUM2INT(rb_x);
     int y         = NUM2INT(rb_y);
-    int width     = NUM2INT(rb_width);
+    int width     = NUM2INT(rb_iv_get(self, "@width"));
+    int height    = NUM2INT(rb_iv_get(self, "@height"));
+    
+    if (x < 0 || x >= width || y < 0 || y >= height)
+        rb_raise(rb_eException, "out of bounds");
     
     Chunk* map;
     Data_Get_Struct(self, Chunk, map);
@@ -321,12 +322,19 @@ static VALUE astar_get(VALUE self, VALUE rb_x, VALUE rb_y)
 
 static VALUE astar_set(VALUE self, VALUE rb_x, VALUE rb_y, VALUE rb_weight)
 {
+    Check_Type(rb_x, T_FIXNUM);
+    Check_Type(rb_y, T_FIXNUM);
     Check_Type(rb_weight, T_FLOAT);
     
     int x         = NUM2INT(rb_x);
     int y         = NUM2INT(rb_y);
-    double weight = NUM2DBL(rb_weight);
     int width     = NUM2INT(rb_iv_get(self, "@width"));
+    int height    = NUM2INT(rb_iv_get(self, "@height"));
+    
+    if (x < 0 || x >= width || y < 0 || y >= height)
+        rb_raise(rb_eException, "out of bounds");
+    
+    double weight = NUM2DBL(rb_weight);
     
     Chunk* map;
     Data_Get_Struct(self, Chunk, map);
@@ -595,6 +603,62 @@ static VALUE astar_polygon(VALUE self, VALUE rb_ary_coords, VALUE rb_weight)
     return self;
 }
 
+static VALUE astar_add(VALUE self, VALUE rb_other)
+{
+    int width        = NUM2INT(rb_iv_get(self, "@width"));
+    int height       = NUM2INT(rb_iv_get(self, "@height"));
+    Chunk* map;
+    Data_Get_Struct(self, Chunk, map);
+    
+    int other_width  = NUM2INT(rb_iv_get(rb_other, "@width"));
+    int other_height = NUM2INT(rb_iv_get(rb_other, "@height"));
+    Chunk* other_map;
+    Data_Get_Struct(rb_other, Chunk, other_map);
+    
+    if (width == other_width && height == other_height)
+    {
+        int i;
+        for(i = 0; i < width*height; i++)
+        {
+            map[i].weight += other_map[i].weight;
+        }
+    }
+    else
+    {
+        rb_raise(rb_eException, "Astar grids must have same width and height");
+    }
+    
+    return self;
+}
+
+static VALUE astar_sub(VALUE self, VALUE rb_other)
+{
+    int width        = NUM2INT(rb_iv_get(self, "@width"));
+    int height       = NUM2INT(rb_iv_get(self, "@height"));
+    Chunk* map;
+    Data_Get_Struct(self, Chunk, map);
+    
+    int other_width  = NUM2INT(rb_iv_get(rb_other, "@width"));
+    int other_height = NUM2INT(rb_iv_get(rb_other, "@height"));
+    Chunk* other_map;
+    Data_Get_Struct(rb_other, Chunk, other_map);
+    
+    if (width == other_width && height == other_height)
+    {
+        int i;
+        for(i = 0; i < width*height; i++)
+        {
+            map[i].weight -= other_map[i].weight;
+        }
+    }
+    else
+    {
+        rb_raise(rb_eException, "Astar grids must have same width and height");
+    }
+    
+    return self;
+}
+
 // The initialization method for this module; Ruby calls this for us
 void Init_astar() {
     Astar = rb_define_class("Astar", rb_cObject);
@@ -614,4 +678,8 @@ void Init_astar() {
     rb_define_method(Astar, "triangle",  astar_triangle, 7);
     rb_define_method(Astar, "rectangle", astar_rectangle, 5);
     rb_define_method(Astar, "polygon",   astar_polygon, 2);
+    
+    // Addition and subtraction of grids
+    rb_define_method(Astar, "add", astar_add, 1);
+    rb_define_method(Astar, "sub", astar_sub, 1);
 }
