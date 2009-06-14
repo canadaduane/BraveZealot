@@ -121,23 +121,23 @@ module BraveZealot
       end
     end
     
-    def create_flag_goal
-      flag_goal = PfGroup.new
-      flag_goal.add_obstacles(@map.obstacles)
-      refresh(:flags, 0.5) do
-        enemy_flags = @map.flags.select{ |f| f.color != @my_color }
-        puts "adding flag goal at #{enemy_flags.first.x}, #{enemy_flags.first.y}"
-        flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.world_size) unless enemy_flags.empty?
-      end
-      flag_goal
-    end
+    # def create_flag_goal
+    #   flag_goal = PfGroup.new
+    #   flag_goal.add_obstacles(@map.obstacles)
+    #   refresh(:flags, 0.5) do
+    #     enemy_flags = @map.flags.select{ |f| f.color != @my_color }
+    #     puts "adding flag goal at #{enemy_flags.first.x}, #{enemy_flags.first.y}"
+    #     flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.world_size) unless enemy_flags.empty?
+    #   end
+    #   flag_goal
+    # end
     
-    def create_home_base_goal
-      base_goal = PfGroup.new
-      base_goal.add_obstacles(@map.obstacles)
-      base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.size)
-      base_goal
-    end
+    # def create_home_base_goal
+    #   base_goal = PfGroup.new
+    #   base_goal.add_obstacles(@map.obstacles)
+    #   base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.size)
+    #   base_goal
+    # end
     
     # Note: estimate_world_time may be non-continuous because @world_time is
     # updated sporadically.

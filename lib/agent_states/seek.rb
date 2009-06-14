@@ -83,10 +83,10 @@ module BraveZealot
       
     def seek_vector_move(vector)
       delta = vector.angle_diff(@tank)
-      puts "current | x: #{@tank.x}, y: #{@tank.y}"
-      puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
-      puts "target angle: #{vector.angle}"
-      puts "delta: #{delta}"
+      # puts "current | x: #{@tank.x}, y: #{@tank.y}"
+      # puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
+      # puts "target angle: #{vector.angle}"
+      # puts "delta: #{delta}"
       
       return Move.new(1.0, delta * 3) #/ (10 * $options.refresh))
     end
