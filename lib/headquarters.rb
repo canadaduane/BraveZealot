@@ -113,12 +113,30 @@ module BraveZealot
     end
     
     # Returns true if any of our tanks possesses an enemy flag
-    def flag_possession?
+    def we_have_enemy_flag?
       @agents.any? do |t|
         #puts "t.tank.flag = #{t.tank.flag}"
         t.tank.flag != "none" &&
         t.tank.flag != @my_color
       end
+    end
+    
+    def enemy_has_our_flag?
+      @map.othertanks.any? do |o|
+        o.tank.flag == @my_color
+      end
+    end
+    
+    def our_flag
+      @map.flags.find{ |f| f.color == @my_color }
+    end
+    
+    def our_base
+      @map.bases.find{ |b| b.color == @my_color }
+    end
+    
+    def our_flag_at_base?
+      our_base.contains_point?(our_flag)
     end
     
     # def create_flag_goal
