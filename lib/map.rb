@@ -183,6 +183,19 @@ module BraveZealot
       end
     end
     
+    def observe_flags(response)
+      if @flags.empty?
+        @flags = response.flags
+      else
+        @flags.each_with_index do |dst_flag, i|
+          src_flag = response.flags[i]
+          dst_flag.observed_x = src_flag.observed_x
+          dst_flag.observed_y = src_flag.observed_y
+          dst_flag.kalman_next(response.time)
+        end
+      end
+    end
+    
     def get_othertank(callsign)
       @othertanks.find{ |t| t.callsign == callsign }
     end

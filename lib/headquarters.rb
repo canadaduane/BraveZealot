@@ -140,37 +140,27 @@ module BraveZealot
       EventMachine::Timer.new(time, &block)
     end
     
-    def on_flags(r)
-      @map.flags = r.flags
-    end
-    
     def on_bases(r)
       @map.bases = r.bases
       @my_base = @map.bases.find{ |b| b.color == @my_color }
     end
     
+    def on_flags(r)
+      @map.observe_flags(r)
+    end
+
     def on_obstacles(r)
       @map.observe_obstacles(r)
     end
 
     def on_othertanks(r)
-      # @map.othertanks = r.othertanks
       @map.observe_othertanks(r)
     end
     
     def on_mytanks(r)
       @map.observe_mytanks(r)
-      #@map.mytanks = r.mytanks
-      #r.mytanks.each do |t|
-      #  @agents[t.index].tank = t if @agents.size > t.index
-      #end
     end
 
-    def disconnect
-      EventMachine::stop_event_loop
-      exit(0)
-    end
-    
     def write_pdf
       @pdf_count ||= 0
       file = $options.pdf_file || "map.pdf"
@@ -207,6 +197,12 @@ module BraveZealot
         end
       end
     end
+    
+    def disconnect
+      EventMachine::stop_event_loop
+      exit(0)
+    end
+    
     
     
     # *** Game Objects and Pattern Matching Methods ***
