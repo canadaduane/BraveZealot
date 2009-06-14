@@ -28,8 +28,9 @@ module BraveZealot
         if @path
           if @path.size >= 10
             @waypoint ||= @path[9]
-          
-            if @short_path = hq.map.search(@tank, @waypoint)
+            
+            @short_path = hq.map.search(@tank, @waypoint)
+            if @short_path && @short_path.size > 4
             
               move = seek_vector_move(@short_path[2].vector_to(@short_path[4]))
             
