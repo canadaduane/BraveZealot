@@ -72,6 +72,16 @@ module BraveZealot
     def length
       @length ||= Math::sqrt( (x**2) + (y**2) )
     end
+    
+    def angle
+      Math.atan2(y, x)
+    end
+    
+    def angle_diff(other)
+      theta = angle
+      phi = other.angle
+      Math.atan2(Math.sin(theta - phi), Math.cos(theta - phi))
+    end
   end
   
 end

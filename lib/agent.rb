@@ -1,6 +1,6 @@
 bzrequire 'lib/communicator'
 bzrequire 'lib/agent_states/dummy'
-bzrequire 'lib/agent_states/smart'
+bzrequire 'lib/agent_states/seek'
 bzrequire 'lib/agent_states/decoy'
 bzrequire 'lib/agent_states/sniper'
 bzrequire 'lib/agent_states/sitting_duck'
@@ -33,10 +33,11 @@ module BraveZealot
     # goal :: Coord   -> Coordinate indicating where the agent is headed
     attr_accessor :state, :goal
     attr_accessor :group
-    attr_accessor :path
+    attr_accessor :path, :short_path
+    attr_accessor :timers
     
     include DummyStates
-    include SmartStates
+    include SeekStates
     include DecoyStates
     include SniperStates
     include HuntingStates
@@ -55,7 +56,9 @@ module BraveZealot
     def initialize(hq, tank)
       @hq, @tank = hq, tank
       @goal = nil
-      
+      @timers = []
+      # Satisfactory proximity of tank to its destination
+      @proximity = 8
       puts "\nStarting agent #{@tank.index}: #{@state}"
     end
     
@@ -63,9 +66,19 @@ module BraveZealot
       @state = initial_state || :dummy
       # Change state up to every +refresh+ seconds
       EventMachine::PeriodicTimer.new($options.refresh) do
-        #puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
+    end
+    
+    # Add a timer and record it in this agent's list of timers
+    def periodically(period = 0.5, maximum = nil, &block)
+      @timers << hq.periodic_action(period, maximum, &block)
+    end
+    
+    # Cancel all timers for this agent
+    def cancel_timers
+      @timers.each{ |t| t.cancel }
     end
     
     # Check if we have fresh enough data, otherwise execute the block

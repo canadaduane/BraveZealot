@@ -76,6 +76,7 @@ module BraveZealot
       end))
       # Do it immediately
       action_wrapper.call
+      timer
     end
     
     def periodic_snapshot(period = 0.5, maximum = nil)
@@ -218,7 +219,8 @@ module BraveZealot
       # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
       # @map.mytanks.each{ |t| distributions << t.kalman_distribution }
       # @map.othertanks.each{ |t| distributions << t.kalman_distribution }
-      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+      paths = @agents.map{ |a| a.path }
+      paths += @agents.select{ |a| !a.short_path.nil? }.map{ |a| a.short_path }
       @map.to_pdf(nil,
         :my_color      => my_color,
         :paths         => paths,
