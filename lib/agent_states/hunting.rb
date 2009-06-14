@@ -7,18 +7,29 @@ module BraveZealot
 
 		MAX_ENEMIES_THRESHOLD = 0	# max number of enemy tanks that can still be alive before
 														  # attempting to capture the flag
-		DECOY_TANK_INDEX = 0			# index for the tank that will act as the decoy
-		START_DECOY_DELAY = 3			# amount of time (seconds) to wait before starting the decoy
-		CAPTURE_FLAG_INDEX_THRESHOLD = 1		# all tanks index below this number will be sent to capture
+		CAPTURE_FLAG_INDEX_THRESHOLD = 5		# all tanks index below this number will be sent to capture
 															# the flag, all equal to or above will be sent to defend our flag
-		DECOY_TIMER = 60					# amount of time (seconds) to run the decoy for
 		TARGET_TIMEOUT = 8				# amount of time (seconds) to wait before selecting a new target
 		FUDGE_FACTOR = 1.3				# our margin of error on our calculations..
 		BULLET_VELOCITY = 100			# meters per second..
+		DECOY_START_DELAY = 60		# amount of time to delay before activating the decoys
+		ENABLE_RANDOM_SHOTS = true
+
+		TRACE_LEVEL = 6
+		DEBUG_LEVEL = 5
+		INFO_LEVEL = 4
+		WARN_LEVEL = 3
+		ERROR_LEVEL = 2
+		FATAL_LEVEL = 1
+		OFF_LEVEL = 0
+		
 
 		# state
     def hunter
-			puts "#{@tank.index} hunter"
+
+			$log_level = INFO_LEVEL
+
+			trace "hunter"
 
       angvel 0
       speed 0
@@ -31,59 +42,58 @@ module BraveZealot
 			# initializes hunter_target_timeout
 			hunter_set_target_timer()
 
-			#if @tank.index == 8 or @tank.index == 9
-			if @tank.index == DECOY_TANK_INDEX
-				if @hunter_decoy_timer.nil?
-					@hunter_decoy_timer = Time.now.to_f
-				end
+			if @hunter_decoy_timer.nil?
+				@hunter_decoy_timer = Time.now.to_f
 			end
 
 			@state = :hunter_select_target
-			puts "#{@tank.index} hunter -> hunter_select_target"
+			debug "hunter -> hunter_select_target"
     end
 
 		# state
 		def hunter_select_target
-			puts "#{@tank.index} hunter_select_target"
+			trace "hunter_select_target"
 
       refresh($options.refresh) do
 
-				# send out our decoy after x number of seconds..
-				if @tank.index == DECOY_TANK_INDEX
-					puts "#{@tank.index} lapsed time = #{Time.now.to_f - @hunter_decoy_timer}"
-					if (Time.now.to_f - @hunter_decoy_timer) > START_DECOY_DELAY
-						@hunter_decoy_timer = nil
-						@state = :hunter_decoy
-						puts "#{@tank.index} hunter_select_target -> hunter_decoy"
-						next
-					end
+				if @tank.index == $decoy_index
+					@state = :hunter_decoy
+					debug "hunter_select_target -> hunter_decoy"
+					next
 				end
-
+	
 				# send out our capture the flag agents.. when we're down to a couple of enemies
 				if (enemies_alive <= MAX_ENEMIES_THRESHOLD) 
-					puts "#{@tank.index} enemies_alive = #{enemies_alive}"
+					trace "enemies_alive = #{enemies_alive}"
 					if @tank.index < CAPTURE_FLAG_INDEX_THRESHOLD
 						goal_enemy_flag()
 						@state = :hunter_capture_flag
-						puts "#{@tank.index} hunter_select_target -> hunter_capture_flag"
+						debug "hunter_select_target -> hunter_capture_flag"
 					else
-						goal_home_base
+						goal_home_base()
 						@state = :hunter_return_to_base
-						puts "#{@tank.index} hunter_select_target -> hunter_return_to_base"
+						debug "hunter_select_target -> hunter_return_to_base"
 					end
 					next
 				end
 
 				if do_we_need_to_find_a_new_target?
-					puts "#{@tank.index} selecting new target"
+					trace "selecting new target"
+
+					update_decoy
+
+					# i have some other targeting algorithms in mind, but random
+					# works much better than closest and our kill rates are high enough
+					# to justify not doing the extra work..
 					#hunter_select_closest_target()
 					hunter_select_random_target()
+
 					hunter_set_target_timer()
 				end
 
         unless @hunter_target.nil? then
           @state = :hunter_find_range
-					puts "#{@tank.index} hunter_select_target -> hunter_find_range"
+					debug "hunter_select_target -> hunter_find_range"
         end
       end
 		end
@@ -97,7 +107,7 @@ module BraveZealot
 				end
 			end
 	
-			puts "enemies_alive = #{count}"
+			trace "enemies_alive = #{count}"
 			return count
 		end
 
@@ -112,17 +122,12 @@ module BraveZealot
 
 		def do_we_need_to_find_a_new_target?
 
-			decoy_timer_expired = false
-
-			if @tank.index == DECOY_TANK_INDEX
-				# puts "#{@tank.index} lapsed time = #{Time.now.to_f - @hunter_decoy_timer}"
-				if (Time.now.to_f - @hunter_decoy_timer) > START_DECOY_DELAY
-					decoy_timer_expired = true
-					puts "#{@tank.index} decoy_timer_expired"
-				end
+			if ($decoy_index == @tank.index)
+				trace "decoy timer expired"
+				return true
 			end
 
-			return (hunter_target_timedout? or @hunter_target.nil? or not @hunter_target.alive? or decoy_timer_expired)
+			return (hunter_target_timedout? or @hunter_target.nil? or (not @hunter_target.alive?))
 		end
 
 		def hunter_select_random_target()
@@ -131,10 +136,10 @@ module BraveZealot
 				new_target = rand(@hq.map.othertanks.size)
 			end
 			@hunter_target = @hq.map.othertanks[new_target]
-			#puts "#{@tank.index} @hunter_target.status = #{@hunter_target.status}"
+			#trace "@hunter_target.status = #{@hunter_target.status}"
 
 			if (@hunter_target.nil?)
-				puts "#{@tank.index} @hunter_target = @hq.map.othertanks[new_target]"
+				fatal "@hunter_target = @hq.map.othertanks[new_target]"
 				Process.exit
 			end
 		end
@@ -150,7 +155,7 @@ module BraveZealot
             distance = dt
             @hunter_target = et
 						if (@hunter_target.nil?)
-							puts "#{@tank.index} @hunter_target = et"
+							fatal "@hunter_target = et"
 							Process.exit
 						end
           end
@@ -160,12 +165,12 @@ module BraveZealot
 
 		# state
     def hunter_find_range
-			puts "#{@tank.index} hunter_find_range"
+			trace "hunter_find_range"
 
 			if (do_we_need_to_find_a_new_target?)
-				puts "#{@tank.index} selecting new target"
+				trace "selecting new target"
 				@state = :hunter
-				puts "#{@tank.index} hunter_find_range -> hunter"
+				trace "hunter_find_range -> hunter"
 				return
 			end
 
@@ -177,9 +182,9 @@ module BraveZealot
 
 					if @hunter_target.nil?
 						@state = :hunter
-						puts "#{@tank.index} error: our hunter_target somehow went nil.."
-						puts ".\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n"
-						puts "#{@tank.index} hunter_find_range -> hunter"
+						error "error: our hunter_target somehow went nil.."
+						error ".\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n"
+						error "hunter_find_range -> hunter"
 						next
 					end
 
@@ -206,19 +211,23 @@ module BraveZealot
           if (diff.abs * FUDGE_FACTOR + eta) < to then
             @hunter_range = to
             @state = :hunter_hone_angle
-						puts "#{@tank.index} hunter_find_range -> hunter_hone_angle"
+						debug "hunter_find_range -> hunter_hone_angle"
             ###puts "found range to be #{@hunter_range}"
             hunter_hone_angle
           end
         end
-				shoot
+
+				if (ENABLE_RANDOM_SHOTS)
+					log_shot()
+					shoot
+				end
       end
 			# this state doesn't exist..
       #@state = :huntx if @hunter_target.nil?
     end
 
     def hunter_hone_angle
-			puts "#{@tank.index} hunter_hone_angle"
+			trace "hunter_hone_angle"
 
 			# it seems like at this point we should reset the refresh timer
 			# for this thread to a small period of time before we expect to
@@ -235,9 +244,9 @@ module BraveZealot
 
 					if @hunter_target.nil?
 						@state = :hunter
-						puts "#{@tank.index} error: our hunter_target somehow went nil.."
-						puts ".\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n"
-						puts "#{@tank.index} hunter_hone_angle -> hunter"
+						error "#our hunter_target somehow went nil.."
+						error ".\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n"
+						error "hunter_hone_angle -> hunter"
 						next
 					end
 
@@ -256,7 +265,13 @@ module BraveZealot
             EventMachine::Timer.new(diff) do 
               angvel 0
               EventMachine::Timer.new(@hunter_range - diff - eta) do
-                shoot
+								# how is this getting reset?
+								if @hunter_target.nil?
+									log_cancelled_shot
+								else
+									log_shot()
+		              shoot
+								end
               end
             end
             #@state = :hunter
@@ -269,9 +284,13 @@ module BraveZealot
             end
           end
           @state = :hunter_find_range
-					puts "#{@tank.index} hunter_hone_angle -> hunter_find_range"
+					debug "hunter_hone_angle -> hunter_find_range"
         end
-	      #shoot
+
+				if (ENABLE_RANDOM_SHOTS)
+					log_shot()
+					shoot
+				end
       end
     end
 
@@ -302,7 +321,7 @@ module BraveZealot
     end
 
     def hunter_decoy
-			puts "#{@tank.index} hunter_decoy"
+			trace "hunter_decoy"
 
 			if (enemies_alive <= MAX_ENEMIES_THRESHOLD) 
 				# retarget immediately so we can get moving..
@@ -311,16 +330,9 @@ module BraveZealot
 			end
 
 			if @hunter_timer.nil?
-				puts "#{@tank.index} set hunter timer"
+				trace "set hunter timer"
 				@hunter_timer = Time.now.to_f
-				puts "#{@tank.index} hunter_decoy -> hunter"
-			end
-
-			#puts "lapsed time = #{Time.now.to_f - @hunter_timer.to_f}"
-			if (Time.now.to_f - @hunter_timer.to_f) > DECOY_TIMER
-				@state = :defender
-				puts "#{@tank.index} hunter_decoy -> defender"
-				return
+				debug "hunter_decoy -> hunter"
 			end
 
       #puts "cv2 - iteration"
@@ -332,12 +344,12 @@ module BraveZealot
 
 		# state
 		def hunter_capture_flag
-			puts "#{@tank.index} hunter_capture_flag"
+			trace "hunter_capture_flag"
 
 			if @hq.flag_possession?
 				goal_home_base
 				@state = :hunter_return_to_base
-				puts "#{@tank.index} hunter_capture_flag -> hunter_return_to_base"
+				debug "hunter_capture_flag -> hunter_return_to_base"
 			else
 		    move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
 		    
@@ -365,14 +377,14 @@ module BraveZealot
 		end
 
 		def hunter_return_to_base
-			puts "#{@tank.index} hunter_return_to_base"
+			trace "hunter_return_to_base"
 
 			if hunter_goal_reached()
 				hunter_set_goal(nil)
 				@group = nil
 
 				@state = :hunter_defend_flag
-				puts "#{@tank.index} hunter_return_to_base -> hunter_defend_flag"
+				debug "hunter_return_to_base -> hunter_defend_flag"
 			else
 		    move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
 		    
@@ -383,11 +395,11 @@ module BraveZealot
 
 		# state
 		def hunter_defend_flag
-			puts "#{@tank.index} hunter_defend_flag"
+			trace "hunter_defend_flag"
 
 			hunter_set_goal(nil)
 			@state = :hunter
-			puts "#{@tank.index} hunter_defend_flag -> hunter"
+			debug "hunter_defend_flag -> hunter"
 		end
 
 		
@@ -403,6 +415,92 @@ module BraveZealot
 
 		def hunter_get_goal()
 			return @private_goal
+		end
+
+		# it feels like this should be done at a higher level
+		# than this, but I'm not sure how to integrate it in best with
+		# the existing code, so I'm just going to do it this way..
+		def update_decoy()
+
+			if $decoy_active.nil?
+				$decoy_active = false
+				$decoy_index = -1
+
+				# really this should be dependent on the amount of noise from the opponent..
+				# but since I don't think I can access that information, i'm opting to do it
+				# this way..
+				if @hq.map.othertanks.size > 10
+					$decoy_start_time = Time.now.to_f + DECOY_START_DELAY
+				else
+					$decoy_start_time = Time.now.to_f
+				end
+			end
+
+			if $decoy_start_time > Time.now.to_f
+				return
+			end
+
+			if $decoy_active
+				# verify the decoy is still alive, if so, then return immediately
+				if @hq.agents[$decoy_index].tank.status == 'normal'
+					return
+				else
+					$decoy_active = false
+					$decoy_index = -1
+				end
+			end
+
+			if $decoy_active == false
+				@hq.agents.each do |agent|
+					if agent.tank.status == 'normal'
+						$decoy_active = true
+						$decoy_index = agent.tank.index
+						break
+					end
+				end
+			end
+		end
+		#
+		# logging code
+		#
+
+		def trace(msg)
+			if ($log_level >= TRACE_LEVEL)
+				puts "trace #{@tank.index} #{msg}"
+			end
+		end
+		def debug(msg)
+			if ($log_level >= DEBUG_LEVEL)
+				puts "debug #{@tank.index} #{msg}"
+			end
+		end
+		def info(msg)
+			if ($log_level >= INFO_LEVEL)
+				puts "info  #{@tank.index} #{msg}"
+			end
+		end
+		def warn(msg)
+			if ($log_level >= WARN_LEVEL)
+				puts "warn  #{@tank.index} #{msg}"
+			end
+		end
+		def error(msg)
+			if ($log_level >= ERROR_LEVEL)
+				puts "error #{@tank.index} #{msg}"
+			end
+		end
+		def fatal(msg)
+			if ($log_level >= FATAL_LEVEL)
+				puts "fatal #{@tank.index} #{msg}"
+			end
+		end
+
+		def log_shot()
+			debug "shot fired at: #{@hunter_target.callsign}, #{@hunter_target.status}"
+		end
+
+		def log_cancelled_shot()
+			debug "cancelled shot"
 		end
   end
 end
