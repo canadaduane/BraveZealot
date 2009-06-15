@@ -75,10 +75,7 @@ module BraveZealot
         finish = Time.now()
         puts "-->time to re-calc shadows #{(finish-start).to_f}"
       end
-      complete_map = Astar.new(@side_length, @side_length, 0.0)
-      complete_map.add(@astar)
-      complete_map.add(@shadows_map)
-      complete_map
+      @shadows_map
     end
 
     def composite_map(freshness = 1.0)
@@ -168,6 +165,7 @@ module BraveZealot
         for row in 0...@side_length
           for col in 0...@side_length
             x, y = array_to_world_coordinates(col, row)
+            #puts "chunk (#{col},#{row}) has weight #{m[col,row]}, initial_weight = #{@astar.initial_weight}"
             pdf.rectangle(x, y, 1).stroke if m[col, row] != @astar.initial_weight
           end
         end
