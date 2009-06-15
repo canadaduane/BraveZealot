@@ -31,11 +31,10 @@ module BraveZealot
   end
 
   class Vector < Coord
-    def initialize(x, y)
-      @x = x
-      @y = y
+    def self.angle(theta)
+      Vector.new(Math::cos(theta), Math::sin(theta))
     end
-
+    
     # Find the cross_product of two vectors.  Useful for checking if a point
     # is inside of an obstacle.
     def cross(v)
@@ -60,7 +59,7 @@ module BraveZealot
     
     def angle_diff(other)
       theta = angle
-      phi = other.angle
+      phi = other.respond_to?(:angle) ? other.angle : other_segment
       Math.atan2(Math.sin(theta - phi), Math.cos(theta - phi))
     end
   end
