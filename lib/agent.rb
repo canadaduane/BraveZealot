@@ -11,6 +11,7 @@ bzrequire 'lib/agent_states/wild'
 bzrequire 'lib/agent_states/hunting'
 bzrequire 'lib/agent_states/random_search'
 bzrequire 'lib/agent_states/defender'
+bzrequire 'lib/agent_states/geurilla'
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -51,6 +52,7 @@ module BraveZealot
     include WildStates
 		# Tourmanet passoff states
 		include DefenderStates
+    include GeurillaStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank)

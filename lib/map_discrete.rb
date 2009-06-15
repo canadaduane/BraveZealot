@@ -12,6 +12,12 @@ module BraveZealot
       @side_length = (@world_size / @granularity).ceil
       # @map = Array.new(@side_length ** 2, 0)
       @astar = Astar.new(@side_length, @side_length, 100.0)
+
+      @shadows_calulated = false
+    end
+
+    def side_length
+      @side_length
     end
     
     # the coordinates generated from this put the item directly in the center of
@@ -44,51 +50,41 @@ module BraveZealot
       end
     end
 
-    def update_shadows
-      ws = world_size
-      layers = []
-      @othertanks.each do |ot|
-        a = Astar.new(@side_length, @side_length, 0.0)
-        @obstacles.each do |ob|
-          #find which two coords make up the max/min angle with where i am 
-          min = nil
-          min_ang = nil
-          max = nil
-          max_ang = nil
-          ob.coords.each do |c|
-            ang = Math::atan2(c.y - ot.y, c.x - ot.x)
-            if min.nil? then
-              min = c
-              min_ang = ang
-            elsif min_ang > ang then
-              min = c
-              min_ang = ang
-            end
-
-            if max.nil? then
-              max = c
-              max_ang = ang
-            elsif max_ang < ang then
-              max = c
-              max_ang = ang
-            end
-          end
-          
-          #now find a projection of the two points to make up 4 total points
-          v = ot.vector_to(min)
-          projected_min = Coord.new(min.x + (ws * v.x), min.y + (ws * v.y))
-          v = ot.vector_to(max)
-          projected_max = Coord.new(max.x + (ws * v.x), max.y + (ws * v.y))
-
-          #draw the shaded region onto the astar map
-          a.quad([min,max,projected_min,projected_max].map{ |c| world_to_array_coordinates(c.x,c.y)}, -1.0)
+    def shadows(freshness)
+      now = Time.now().to_f
+      @shadows_time ||= Time.mktime(0).to_f
+      if (now - @shadows_time) > freshness then
+        @shadows_time = now
+        if @shadows_map.nil? then
+          @shadows_map = Astar.new(@side_length, @side_length, 0.0)
+        else
+          @shadows_map.clear
         end
-        #add this astar map to my list of layers
-        layers.push(a)
+
+        start = Time.now()
+        layers = []
+        @othertanks.each do |ot|
+          if ot.alive? then
+            layers.push(ot.shadows(self, freshness))
+          end
+        end
+        #start = Time.now()
+        layers.each do |l|
+          @shadows_map.add(l)
+        end
+        finish = Time.now()
+        puts "-->time to re-calc shadows #{(finish-start).to_f}"
       end
-      layers.each do |l|
-        @astar.add(l)
-      end
+      complete_map = Astar.new(@side_length, @side_length, 0.0)
+      complete_map.add(@astar)
+      complete_map.add(@shadows_map)
+      complete_map
+    end
+
+    def composite_map(freshness = 1.0)
+      composite_map = Astar.new(@side_length, @side_length, 0.0)
+      composite_map.add(@astar)
+      composite_map.add(shadows(freshness))
     end
     
     def coord_to_index(x, y)
@@ -103,9 +99,23 @@ module BraveZealot
       # "Draw" the obstacles onto the search grid
       obstacles.each do |o|
         vertices = o.coords.map{ |c| world_to_array_coordinates(c.x, c.y) }
-        @astar.quad(vertices, -1.0)
+        @astar.quad(vertices, -10000.0)
       end
-      update_shadows
+
+      #shadows(0.5)
+    end
+
+    def shadow_search(start,goal)
+      sx, sy = world_to_array_coordinates(start.x, start.y)
+      gx, gy = world_to_array_coordinates(goal.x, goal.y)
+      
+      
+
+      if (path = composite_map.search(sx, sy, gx, gy))
+        path = path.map do |x, y|
+          Coord.new(*array_to_world_coordinates(x, y))
+        end
+      end
     end
     
     def search(start, goal, smoothness = 2)
