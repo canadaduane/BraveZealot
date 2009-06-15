@@ -2,15 +2,6 @@ module BraveZealot
   module RandomSearchStates
     def rsr
       # rsr_stochastics
-      periodically(0.5) do
-        if hq.enemy_flags.size > 0
-          enemy_color = hq.enemy_flags.first.color
-          ahead = hq.enemies_ahead(@tank, @tank.angle, enemy_color, Math::PI/8)
-          if ahead.size > 0 and @tank.vector_to(ahead.first).length < 200
-            periodically(0.1, 3){ shoot }
-          end
-        end
-      end
       rsr_choose_destination
     end
     

@@ -43,6 +43,7 @@ def start_server(bzfs, world)
     "-set _tankAngVel 0.5 " +
     "-set _rejoinTime 0 " +
     "-set _grabOwnFlag 0 " +
+    "-set _explodeTime 240 " +
     (world ? "-world #{File.expand_path(world)} " : "") +
     ">server.log 2>server.log"
   shell cmd
