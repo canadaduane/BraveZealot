@@ -603,6 +603,42 @@ static VALUE astar_polygon(VALUE self, VALUE rb_ary_coords, VALUE rb_weight)
     return self;
 }
 
+static VALUE astar_edges(VALUE self, VALUE rb_weight)
+{
+    Check_Type(rb_weight, T_FLOAT);
+
+    int width             = NUM2INT(rb_iv_get(self, "@width"));
+    int height            = NUM2INT(rb_iv_get(self, "@height"));
+    double initial_weight = NUM2DBL(rb_iv_get(self, "@initial_weight"));
+    double weight         = NUM2DBL(rb_weight);
+    
+    Chunk* map;
+    Data_Get_Struct(self, Chunk, map);
+    
+    int x, y;
+    for (y = 1; y < height-1; y++)
+    {
+        int pos = AT(1, y);
+        for (x = 1; x < width-1; x++)
+        {
+            if (map[pos].weight != initial_weight &&
+                    (
+                    map[pos-1].weight == initial_weight ||
+                    map[pos+1].weight == initial_weight ||
+                    map[pos+width].weight == initial_weight ||
+                    map[pos-width].weight == initial_weight
+                    )
+                )
+            {
+                map[pos].weight = weight;
+            }
+            pos++;
+        }
+    }
+    
+    return self;
+}
+
 static VALUE astar_add(VALUE self, VALUE rb_other)
 {
     int width        = NUM2INT(rb_iv_get(self, "@width"));
@@ -682,4 +718,5 @@ void Init_astar() {
     // Addition and subtraction of grids
     rb_define_method(Astar, "add", astar_add, 1);
     rb_define_method(Astar, "sub", astar_sub, 1);
+    rb_define_method(Astar, "edges", astar_edges, 1);
 }

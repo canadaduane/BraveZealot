@@ -54,7 +54,7 @@ module BraveZealot
                   end
                   
                   # Periodically take PDF snapshots of the world
-                  periodic_action(2, 30) { write_pdf }
+                  periodic_action(2, 60) { write_pdf }
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
@@ -308,7 +308,9 @@ module BraveZealot
     # Array of enemy tanks within +radians+ of coord & theta
     def enemies_ahead(coord, theta, enemy_color, radians = Math::PI/4)
       direction = Vector.angle(theta)
-      tanks_on_team(enemy_color).select{ |t| direction.angle_diff(coord.vector_to(t)) < radians }
+      tanks_on_team(enemy_color).select do |t|
+        direction.angle_diff(coord.vector_to(t)).abs < radians
+      end
     end
     
     
@@ -318,9 +320,8 @@ module BraveZealot
       Proc.new {
         nearby = enemies_nearby(agent.tank, enemy_color, 50)
         ahead  = enemies_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/4)
-        if nearby.size > 0
-          agent.set_state(:killer, :target => nearby[0])
-        end
+        target = nearby.first || ahead.first
+        agent.set_state(:assassin, :target => target) unless target.nil?
       }
     end
     
@@ -330,32 +331,33 @@ module BraveZealot
         # Choose one enemy for now
         enemy_color = flags.first.color
         enemy_flag = get_flag(enemy_color)
+        enemies = tanks_on_team(enemy_color)
         
         # Only strategize with living agents
         ags = living_agents
         # puts "HQ: I have #{ags.size} agents"
         
-        enemy_near_me = Proc.new {
-          
-        }
-        
-        
-        
-        case ags.size
-        when 0 then
-          puts "Ah! We're dead. No agents left."
-        when 1 then
-          puts "Only one agent left... Kamakaze!!"
-          ags[0].set_state(:seek, :goal => enemy_flag)
-          ags[0].periodically(0.5) { ags[0].shoot }
-        when 2 then
-          puts "Two agents left... one defense one offense"
-          ags = agents_nearest(enemy_flag, 2)
-          ags[0].set_state(:seek, :goal => enemy_flag, :abort => enemy_near_me(ags[0]))
-          ags[1].set_state(:seek, :goal => our_flag)
-        else
-          puts "I don't know what to do with 3 or more agents right now"
+        if enemies.size > 0
+          puts "Targetting enemy: #{enemies.first.callsign}"
+          ags.first.set_state(:assassin, :target_tank => enemies.first)
         end
+        
+        # case ags.size
+        # when 0 then
+        #   puts "Ah! We're dead. No agents left."
+        # when 1 then
+        #   puts "Only one agent left... Kamakaze!!"
+        #   ags[0].set_state(:seek, :goal => enemy_flag)
+        #   ags[0].periodically(0.5) { ags[0].shoot }
+        # when 2 then
+        #   puts "Two agents left... one defense one offense"
+        #   ags = agents_nearest(enemy_flag, 2)
+        #   ags[0].set_state(:seek, :goal => enemy_flag,
+        #                    :abort => kill_if_enemy_ahead(ags[0], enemy_color))
+        #   ags[1].set_state(:seek, :goal => our_flag)
+        # else
+        #   puts "I don't know what to do with 3 or more agents right now"
+        # end
         
         # @map.flags.each do |flag|
         #   score = base_defense_score(flag.color)
@@ -363,8 +365,8 @@ module BraveZealot
         # end
       else
         puts "No enemies on map"
-        @base_target ||= @map.bases.select{ |b| b.color != @my_color }.randomly_pick(1).first
-        living_agents.each{ |a| a.set_state(:seek, :goal => @base_target.center) }
+        # @base_target ||= @map.bases.select{ |b| b.color != @my_color }.randomly_pick(1).first
+        # living_agents.each{ |a| a.set_state(:seek, :goal => @base_target.center) }
       end
     end
     

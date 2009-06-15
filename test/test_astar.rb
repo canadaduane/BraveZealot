@@ -204,6 +204,31 @@ class AstarTest < Test::Unit::TestCase
     end
   end
   
+  def test_edges
+    grid = Astar.new(7, 7)
+    
+    grid.edges(-1.0)
+    assert_grid_uniformly_equal 0, grid
+    
+    grid.rectangle(2,2,  4,4,  1.0)
+    assert_grid_equal [[0,0,0,0,0,0,0],
+                       [0,0,0,0,0,0,0],
+                       [0,0,1,1,1,0,0],
+                       [0,0,1,1,1,0,0],
+                       [0,0,1,1,1,0,0],
+                       [0,0,0,0,0,0,0],
+                       [0,0,0,0,0,0,0]], grid
+    
+    grid.edges(2.0)
+    assert_grid_equal [[0,0,0,0,0,0,0],
+                       [0,0,0,0,0,0,0],
+                       [0,0,2,2,2,0,0],
+                       [0,0,2,1,2,0,0],
+                       [0,0,2,2,2,0,0],
+                       [0,0,0,0,0,0,0],
+                       [0,0,0,0,0,0,0]], grid
+  end
+  
   # def test_random_large
   #   @arr = []
   #   1000000.times{ @arr << (rand*1000).to_int }

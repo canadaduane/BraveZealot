@@ -11,6 +11,7 @@ bzrequire 'lib/agent_states/wild'
 bzrequire 'lib/agent_states/hunting'
 bzrequire 'lib/agent_states/random_search'
 bzrequire 'lib/agent_states/defender'
+bzrequire 'lib/agent_states/assassin'
 bzrequire 'lib/agent_states/geurilla'
 require 'ruby-debug'
 
@@ -50,8 +51,9 @@ module BraveZealot
     include GaussianAccelerationStates
     # Non-conforming Pigeons
     include WildStates
-		# Tourmanet passoff states
-		include DefenderStates
+    # Tourmanet passoff states
+    include DefenderStates
+    include AssassinStates
     include GeurillaStates
     
     # See above for definitions of hq and tank

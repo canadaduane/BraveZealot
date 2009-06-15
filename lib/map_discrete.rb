@@ -101,6 +101,7 @@ module BraveZealot
         vertices = o.coords.map{ |c| world_to_array_coordinates(c.x, c.y) }
         @astar.quad(vertices, -10000.0)
       end
+      @astar.edges(1000.0)
     end
     
     def search(start, goal, smoothness = 2, use_composite = false)
