@@ -300,14 +300,14 @@ module BraveZealot
     end
     
     # Array of enemy tanks within +radius+ of +coord+
-    def enemies_nearby(coord, enemy_color, radius = 350)
-      tanks_on_team(enemy_color).select{ |t| coord.vector_to(t).length < radius }
+    def tanks_nearby(coord, color, radius = 350)
+      tanks_on_team(color).select{ |t| coord.vector_to(t).length < radius }
     end
     
     # Array of enemy tanks within +radians+ of coord & theta
-    def enemies_ahead(coord, theta, enemy_color, radians = Math::PI/4)
+    def tanks_ahead(coord, theta, color, radians = Math::PI/4)
       direction = Vector.angle(theta)
-      tanks_on_team(enemy_color).select do |t|
+      tanks_on_team(color).select do |t|
         direction.angle_diff(coord.vector_to(t)).abs < radians
       end
     end
@@ -317,8 +317,8 @@ module BraveZealot
     
     def kill_if_enemy_ahead(agent, enemy_color)
       Proc.new {
-        nearby = enemies_nearby(agent.tank, enemy_color, 50)
-        ahead  = enemies_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/6)
+        nearby = tanks_nearby(agent.tank, enemy_color, 50)
+        ahead  = tanks_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/6)
         target = nearby.first || ahead.first
         if target and @tank.vector_to(target).length < 375
           agent.set_state(:assassinate, :target_tank => target)
@@ -385,15 +385,16 @@ module BraveZealot
           EM::Timer.new(20){ @grp_defend = nil }
         end
         
-        # If enemy's flag is mostly undefended, send closest 2 agents to grab it
-        if  (@grp_offense.nil? or @grp_offense.size < 2) and
+        # If enemy's flag is mostly undefended, send closest 3 agents to grab it
+        if  @dispersed and
+            (@grp_offense.nil? or @grp_offense.size < 3) and
             defense_score(enemy_flag, enemy_color, 150) <= 1
           puts "Enemy flag is mostly undefended"
-          @grp_offense = agents_nearest(enemy_flag, 2)
+          @grp_offense = agents_nearest(enemy_flag, 3)
           @grp_offense.each do |agent|
             agent.set_state(:capture_flag)
           end
-        elsif !@grp_offense.all?{ |a| ags.include?(a) }
+        elsif @grp_offense and !@grp_offense.all?{ |a| ags.include?(a) }
           @grp_offense.delete_if do |agent|
             !ags.include?(agent)
           end

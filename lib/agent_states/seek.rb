@@ -6,6 +6,19 @@ module BraveZealot
       # Look for the enemy flag if no goal is currently set
       seek_enemy_flag if @goal.nil?
       
+      periodically(0.5) do
+        if hq.enemy_flags.size > 0
+          enemy_color = hq.enemy_flags.first.color
+          enemies_ahead = hq.tanks_ahead(@tank, @tank.angle, enemy_color, Math::PI/8)
+          # friends_ahead = hq.tanks_ahead(@tank, @tank.angle, hq.my_color, Math::PI/8)
+          friends_ahead = 0 # don't worry about shooting our teammates since we can't
+          if enemies_ahead.size > friends_ahead.size and
+             @tank.vector_to(enemies_ahead.first).length < 200
+            periodically(0.1, 3){ shoot }
+          end
+        end
+      end unless @seek_no_shoot
+      
       # Update the larger path plan every second or so
       periodically(5.0) { seek_update_path }
       

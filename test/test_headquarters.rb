@@ -18,17 +18,17 @@ module BraveZealot
       end
     end
     
-    def test_enemies_ahead
-      enemies = @hq.enemies_ahead(Coord.new(0, 0), Math::PI/2, "red")
+    def test_tanks_ahead
+      enemies = @hq.tanks_ahead(Coord.new(0, 0), Math::PI/2, "red")
       assert_equal ["t1", "t2"], enemies.map{ |e| e.callsign }
       
-      enemies = @hq.enemies_ahead(Coord.new(1, 5), 0, "red")
+      enemies = @hq.tanks_ahead(Coord.new(1, 5), 0, "red")
       assert_equal ["t2", "t3"], enemies.map{ |e| e.callsign }
       
-      enemies = @hq.enemies_ahead(Coord.new(-1, 5), Math::PI, "red")
+      enemies = @hq.tanks_ahead(Coord.new(-1, 5), Math::PI, "red")
       assert_equal [], enemies.map{ |e| e.callsign }
       
-      enemies = @hq.enemies_ahead(Coord.new(1, 5), Math::PI, "red")
+      enemies = @hq.tanks_ahead(Coord.new(1, 5), Math::PI, "red")
       assert_equal ["t1"], enemies.map{ |e| e.callsign }
     end
     
