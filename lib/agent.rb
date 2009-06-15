@@ -1,5 +1,5 @@
 bzrequire 'lib/communicator'
-Dir.glob(File.join(File.dirname(__FILE__), 'agent_states', '*')) do |astate|
+Dir.glob(File.join(File.dirname(__FILE__), 'agent_states', '*.rb')) do |astate|
   require astate
 end
 require 'ruby-debug'
