@@ -44,10 +44,14 @@ module BraveZealot
                   @map.observe_mytanks(r)
                   
                   # BEGIN!
-                  #@agents.each_with_index do |a, i|
-                  #  initial_state = $options.initial_state[i]
-                  #  a.begin_state_loop(initial_state)
-                  #end
+                  @agents.each_with_index do |a, i|
+                    if $options.strategy
+                      initial_state = :dummy
+                    else
+                      initial_state = $options.initial_state[i]
+                    end
+                    a.begin_state_loop(initial_state)
+                  end
                   
                   # Periodically take PDF snapshots of the world
                   periodic_action(2, 30) { write_pdf }
@@ -56,7 +60,7 @@ module BraveZealot
                   periodic_update
                   
                   # Make strategic decisions every once in a while
-                  #periodic_action(5) { strategize }
+                  periodic_action(1) { strategize } if $options.strategy
                 end
               end
             end
@@ -227,16 +231,28 @@ module BraveZealot
       @map.flags.select{ |f| f.color != @my_color }
     end
     
-    def enemy_bases
-      @map.bases.select{ |b| b.color != @my_color }
+    def enemy_colors
+      enemy_flags.map{ |f| f.color }
     end
     
+    # Return an array of bases that have associated enemy tanks
+    # (Note: does not return unused bases)
+    def enemy_bases
+      colors = enemy_colors
+      @map.bases.select{ |b| colors.include?(b.color) }
+    end
+    
+    # Returns living tanks on a given team
     def tanks_on_team(color)
       if color == @my_color
-        @map.mytanks
+        @map.mytanks.select{ |t| t.status == "normal" }
       else
-        @map.othertanks.select{ |t| t.color == color }
+        @map.othertanks.select{ |t| t.color == color && t.status == "normal" }
       end
+    end
+    
+    def living_agents
+      @agents.select{ |a| a.tank.status == "normal" }
     end
     
     # Returns true if the enemy's flag is in the game world
@@ -246,10 +262,9 @@ module BraveZealot
     
     # Returns true if any of our tanks possesses an enemy flag
     def we_have_enemy_flag?
-      @agents.any? do |t|
-        #puts "t.tank.flag = #{t.tank.flag}"
-        t.tank.flag != "none" &&
-        t.tank.flag != @my_color
+      @agents.any? do |a|
+        a.tank.flag != "none" &&
+        a.tank.flag != @my_color
       end
     end
     
@@ -275,12 +290,51 @@ module BraveZealot
       enemy_bases.select{ |b| base_defense_score(b.color) == 0 }
     end
     
+    # Return an array of the agents nearest to +coord+, in order of nearest to farthest
+    def agents_nearest(count, coord)
+      if coord.respond_to?(:vector_to)
+        @agents.sort_by{ |a| coord.vector_to(a).length }[0...count]
+      else
+        []
+      end
+    end
+    
+    
     # *** The General's Quarters, Strategy, etc. ***
     
     def strategize
-      @map.flags.each do |flag|
-        score = base_defense_score(flag.color)
-        puts "Team: #{flag.color}, defense score: #{score}"
+      flags = enemy_flags()
+      if flags.size > 0
+        # Choose one enemy for now
+        enemy_color = flags.first.color
+        enemy_flag = get_flag(enemy_color)
+        
+        # Only strategize with living agents
+        ags = living_agents
+        # puts "HQ: I have #{ags.size} agents"
+        
+        case ags.size
+        when 1 then
+          puts "Only one agent left... Kamakaze!!"
+          ags[0].set_state(:seek, :goal => enemy_flag)
+          ags[0].periodically(0.5) { ags[0].shoot }
+        when 2 then
+          puts "Two agents left... one defense one offense"
+          ags = agents_nearest(2, enemy_flag)
+          ags[0].set_state(:seek, :goal => enemy_flag)
+          ags[1].set_state(:seek, :goal => our_flag)
+        else
+          puts "I don't know what to do with 3 or more agents right now"
+        end
+        
+        # @map.flags.each do |flag|
+        #   score = base_defense_score(flag.color)
+        #   puts "Team: #{flag.color}, defense score: #{score}"
+        # end
+      else
+        puts "No enemies on map"
+        @base_target ||= @map.bases.select{ |b| b.color != @my_color }.randomly_pick(1).first
+        living_agents.each{ |a| a.set_state(:seek, :goal => @base_target.center) }
       end
     end
     

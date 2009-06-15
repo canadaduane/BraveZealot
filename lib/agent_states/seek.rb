@@ -38,6 +38,7 @@ module BraveZealot
               angvel move.angvel
             end
           else
+            @short_path = nil # so it doesn't show up on the pdf output
             transition(:seek_fast, :seek_field)
           end
         else

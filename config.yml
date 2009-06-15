@@ -2,8 +2,8 @@
   :server:        "127.0.0.1"
   :port:          6000
   :initial_state: "smart,dummy"
-  :random_path:   false
   :refresh:       0.1
+  :strategy:      false
   :debug:         false
   :abort_on_int:  true
 # This line makes ctrl-C dump a PDF map of the world:
