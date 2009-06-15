@@ -346,7 +346,7 @@ module BraveZealot
 		def hunter_capture_flag
 			trace "hunter_capture_flag"
 
-			if @hq.flag_possession?
+			if @hq.we_have_enemy_flag?
 				goal_home_base
 				@state = :hunter_return_to_base
 				debug "hunter_capture_flag -> hunter_return_to_base"
