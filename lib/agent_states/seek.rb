@@ -14,7 +14,7 @@ module BraveZealot
       #     friends_ahead = 0 # don't worry about shooting our teammates since we can't
           # if enemies_ahead.size > friends_ahead.size and
           #    @tank.vector_to(enemies_ahead.first).length < 200
-            periodically(0.1, 3){ shoot }
+            periodically(0.1){ shoot }
           # end
       #   end
       # end unless @seek_no_shoot

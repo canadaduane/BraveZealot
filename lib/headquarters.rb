@@ -361,9 +361,9 @@ module BraveZealot
         if !@tracking_flag and enemy_has_our_flag?
           @tracking_flag = true
           enemy = enemy_with_our_flag
-          @grp_kill.each do |agent|
-            agent.set_state(:capture_flag)
-          end
+          # @grp_kill.each do |agent|
+          #   agent.set_state(:capture_flag)
+          # end
           @grp_kill = agents_nearest(enemy, 2)
           @grp_kill.each do |agent|
             agent.push_next_state(:assassinate_done, :done)
