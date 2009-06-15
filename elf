@@ -150,7 +150,7 @@ opts = OptionParser.new do |opts|
     $options.team = t
   end
 
-  opts.on("-i", "--initial-state [LIST,OF,STATES]", "(e.g. 'dummy', 'smart')") do |i|
+  opts.on("-i", "--initial-state [LIST,OF,STATES]", "(e.g. 'dummy', 'capture_flag')") do |i|
     $options.initial_state = i
   end
 
