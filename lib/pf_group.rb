@@ -58,13 +58,13 @@ module BraveZealot
       
       return dx, dy
     end
-
+    
     # suggest a move
     def suggest_move(current_x, current_y, current_angle)
-      dx,dy = suggest_delta(current_x,current_y)
+      dx, dy = suggest_delta(current_x,current_y)
       #print "current angle is #{current_angle}\n"
-      #print "the goal angle is #{ang_g}\n";
       ang_g = Math.atan2(dy,dx)
+      #print "the goal angle is #{ang_g}\n";
       distance = Math.sqrt(dx**2 + dy**2)
 
       #print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"
@@ -87,13 +87,12 @@ module BraveZealot
       m = Move.new(speed, angvel)
 
       #if we don't need to move, then lets not spin
-      if ( speed < 0.01 ) then
-        angvel = 0
-      end
+      angvel = 0 if ( speed < 0.01 )
 
       # And the final factor in our speed is based on how far off our desired
       # angle we are (Note: we should never be turning more than pi)
-      speed = m.speed()*((2*((((Math::PI - a.abs()).abs())) / Math::PI ))-1)
+      
+      speed = m.speed * ( 2 * ( Math::PI - a.abs() ).abs() / Math::PI - 1 )
       # puts "Sugg speed: #{speed}"
       #speed = m.speed()*((((((Math::PI - a.abs()).abs())) / Math::PI )))
       

@@ -182,6 +182,28 @@ class AstarTest < Test::Unit::TestCase
     assert_nil none.search(0,0, 3,3)
   end
   
+  def test_out_of_bounds
+    grid = Astar.new(4, 4)
+    assert_raise(Exception) { grid.get(4, 5) }
+    assert_raise(Exception) { grid.get(0, -1) }
+    assert_raise(Exception) { grid.set(4, 5, -1.0) }
+    assert_raise(Exception) { grid.set(-1, 5, -1.0) }
+  end
+  
+  def test_add_grids
+    grid1 = Astar.new(4, 4, 1.0)
+    grid2 = Astar.new(4, 4, 0.0)
+    grid2[1, 1] = -1.0
+    
+    assert_grid_equal [[1,1,1,1],[1,0,1,1],[1,1,1,1],[1,1,1,1]], grid1.add(grid2)
+    assert_grid_uniformly_equal -1, grid2.sub(grid1)
+    
+    assert_raise(Exception) do
+      grid3 = Astar.new(4, 5)
+      grid1.add(grid3)
+    end
+  end
+  
   # def test_random_large
   #   @arr = []
   #   1000000.times{ @arr << (rand*1000).to_int }
@@ -201,7 +223,7 @@ class AstarTest < Test::Unit::TestCase
         @large = Astar.new(1000, 1000)
       end
       x.report("Search a 1,000,000 node graph") do
-        @large.search(0,0,999,999)
+        @large.search(0,0,  999,999)
       end
       x.report("Draw 500 obstacles of size 500x500") do
         500.times do

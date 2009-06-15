@@ -1,23 +1,17 @@
 bzrequire 'lib/coord'
 bzrequire 'lib/team_colors'
+bzrequire 'lib/rect_methods'
 
 require 'pdf/writer'
 
 module BraveZealot
-  class Base < Struct.new(:color, :coords)
-    def center
-      if @center.nil? then
-        x = 0.0
-        y = 0.0
-        coords.each do |c|
-          x += c.x
-          y += c.y
-        end
-        x = x/coords.size
-        y = y/coords.size
-        @center = Coord.new(x,y)
-      end
-      @center
+  class Base
+    attr_accessor :color, :coords
+    
+    include RectMethods
+    
+    def initialize(color, coords)
+      @color, @coords = color, coords
     end
     
     def to_pdf(pdf = nil, options = {})

@@ -1,5 +1,6 @@
 bzrequire 'lib/map'
 bzrequire 'lib/astar/astar'
+require 'rubystats/normal_distribution'
 
 module BraveZealot
   class MapDiscrete < Map
@@ -106,13 +107,15 @@ module BraveZealot
       end
     end
     
-    def search(start, goal, smoothness = 3)
+    def search(start, goal, smoothness = 2)
       sx, sy = world_to_array_coordinates(start.x, start.y)
       gx, gy = world_to_array_coordinates(goal.x, goal.y)
-      path = @astar.search(sx, sy, gx, gy).map do |x, y|
-        Coord.new(*array_to_world_coordinates(x, y))
+      if (path = @astar.search(sx, sy, gx, gy))
+        path = path.map do |x, y|
+          Coord.new(*array_to_world_coordinates(x, y))
+        end
+        smoothen_path!(path, smoothness)
       end
-      smoothen_path!(path, smoothness)
     end
     
     def smoothen_path!(path, iters = 3)
@@ -123,6 +126,23 @@ module BraveZealot
         end
       end
       path
+    end
+    
+    def randomize_path!(path, wander_variance = 40, smoothness = 5)
+      return if path.nil? or path.size <= 2
+      wander  = Rubystats::NormalDistribution.new(0, wander_variance)
+      
+      path[1..-2].each do |coord|
+        begin
+          wx, wy = wander.rng, wander.rng
+          check_coord = Coord.new(coord.x + wx, coord.y + wy)
+        end while !in_world_space?(check_coord)
+        
+        coord.x = check_coord.x
+        coord.y = check_coord.y
+      end
+      
+      smoothen_path!(path, smoothness)
     end
     
     # Find a random place on the map that isn't blocked by an obstacle
@@ -143,8 +163,8 @@ module BraveZealot
         
         pdf.stroke_style(PDF::Writer::StrokeStyle.new(1))
         pdf.stroke_color Color::RGB::Red
-        for row in 0..@side_length
-          for col in 0..@side_length
+        for row in 0...@side_length
+          for col in 0...@side_length
             x, y = array_to_world_coordinates(col, row)
             pdf.rectangle(x, y, 1).stroke if @astar[col, row] != @astar.initial_weight
           end
@@ -152,7 +172,7 @@ module BraveZealot
         
         if options[:paths]
           pdf.stroke_style(PDF::Writer::StrokeStyle.new(2))
-          pdf.stroke_color Color::RGB::Red
+          pdf.stroke_color Color::RGB::Blue
           # p options[:paths]
           options[:paths].each do |path|
             if path and path.size > 1

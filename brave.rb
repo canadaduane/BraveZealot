@@ -41,6 +41,10 @@ opts = OptionParser.new do |opts|
     $options.initial_state = i
   end
 
+  opts.on("-n", "--random-path", "(e.g. 'dummy', 'smart')") do
+    $options.random_path = true
+  end
+
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|
     $options.refresh = r.to_f
   end
@@ -49,7 +53,7 @@ opts = OptionParser.new do |opts|
     $options.gnuplot_file = r
   end
 
-  opts.on("-d", "--debug", "Do you want to see the detailed gnuplot?") do |r|
+  opts.on("-d", "--debug", "Do you want to see the detailed gnuplot?") do
     $options.debug = true
   end
 end

@@ -50,12 +50,14 @@ module BraveZealot
                   #end
                   
                   # Periodically take PDF snapshots of the world
-                  periodic_snapshot(2, 30)
+                  periodic_action(2, 30) { write_pdf }
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
-
                   @map.update_shadows
+                  
+                  # Make strategic decisions every once in a while
+                  #periodic_action(5) { strategize }
                 end
               end
             end
@@ -78,19 +80,14 @@ module BraveZealot
       end))
       # Do it immediately
       action_wrapper.call
+      timer
     end
     
-    def periodic_snapshot(period = 0.5, maximum = nil)
-      periodic_action(period, maximum) do
-        write_pdf
-      end
-    end
-
     def periodic_update(period = 0.3)
       # puts "periodic update"
       
-      # Get up to 10 samples of the obstacles
-      periodic_action(period * 1.5, 50) do
+      # Get up to 25 samples of the obstacles
+      periodic_action(period * 1.5, 25) do
         obstacles
       end
       
@@ -102,42 +99,6 @@ module BraveZealot
         sleep(third * 2.0) { mytanks; othertanks    }
         sleep(third * 3.0) { shots                  }
       end
-    end
-    
-    def enemy_flags
-      @map.flags.select{ |f| f.color != @my_color }
-    end
-    
-    # Returns true if the enemy's flag is in the game world
-    def enemy_flag_exists?
-      !(enemy_flags.empty?)
-    end
-    
-    # Returns true if any of our tanks possesses an enemy flag
-    def flag_possession?
-      @agents.any? do |t|
-        #puts "t.tank.flag = #{t.tank.flag}"
-        t.tank.flag != "none" &&
-        t.tank.flag != @my_color
-      end
-    end
-    
-    def create_flag_goal
-      flag_goal = PfGroup.new
-      flag_goal.add_obstacles(@map.obstacles)
-      refresh(:flags, 0.5) do
-        enemy_flags = @map.flags.select{ |f| f.color != @my_color }
-        puts "adding flag goal at #{enemy_flags.first.x}, #{enemy_flags.first.y}"
-        flag_goal.add_goal(enemy_flags.first.x, enemy_flags.first.y, @map.world_size) unless enemy_flags.empty?
-      end
-      flag_goal
-    end
-    
-    def create_home_base_goal
-      base_goal = PfGroup.new
-      base_goal.add_obstacles(@map.obstacles)
-      base_goal.add_goal(@my_base.center.x, @my_base.center.y, @map.size)
-      base_goal
     end
     
     # Note: estimate_world_time may be non-continuous because @world_time is
@@ -180,37 +141,27 @@ module BraveZealot
       EventMachine::Timer.new(time, &block)
     end
     
-    def on_flags(r)
-      @map.flags = r.flags
-    end
-    
     def on_bases(r)
       @map.bases = r.bases
       @my_base = @map.bases.find{ |b| b.color == @my_color }
     end
     
+    def on_flags(r)
+      @map.observe_flags(r)
+    end
+
     def on_obstacles(r)
       @map.observe_obstacles(r)
     end
 
     def on_othertanks(r)
-      # @map.othertanks = r.othertanks
       @map.observe_othertanks(r)
     end
     
     def on_mytanks(r)
       @map.observe_mytanks(r)
-      #@map.mytanks = r.mytanks
-      #r.mytanks.each do |t|
-      #  @agents[t.index].tank = t if @agents.size > t.index
-      #end
     end
 
-    def disconnect
-      EventMachine::stop_event_loop
-      exit(0)
-    end
-    
     def write_pdf
       @pdf_count ||= 0
       file = $options.pdf_file || "map.pdf"
@@ -220,7 +171,8 @@ module BraveZealot
       # @obstacles.each{ |o| o.coords.each{ |c| distributions << c.kalman_distribution } } if @obstacles
       # @map.mytanks.each{ |t| distributions << t.kalman_distribution }
       # @map.othertanks.each{ |t| distributions << t.kalman_distribution }
-      paths = @agents.select{ |a| a.respond_to? :path }.map{ |a| a.path }
+      paths = @agents.map{ |a| a.path }
+      paths += @agents.select{ |a| !a.short_path.nil? }.map{ |a| a.short_path }
       @map.to_pdf(nil,
         :my_color      => my_color,
         :paths         => paths,
@@ -246,5 +198,92 @@ module BraveZealot
         end
       end
     end
+    
+    def disconnect
+      EventMachine::stop_event_loop
+      exit(0)
+    end
+    
+    
+    
+    # *** Game Objects and Pattern Matching Methods ***
+    
+    def get_flag(color)
+      @map.flags.find{ |f| f.color == color }
+    end
+    
+    def our_flag
+      get_flag(@my_color)
+    end
+    
+    def get_base(color)
+      @map.bases.find{ |b| b.color == color }
+    end
+    
+    def our_base
+      get_base(@my_color)
+    end
+    
+    def enemy_flags
+      @map.flags.select{ |f| f.color != @my_color }
+    end
+    
+    def enemy_bases
+      @map.bases.select{ |b| b.color != @my_color }
+    end
+    
+    def tanks_on_team(color)
+      if color == @my_color
+        @map.mytanks
+      else
+        @map.othertanks.select{ |t| t.color == color }
+      end
+    end
+    
+    # Returns true if the enemy's flag is in the game world
+    def enemy_flag_exists?
+      !(enemy_flags.empty?)
+    end
+    
+    # Returns true if any of our tanks possesses an enemy flag
+    def we_have_enemy_flag?
+      @agents.any? do |t|
+        #puts "t.tank.flag = #{t.tank.flag}"
+        t.tank.flag != "none" &&
+        t.tank.flag != @my_color
+      end
+    end
+    
+    def enemy_has_our_flag?
+      @map.othertanks.any? do |o|
+        o.tank.flag == @my_color
+      end
+    end
+    
+    def our_flag_at_base?
+      our_base.contains_point?(our_flag)
+    end
+    
+    # Returns the number of tanks defending a base
+    def base_defense_score(color, radius = 50)
+      base = get_base(color)
+      tanks_on_team(color).inject(0) do |sum, tank|
+        sum + (base.center.vector_to(tank).length < radius ? 1 : 0)
+      end
+    end
+    
+    def undefended_enemy_bases
+      enemy_bases.select{ |b| base_defense_score(b.color) == 0 }
+    end
+    
+    # *** The General's Quarters, Strategy, etc. ***
+    
+    def strategize
+      @map.flags.each do |flag|
+        score = base_defense_score(flag.color)
+        puts "Team: #{flag.color}, defense score: #{score}"
+      end
+    end
+    
   end
 end
