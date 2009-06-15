@@ -44,16 +44,18 @@ module BraveZealot
                   @map.observe_mytanks(r)
                   
                   # BEGIN!
-                  @agents.each_with_index do |a, i|
-                    initial_state = $options.initial_state[i]
-                    a.begin_state_loop(initial_state)
-                  end
+                  #@agents.each_with_index do |a, i|
+                  #  initial_state = $options.initial_state[i]
+                  #  a.begin_state_loop(initial_state)
+                  #end
                   
                   # Periodically take PDF snapshots of the world
                   periodic_snapshot(2, 30)
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
+
+                  @map.update_shadows
                 end
               end
             end

@@ -1,4 +1,4 @@
-require 'rubystats/normal_distribution'
+#require 'rubystats/normal_distribution'
 
 module BraveZealot
   module RandomSearchStates
