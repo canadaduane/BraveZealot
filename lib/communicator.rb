@@ -86,7 +86,7 @@ module BraveZealot
       end
     
       def add(item)
-        @value ||= []
+        @value = [] unless @value.is_a?(Array)
         @value << item
       end
     end
