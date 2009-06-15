@@ -273,9 +273,15 @@ module BraveZealot
       end
     end
     
+    def enemy_with_our_flag
+      @map.othertanks.find do |o|
+        o.flag == @my_color
+      end
+    end
+    
     def enemy_has_our_flag?
       @map.othertanks.any? do |o|
-        o.tank.flag == @my_color
+        o.flag == @my_color
       end
     end
     
@@ -349,6 +355,22 @@ module BraveZealot
             agent.set_state(:disperse)
           end
           EM::Timer.new(10){ @dispersed = true }
+        end
+        
+        # If the enemy has our flag, go after him
+        if !@tracking_flag and enemy_has_our_flag?
+          @tracking_flag = true
+          enemy = enemy_with_our_flag
+          @grp_kill.each do |agent|
+            agent.set_state(:capture_flag)
+          end
+          @grp_kill = agents_nearest(enemy, 2)
+          @grp_kill.each do |agent|
+            agent.push_next_state(:assassinate_done, :done)
+            agent.push_next_state(:seek_done, :done)
+            agent.set_state(:assassinate, :target_tank => enemy)
+          end
+          EM::Timer.new(15){ @tracking_flag = false }
         end
         
         if @dispersed and @grp_middle.nil?
