@@ -2,7 +2,7 @@ bzrequire 'lib/coord'
 bzrequire 'lib/team_colors'
 bzrequire 'lib/rect_methods'
 
-require 'pdf/writer'
+# require 'pdf/writer'
 
 module BraveZealot
   class Base

@@ -2,7 +2,7 @@ bzrequire 'lib/obstacle.rb'
 bzrequire 'lib/indent'
 bzrequire 'lib/team_colors'
 
-require 'pdf/writer'
+# require 'pdf/writer'
 
 module BraveZealot
   class Map
