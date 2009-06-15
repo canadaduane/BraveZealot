@@ -386,7 +386,7 @@ module BraveZealot
           end
           # Assign remaining to geurilla tactics
           @grp_middle.each do |agent|
-            agent.set_state(:geurilla, :geurilla_goal => enemy_flag)
+            agent.set_state(:rsr)
           end
           @grp_kill.each do |agent|
             if enemy = enemies_nearest(agent.tank, enemy_color, 1).first
@@ -409,8 +409,8 @@ module BraveZealot
         
         # If enemy's flag is mostly undefended, send closest 3 agents to grab it
         if  @dispersed and
-            (@grp_offense.nil? or @grp_offense.size < 3) and
-            defense_score(enemy_flag, enemy_color, 150) <= 1
+            (@grp_offense.nil? or @grp_offense.size < 3)
+            # defense_score(enemy_flag, enemy_color, 150) <= 1
           puts "Enemy flag is mostly undefended"
           @grp_offense = agents_nearest(enemy_flag, 3)
           @grp_offense.each do |agent|
