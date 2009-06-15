@@ -11,7 +11,8 @@ module BraveZealot
     end
     
     def alive?
-      status != 'dead'
+			#puts "#{callsign} status == #{status}"
+      status == 'normal'
     end
 
     def to_pdf(pdf = nil, options = {})

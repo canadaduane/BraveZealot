@@ -58,7 +58,6 @@ module BraveZealot
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
-                  @map.update_shadows
                   
                   # Make strategic decisions every once in a while
                   periodic_action(1) { strategize } if $options.strategy
