@@ -7,7 +7,7 @@ module BraveZealot
       seek_enemy_flag if @goal.nil?
       
       # Update the larger path plan every second or so
-      periodically(1.0) { seek_update_path }
+      periodically(5.0) { seek_update_path }
       
       # Default to a fast-action agent
       transition(:seek, :seek_fast)
@@ -85,12 +85,17 @@ module BraveZealot
       
     def seek_vector_move(vector)
       delta = vector.angle_diff(@tank)
-      # puts "current | x: #{@tank.x}, y: #{@tank.y}"
-      # puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
-      # puts "target angle: #{vector.angle}"
-      # puts "delta: #{delta}"
+      puts "current | x: #{@tank.x}, y: #{@tank.y}"
+      puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
+      puts "target angle: #{vector.angle}"
+      puts "delta: #{delta}"
+
+      speed = 1.0
+      speed *= ( 2 * ( Math::PI - delta.abs() ).abs() / Math::PI - 1 )
       
-      return Move.new(1.0, delta * 3) #/ (10 * $options.refresh))
+      angvel = delta / (5 * $options.refresh)
+      
+      return Move.new(speed, angvel)
     end
     
   end

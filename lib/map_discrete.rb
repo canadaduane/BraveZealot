@@ -105,6 +105,7 @@ module BraveZealot
         vertices = o.coords.map{ |c| world_to_array_coordinates(c.x, c.y) }
         @astar.quad(vertices, -1.0)
       end
+      @astar.edges(1000.0)
       update_shadows
     end
     
