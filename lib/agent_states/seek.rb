@@ -24,7 +24,7 @@ module BraveZealot
     
     def seek_fast
       if @tank.vector_to(@goal).length <= @proximity
-        transition(:seek_fast, :seek_arrived)
+        transition(:seek_fast, :seek_done)
       else
         seek_update_path
         if @path
@@ -51,8 +51,11 @@ module BraveZealot
     end
     
     def seek_field
-      if @tank.vector_to(@goal).length <= @proximity
-        transition(:seek_field, :seek_arrived)
+      distance = @tank.vector_to(@goal).length
+      if distance <= @proximity
+        transition(:seek_field, :seek_done)
+      elsif distance > 50
+        transition(:seek_field, :seek_fast)
       else
         group = PfGroup.new
         group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 1))
@@ -63,39 +66,30 @@ module BraveZealot
       end
     end
     
-    def seek_arrived
+    def seek_done
       puts "\nseek arrived\n"
-      transition(:seek_arrived, :seek_enemy_flag)
+      transition(:seek_done, :wait)
     end
     
-    def seek_enemy_flag
-      if hq.enemy_flag_exists?
-        @goal = hq.enemy_flags.randomly_pick(1).first
-        puts "Seeking enemy flag: #{@goal.color} at (#{@goal.x}, #{@goal.y})"
-        transition(:seek_enemy_flag, :seek)
-      else
-        # Remain in :smart_look_for_enemy_flag state otherwise
-      end
-    end
+    protected
     
-    def seek_home_base
-      @goal = hq.my_base.center
-      puts "Seeking home base: (#{@goal.x}, #{@goal.y})"
-      transition(:seek_home_base, :seek)
-    end
-    
-      
     def seek_vector_move(vector)
       delta = vector.angle_diff(@tank)
       puts "current | x: #{@tank.x}, y: #{@tank.y}"
       puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
       puts "target angle: #{vector.angle}"
       puts "delta: #{delta}"
-
-      speed = 1.0
-      speed *= ( 2 * ( Math::PI - delta.abs() ).abs() / Math::PI - 1 )
+      
+      if delta.abs > Math::PI / 2
+        speed = -1.0
+      else
+        speed = 1.0
+      end
+      # speed *= ( 2 * ( Math::PI - delta.abs() ).abs() / Math::PI - 1 )
       
       angvel = delta / (5 * $options.refresh)
+      
+      puts "suggested speed: #{speed}, angvel: #{angvel}"
       
       return Move.new(speed, angvel)
     end
