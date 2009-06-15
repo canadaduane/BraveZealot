@@ -1,5 +1,6 @@
 bzrequire 'lib/kalman'
 bzrequire 'lib/coord'
+bzrequire 'lib/shadow_methods'
 
 module BraveZealot
   class MyTank < Struct.new(:index, :callsign, :status,
@@ -8,6 +9,7 @@ module BraveZealot
     
     include Kalman
     include XYMethods
+    include ShadowMethods
     
     def speed
       Math.sqrt(vx**2 + vy**2)

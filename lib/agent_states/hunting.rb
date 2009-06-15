@@ -179,7 +179,6 @@ module BraveZealot
 
       refresh($options.refresh) do
         range_options.each do |to|
-
           if @hunter_target.nil?
             @state = :hunter
             error "error: our hunter_target somehow went nil.."
@@ -243,7 +242,7 @@ module BraveZealot
         @hq.refresh(:othertanks, $options.refresh) do
 
           if @hunter_target.nil?
-            @state = :hunter
+            @state = :hunter_done
             error "#our hunter_target somehow went nil.."
             error ".\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n.\n"
             error "hunter_hone_angle -> hunter"
@@ -292,6 +291,10 @@ module BraveZealot
           shoot
         end
       end
+    end
+
+    def hunter_done
+      transition(:hunter_done, :hunter)
     end
 
     def hunter_calc_diff(p)
