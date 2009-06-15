@@ -344,13 +344,17 @@ module BraveZealot
 
 		# state
 		def hunter_capture_flag
-			trace "hunter_capture_flag"
+      $num_capture ||= 0
+      if $num_capture < 2 then
+        $num_capture += 1
+        trace "hunter_capture_flag"
 
-			push_next_state(:seek, :sniper_flag_captured)
-      f = hq.enemy_flags.first
-      puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
-      @goal = Coord.new(f.x, f.y)
-      @state = :seek
+        push_next_state(:seek_arrived, :seek_home_base)
+        f = hq.enemy_flags.first
+        puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
+        
+        @state = :seek_enemy_flag
+      end
     end
 
 		def goal_enemy_flag
