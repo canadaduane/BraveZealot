@@ -349,7 +349,7 @@ module BraveZealot
         $num_capture += 1
         trace "hunter_capture_flag"
 
-        push_next_state(:seek_arrived, :seek_home_base)
+        push_next_state(:seek_done, :seek_home_base)
         f = hq.enemy_flags.first
         puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
         

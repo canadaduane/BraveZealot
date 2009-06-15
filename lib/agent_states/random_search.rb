@@ -21,7 +21,7 @@ module BraveZealot
       # puts "RSR Path Before: #{@path.inspect}"
       # hq.map.randomize_path!(@path)
       # puts "RSR Path After: #{@path.inspect}"
-      push_next_state(:seek_arrived, :rsr_choose_destination)
+      push_next_state(:seek_done, :rsr_choose_destination)
       transition(:rsr_choose_destination, :seek)
     end
     

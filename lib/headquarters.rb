@@ -46,7 +46,7 @@ module BraveZealot
                   # BEGIN!
                   @agents.each_with_index do |a, i|
                     if $options.strategy
-                      initial_state = :dummy
+                      initial_state = :wait
                     else
                       initial_state = $options.initial_state[i]
                     end
@@ -340,6 +340,8 @@ module BraveZealot
         if enemies.size > 0
           puts "Targetting enemy: #{enemies.first.callsign}"
           ags.first.set_state(:assassin, :target_tank => enemies.first)
+        else
+          puts "No enemies to target (#{@map.othertanks.inspect})"
         end
         
         # case ags.size

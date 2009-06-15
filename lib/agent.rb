@@ -75,7 +75,7 @@ module BraveZealot
       puts "\nStarting agent #{@tank.index}: #{@state}"
       # Change state up to every +refresh+ seconds
       @state_loop = EventMachine::PeriodicTimer.new($options.refresh) do
-        # puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
     end
@@ -127,15 +127,18 @@ module BraveZealot
       @state = @next_state[state].shift || default
     end
     
+    # Sets the primary state of the agent, cancels timers etc.
     def set_state(state, options = {}, &abort)
-      options[:abort] = abort unless abort.nil?
-      # Set all appropriate instance variables
-      options.each do |k, v|
-        instance_variable_set("@#{k}", v)
+      if @set_state != state
+        @set_state = @state = state
+        options[:abort] = abort unless abort.nil?
+        # Set all appropriate instance variables
+        options.each do |k, v|
+          instance_variable_set("@#{k}", v)
+        end
+        cancel_timers
+        @next_state = {}
       end
-      cancel_timers
-      @next_state = {}
-      @state = state
     end
     
     def refresh(freshness, &block)
