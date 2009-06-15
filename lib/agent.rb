@@ -68,7 +68,7 @@ module BraveZealot
       puts "\nStarting agent #{@tank.index}: #{@state}"
       # Change state up to every +refresh+ seconds
       @state_loop = EventMachine::PeriodicTimer.new($options.refresh) do
-        puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        # puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
     end
