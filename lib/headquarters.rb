@@ -385,11 +385,12 @@ module BraveZealot
           EM::Timer.new(20){ @grp_defend = nil }
         end
         
-        # If enemy's flag is mostly undefended, send closest 2 agents to grab it
-        if  (@grp_offense.nil? or @grp_offense.size < 2) and
+        # If enemy's flag is mostly undefended, send closest 3 agents to grab it
+        if  @dispersed and
+            (@grp_offense.nil? or @grp_offense.size < 3) and
             defense_score(enemy_flag, enemy_color, 150) <= 1
           puts "Enemy flag is mostly undefended"
-          @grp_offense = agents_nearest(enemy_flag, 2)
+          @grp_offense = agents_nearest(enemy_flag, 3)
           @grp_offense.each do |agent|
             agent.set_state(:capture_flag)
           end

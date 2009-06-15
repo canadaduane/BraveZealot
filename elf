@@ -44,6 +44,8 @@ def start_server(bzfs, world)
     "-set _rejoinTime 0 " +
     "-set _grabOwnFlag 0 " +
     "-set _explodeTime 240 " +
+    "-ms 3 " +
+    "-noTeamKills " +
     (world ? "-world #{File.expand_path(world)} " : "") +
     ">server.log 2>server.log"
   shell cmd
@@ -59,7 +61,7 @@ end
 
 def start_robot(options)
   cmd = "#{options.bzrobots} " +
-    (options.noise ? "-posnoise 5 " : "") +
+    (options.noise ? "-posnoise #{options.noise} " : "") +
     "-team #{options.team} " +
     "-solo #{options.members} " +
     "-p #{options.robot_port} " +
@@ -102,6 +104,7 @@ $options = OpenStruct.new(
   :robot_port    => nil,
   :members       => 1,
   :team          => "green",
+  :noise         => false,
   :callsign      => nil,
   :initial_state => "dummy",
   :show_options  => false,
@@ -167,8 +170,8 @@ opts = OptionParser.new do |opts|
     $options.debug = true
   end
 
-  opts.on("-n", "--noise", "Turn Normal noise on") do |d|
-    $options.noise = true
+  opts.on("-n", "--noise [AMOUNT]", "Turn Normal noise on") do |d|
+    $options.noise = d
   end
 end
 
