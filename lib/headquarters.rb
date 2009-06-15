@@ -373,29 +373,35 @@ module BraveZealot
           EM::Timer.new(15){ @tracking_flag = false }
         end
         
-        if @dispersed and @grp_middle.nil?
-          others = ags.
-            reject{ |a| (@grp_defense || []).include? a}.
-            reject{ |a| (@grp_offense || []).include? a}
-          if others.size > 2
-            @grp_kill = others[0..1]
-            @grp_middle = others[2..-1]
-          else
-            @grp_kill = []
-            @grp_middle = others
+        # if @dispersed and @grp_middle.nil?
+        #   others = ags.
+        #     reject{ |a| (@grp_defense || []).include? a}.
+        #     reject{ |a| (@grp_offense || []).include? a}
+        #   if others.size > 2
+        #     @grp_kill = others[0..1]
+        #     @grp_middle = others[2..-1]
+        #   else
+        #     @grp_kill = []
+        #     @grp_middle = others
+        #   end
+        #   # Assign remaining to geurilla tactics
+        #   @grp_middle.each do |agent|
+        #     agent.set_state(:rsr)
+        #   end
+        #   @grp_kill.each do |agent|
+        #     if enemy = enemies_nearest(agent.tank, enemy_color, 1).first
+        #       agent.push_next_state(:assassinate_done, :done)
+        #       agent.push_next_state(:seek_done, :done)
+        #       agent.set_state(:assassinate, :target_tank => enemy)
+        #     end
+        #   end
+        #   EM::Timer.new(30){ @grp_middle = nil }
+        # end
+        
+        if @dispersed
+          ags.each do |agent|
+            agent.set_state(:capture_flag, :goal => enemy_flag)
           end
-          # Assign remaining to geurilla tactics
-          @grp_middle.each do |agent|
-            agent.set_state(:rsr)
-          end
-          @grp_kill.each do |agent|
-            if enemy = enemies_nearest(agent.tank, enemy_color, 1).first
-              agent.push_next_state(:assassinate_done, :done)
-              agent.push_next_state(:seek_done, :done)
-              agent.set_state(:assassinate, :target_tank => enemy)
-            end
-          end
-          EM::Timer.new(30){ @grp_middle = nil }
         end
         
         if @grp_defense.nil? and ags.size > 2 and our_defense_score == 0
@@ -407,20 +413,20 @@ module BraveZealot
           EM::Timer.new(20){ @grp_defend = nil }
         end
         
-        # If enemy's flag is mostly undefended, send closest 3 agents to grab it
-        if  @dispersed and
-            (@grp_offense.nil? or @grp_offense.size < 3)
-            # defense_score(enemy_flag, enemy_color, 150) <= 1
-          puts "Enemy flag is mostly undefended"
-          @grp_offense = agents_nearest(enemy_flag, 3)
-          @grp_offense.each do |agent|
-            agent.set_state(:capture_flag)
-          end
-        elsif @grp_offense and !@grp_offense.all?{ |a| ags.include?(a) }
-          @grp_offense.delete_if do |agent|
-            !ags.include?(agent)
-          end
-        end
+        # # If enemy's flag is mostly undefended, send closest 3 agents to grab it
+        # if  @dispersed and
+        #     (@grp_offense.nil? or @grp_offense.size < 3)
+        #     # defense_score(enemy_flag, enemy_color, 150) <= 1
+        #   puts "Enemy flag is mostly undefended"
+        #   @grp_offense = agents_nearest(enemy_flag, 3)
+        #   @grp_offense.each do |agent|
+        #     agent.set_state(:capture_flag)
+        #   end
+        # elsif @grp_offense and !@grp_offense.all?{ |a| ags.include?(a) }
+        #   @grp_offense.delete_if do |agent|
+        #     !ags.include?(agent)
+        #   end
+        # end
           
         # if enemies.size > 0
         #   puts "Targetting enemy: #{enemies.first.callsign}"
