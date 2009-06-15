@@ -1,18 +1,7 @@
 bzrequire 'lib/communicator'
-bzrequire 'lib/agent_states/dummy'
-bzrequire 'lib/agent_states/seek'
-bzrequire 'lib/agent_states/decoy'
-bzrequire 'lib/agent_states/sniper'
-bzrequire 'lib/agent_states/sitting_duck'
-bzrequire 'lib/agent_states/constant_velocity'
-bzrequire 'lib/agent_states/constant_acceleration'
-bzrequire 'lib/agent_states/gaussian_acceleration'
-bzrequire 'lib/agent_states/wild'
-bzrequire 'lib/agent_states/hunting'
-bzrequire 'lib/agent_states/random_search'
-bzrequire 'lib/agent_states/defender'
-bzrequire 'lib/agent_states/assassin'
-bzrequire 'lib/agent_states/geurilla'
+Dir.glob(File.join(File.dirname(__FILE__), 'agent_states', '*')) do |astate|
+  require astate
+end
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -53,8 +42,10 @@ module BraveZealot
     include WildStates
     # Tourmanet passoff states
     include DefenderStates
-    include AssassinStates
+    include AssassinateStates
+    include CaptureFlagStates
     include GeurillaStates
+    include DisperseStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank)
@@ -111,10 +102,6 @@ module BraveZealot
       @times[symbol] = time
     end
     
-    def wait
-      # do nothing
-    end
-    
     def push_next_state(state, next_state)
       @next_state ||= {}
       @next_state[state] ||= []
@@ -139,6 +126,16 @@ module BraveZealot
         cancel_timers
         @next_state = {}
       end
+    end
+    
+    def wait
+      speed 0.0
+      angvel 0.0
+      # do nothing
+    end
+    
+    def done
+      @set_state = nil
     end
     
     def refresh(freshness, &block)

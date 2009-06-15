@@ -51,8 +51,11 @@ module BraveZealot
     end
     
     def seek_field
-      if @tank.vector_to(@goal).length <= @proximity
+      distance = @tank.vector_to(@goal).length
+      if distance <= @proximity
         transition(:seek_field, :seek_done)
+      elsif distance > 50
+        transition(:seek_field, :seek_fast)
       else
         group = PfGroup.new
         group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 5, 1))

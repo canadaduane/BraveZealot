@@ -339,7 +339,9 @@ module BraveZealot
         
         if enemies.size > 0
           puts "Targetting enemy: #{enemies.first.callsign}"
-          ags.first.set_state(:assassin, :target_tank => enemies.first)
+          ags.first.push_next_state(:assassinate_done, :done)
+          ags.first.push_next_state(:seek_done, :done)
+          ags.first.set_state(:assassinate, :target_tank => enemies.first)
         else
           puts "No enemies to target (#{@map.othertanks.inspect})"
         end
