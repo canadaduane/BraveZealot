@@ -1,5 +1,9 @@
 module BraveZealot
   module GeurillaStates
+    TARGET_TIMEOUT = 8        # amount of time (seconds) to wait before selecting a new target
+    FUDGE_FACTOR = 1.3        # our margin of error on our calculations..
+    BULLET_VELOCITY = 100     # meters per second..
+
     def geurilla
       push_next_state(:geurilla_take_cover_done, :geurilla_status_check)
       @state = :geurilla_take_cover
@@ -14,10 +18,12 @@ module BraveZealot
       x,y = hq.map.array_to_world_coordinates(col,row)
       @goal = Coord.new(x,y)
       @state = :seek
-      push_next_state(:seek_arrived, :geurilla_take_cover_done)
+      push_next_state(:seek_done, :geurilla_take_cover_done)
+      puts " geurilla_take_cover -> seek"
     end
 
     def geurilla_take_cover_done
+      puts " geurilla_take_cover_done -> ?"
       transition(:geurilla_take_cover_done, :geurilla_status_check)
     end
 
@@ -31,7 +37,7 @@ module BraveZealot
         (-11..11).each do |row_mod|
           new_col = col+col_mod
           new_row = row+row_mod
-          if new_col >= 0 and new_col <= hq.map.side_length and new_row >= 0 and new_row <= hq.map.side_length then
+          if new_col >= 0 and new_col < hq.map.side_length and new_row >= 0 and new_row < hq.map.side_length then
             w = world[new_col, new_row]
             if w >= 0 and w < current_weight then
               puts "found shadier spot at #{ new_col },#{ new_row }"
@@ -44,20 +50,23 @@ module BraveZealot
     end
 
     def geurilla_trap
+      speed 0
+      angvel 0
       @geurilla_ranges ||= [0.0, 0.10, 0.25, 0.50, 0.75, 1.0, 1.5, 2.0]
       unless geurilla_enemy_in_range?
         @state = :geurilla_trap_done
       else
-        shadow_map = @tank.shadows(0.5)
+        shadow_map = @tank.shadows(hq.map,0.5)
         soonest = 100.0
         soonest_position = nil
         soonest_enemy = nil
 
-        geurilla_closest_enemies.each do |ot|
+        geurilla_closest_enemies.each do |o|
+          ot = o.tank
           @geurilla_ranges.each do |r|
             ep = ot.kalman_predicted_mu(r)
             epc = Coord.new(ep[0], ep[3])
-            col,row = hq.map.world_to_array_coordinates(c.x, c.y)
+            col,row = hq.map.world_to_array_coordinates(epc.x, epc.y)
             if shadow_map[col,row] == 0.0 and r < soonest
               puts "found a solution in #{r} sec @ #{col},#{row}"
               soonest = r
@@ -69,14 +78,97 @@ module BraveZealot
         end
 
         # were we unable to find a solution?
-        unless soonest_enemy.nil?
+        if soonest_enemy.nil?
           puts "no solutions available"
           @state = :geurilla_trap_done
         else
-          push_next_state(:hunter_done, :geurilla_status_check)
-          @hunter_target = soonest_enemy
-          @hunter_target_timeout = Time.now.to_f + 3.0
-          @state = :hunter_find_range
+          @guerilla_target = soonest_enemy
+          geurilla_set_target_timer
+          @state = :geurilla_find_range
+        end
+      end
+    end
+
+    def geurilla_target_timedout?
+      current = Time.now.to_f
+      return current > @geurilla_target_timeout
+    end
+
+    def geurilla_set_target_timer()
+      @geurilla_target_timeout = Time.now.to_f + TARGET_TIMEOUT
+    end
+
+     def geurilla_find_range
+      #these are the ranges we will check
+      range_options = [0.25, 0.50, 0.75, 1.0, 1.25, 1.50, 1.75, 2.00, 2.50]
+
+      refresh($options.refresh) do
+        range_options.each do |to|
+          if @geurilla_target.nil?
+            @state = :geurilla_status_check
+            next
+          end
+
+          #expected position
+          ep = @geurilla_target.kalman_predicted_mu(to)
+          epc = Coord.new(ep[0], ep[3])
+
+          #figure out how long the bullet has to travel
+          d = @tank.to_coord.vector_to(epc).length
+          eta = d / BULLET_VELOCITY
+
+          #figure out how long we have to turn for
+          diff = geurilla_calc_diff(epc)
+
+          if (diff.abs * FUDGE_FACTOR + eta) < to then
+            @geurilla_range = to
+            @state = :geurilla_hone_angle
+            geurilla_hone_angle
+          end
+        end
+      end
+    end
+
+    def geurilla_hone_angle
+      refresh($options.refresh) do
+        @hq.refresh(:othertanks, $options.refresh) do
+
+          if @geurilla_target.nil?
+            @state = :geurilla_trap_done
+            next
+          end
+
+          ep = @geurilla_target.kalman_predicted_mu(@geurilla_range)
+          epc = Coord.new(ep[0], ep[3])
+
+          d = @tank.to_coord.vector_to(epc).length
+          eta = d/BULLET_VELOCITY
+
+          diff = hunter_calc_diff(epc)
+
+          if diff.abs < $options.refresh then
+            #puts "Taking the shot - turn for #{diff}sec and then shoot - eta=#{eta}"
+            angvel((diff < 0.0) ? -1 : 1)
+            EventMachine::Timer.new(diff) do 
+              angvel 0
+              EventMachine::Timer.new(@geurilla_range - diff - eta) do
+                # how is this getting reset?
+                unless @geurilla_target.nil?
+                  shoot
+                end
+              end
+            end
+            #@state = :hunter
+            #puts "#{@tank.index} hunter_hone_angle -> hunter"
+          else
+            if (eta + diff) < @geurilla_range then
+              n = diff / (2*$options.refresh)
+              #puts "setting my angvel to #{n}"
+              angvel n
+            end
+          end
+          @state = :geurilla_find_range
+          debug "hunter_hone_angle -> hunter_find_range"
         end
       end
     end
@@ -102,7 +194,7 @@ module BraveZealot
       end
     end
 
-    def guerilla_opportunity
+    def geurilla_opportunity
       transition(:geurilla_opportunity, :geurilla_status_check)
     end
 
@@ -110,7 +202,7 @@ module BraveZealot
       if geurilla_closest_enemies.empty?
         return false
       else
-        dist = @tank.vector_to(geurilla_closest_enemies.first).length
+        dist = @tank.vector_to(geurilla_closest_enemies.first.tank).length
         return (dist < 50.0)
       end
     end
@@ -123,10 +215,10 @@ module BraveZealot
         @geurilla_closest = hq.agents_nearest(Coord.new(@tank.x, @tank.y), num_enemies)
         puts "getting closest enemies from HQ #{@geurilla_closest}"
         if @geurilla_closest.nil? then
-          @guerilla_closest = []
+          @geurilla_closest = []
         end
       end
-      @guerilla_closest
+      @geurilla_closest
     end
 
     def guerilla_goal
