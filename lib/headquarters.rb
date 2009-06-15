@@ -386,7 +386,7 @@ module BraveZealot
           end
           # Assign remaining to geurilla tactics
           @grp_middle.each do |agent|
-            agent.set_state(:rsr)
+            agent.set_state(:geurilla, :geurilla_goal => enemy_flag)
           end
           @grp_kill.each do |agent|
             if enemy = enemies_nearest(agent.tank, enemy_color, 1).first
@@ -402,7 +402,7 @@ module BraveZealot
           puts "No one is defending our flag"
           @grp_defense = agents_nearest(our_flag, ags.size > 3 ? 2 : 1)
           @grp_defense.each do |agent|
-            agent.set_state(:defend, :goal => our_flag)
+            agent.set_state(:geurilla, :goal => our_flag)
           end
           EM::Timer.new(20){ @grp_defend = nil }
         end
