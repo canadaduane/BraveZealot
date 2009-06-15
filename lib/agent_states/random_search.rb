@@ -1,4 +1,3 @@
-
 module BraveZealot
   module RandomSearchStates
     def rsr

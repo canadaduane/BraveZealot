@@ -35,6 +35,14 @@ module BraveZealot
       end
       
     end
+
+    def astar
+      if @astar.nil? then
+        update_astar
+      end 
+      @astar
+    end
+
   end
 end
 
