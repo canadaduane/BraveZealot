@@ -54,7 +54,7 @@ module BraveZealot
                   end
                   
                   # Periodically take PDF snapshots of the world
-                  periodic_action(2, 60) { write_pdf }
+                  # periodic_action(2, 60) { write_pdf }
 
                   # Update obstacles, flags, tanks, shots
                   periodic_update
