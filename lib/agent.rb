@@ -23,9 +23,9 @@ module BraveZealot
     # state :: Symbol  -> :capture_flag, :home
     # goal :: Coord   -> Coordinate indicating where the agent is headed
     attr_accessor :state, :goal
-    attr_accessor :group
     attr_accessor :path, :short_path
     attr_accessor :timers
+    attr_accessor :priorities
     
     include DummyStates
     include SeekStates
@@ -46,12 +46,14 @@ module BraveZealot
     include CaptureFlagStates
     include GeurillaStates
     include DisperseStates
+    include DefendStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank)
       @hq, @tank = hq, tank
       @goal = nil
       @timers = []
+      @priorities = []
       # Satisfactory proximity of tank to its destination
       @proximity = 8
     end
@@ -66,7 +68,7 @@ module BraveZealot
       puts "\nStarting agent #{@tank.index}: #{@state}"
       # Change state up to every +refresh+ seconds
       @state_loop = EventMachine::PeriodicTimer.new($options.refresh) do
-        # puts "Agent #{@tank.index} entering state #{@state.inspect}"
+        puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
     end
@@ -126,6 +128,12 @@ module BraveZealot
         cancel_timers
         @next_state = {}
       end
+    end
+    
+    def idle?
+      @state == :wait ||
+      @state == :done ||
+      @state.nil?
     end
     
     def wait

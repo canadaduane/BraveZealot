@@ -292,7 +292,11 @@ module BraveZealot
     
     # Return an array of the agents nearest to +coord+, in order of nearest to farthest
     def agents_nearest(coord, count)
-      @agents.sort_by{ |a| coord.vector_to(a.tank).length }[0...count]
+      living_agents.sort_by{ |a| coord.vector_to(a.tank).length }[0...count]
+    end
+    
+    def enemies_nearest(coord, enemy_color, count)
+      tanks_on_team(enemy_color).sort_by{ |t| coord.vector_to(t).length }[0...count]
     end
     
     # Array of enemy tanks within +radius+ of +coord+
@@ -332,24 +336,69 @@ module BraveZealot
         
         # Only strategize with living agents
         ags = living_agents
-        # puts "HQ: I have #{ags.size} agents"
+        puts "HQ: I have #{ags.size} agents"
+        # p ags.map{ |a| a.assignment }
+        
+        our_defense_score = defense_score(our_flag, @my_color, 50)
         
         # If we're all crowded around our base, move out
-        if defense_score(our_flag, @my_color, 50) == ags.size
-          puts "Dispersing agents near home base"
-          ags.each do |agent|
+        if @grp_crowded.nil? and our_defense_score == ags.size
+          puts "Flag area is crowded"
+          @grp_crowded = ags.select{ |a| a.idle? }
+          @grp_crowded.each do |agent|
             agent.set_state(:disperse)
           end
+          EM::Timer.new(10){ @dispersed = true }
+        end
+        
+        if @dispersed and @grp_middle.nil?
+          others = ags.
+            reject{ |a| (@grp_defense || []).include? a}.
+            reject{ |a| (@grp_offense || []).include? a}
+          if others.size > 2
+            @grp_kill = others[0..1]
+            @grp_middle = others[2..-1]
+          else
+            @grp_kill = []
+            @grp_middle = others
+          end
+          # Assign remaining to geurilla tactics
+          @grp_middle.each do |agent|
+            agent.set_state(:rsr)
+          end
+          @grp_kill.each do |agent|
+            if enemy = enemies_nearest(agent.tank, enemy_color, 1).first
+              agent.push_next_state(:assassinate_done, :done)
+              agent.push_next_state(:seek_done, :done)
+              agent.set_state(:assassinate, :target_tank => enemy)
+            end
+          end
+          EM::Timer.new(30){ @grp_middle = nil }
+        end
+        
+        if @grp_defense.nil? and ags.size > 2 and our_defense_score == 0
+          puts "No one is defending our flag"
+          @grp_defense = agents_nearest(our_flag, ags.size > 3 ? 2 : 1)
+          @grp_defense.each do |agent|
+            agent.set_state(:defend, :goal => our_flag)
+          end
+          EM::Timer.new(20){ @grp_defend = nil }
         end
         
         # If enemy's flag is mostly undefended, send closest 2 agents to grab it
-        if defense_score(enemy_flag, enemy_color, 150) <= 1
-          puts "Sending two agents to capture flag"
-          agents_nearest(enemy_flag, 2).each do |agent|
+        if  (@grp_offense.nil? or @grp_offense.size < 2) and
+            defense_score(enemy_flag, enemy_color, 150) <= 1
+          puts "Enemy flag is mostly undefended"
+          @grp_offense = agents_nearest(enemy_flag, 2)
+          @grp_offense.each do |agent|
             agent.set_state(:capture_flag)
           end
+        elsif !@grp_offense.all?{ |a| ags.include?(a) }
+          @grp_offense.delete_if do |agent|
+            !ags.include?(agent)
+          end
         end
-        
+          
         # if enemies.size > 0
         #   puts "Targetting enemy: #{enemies.first.callsign}"
         #   ags.first.push_next_state(:assassinate_done, :done)

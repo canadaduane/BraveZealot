@@ -75,10 +75,10 @@ module BraveZealot
     
     def seek_vector_move(vector)
       delta = vector.angle_diff(@tank)
-      puts "current | x: #{@tank.x}, y: #{@tank.y}"
-      puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
-      puts "target angle: #{vector.angle}"
-      puts "delta: #{delta}"
+      # puts "current | x: #{@tank.x}, y: #{@tank.y}"
+      # puts "current angle: #{@tank.angle}, angvel: #{@tank.angvel}"
+      # puts "target angle: #{vector.angle}"
+      # puts "delta: #{delta}"
       
       if delta.abs > Math::PI / 2
         speed = -1.0
@@ -89,7 +89,7 @@ module BraveZealot
       
       angvel = delta / (5 * $options.refresh)
       
-      puts "suggested speed: #{speed}, angvel: #{angvel}"
+      # puts "suggested speed: #{speed}, angvel: #{angvel}"
       
       return Move.new(speed, angvel)
     end

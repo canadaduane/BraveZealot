@@ -71,8 +71,8 @@ module BraveZealot
         #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
 
         # transition to the next state
-        push_next_state(:smart_follow_path, :decoy_move_to_goal)
-        @state = :smart
+        push_next_state(:seek_done, :decoy_move_to_goal)
+        @state = :seek
     end
 
     def set_decoy_goal_point
@@ -85,8 +85,8 @@ module BraveZealot
         #@group.add_field(Pf.new(@goal.x, @goal.y, hq.map.world_size, 1, 1.0))
 
         # transition to the next state
-        push_next_state(:smart_follow_path, :decoy_move_to_start)
-        @state = :smart
+        push_next_state(:seek_done, :decoy_move_to_start)
+        @state = :seek
     end
   end
 end
