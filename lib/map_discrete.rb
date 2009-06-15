@@ -101,27 +101,17 @@ module BraveZealot
         vertices = o.coords.map{ |c| world_to_array_coordinates(c.x, c.y) }
         @astar.quad(vertices, -10000.0)
       end
-
-      #shadows(0.5)
-    end
-
-    def shadow_search(start,goal)
-      sx, sy = world_to_array_coordinates(start.x, start.y)
-      gx, gy = world_to_array_coordinates(goal.x, goal.y)
-      
-      
-
-      if (path = composite_map.search(sx, sy, gx, gy))
-        path = path.map do |x, y|
-          Coord.new(*array_to_world_coordinates(x, y))
-        end
-      end
     end
     
-    def search(start, goal, smoothness = 2)
+    def search(start, goal, smoothness = 2, use_composite = false)
       sx, sy = world_to_array_coordinates(start.x, start.y)
       gx, gy = world_to_array_coordinates(goal.x, goal.y)
-      if (path = @astar.search(sx, sy, gx, gy))
+      if use_composite then
+        m = composite_map(1.0)
+      else
+        m = @astar
+      end
+      if (path = m.search(sx, sy, gx, gy))
         path = path.map do |x, y|
           Coord.new(*array_to_world_coordinates(x, y))
         end

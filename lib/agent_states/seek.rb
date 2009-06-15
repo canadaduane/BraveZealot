@@ -14,8 +14,7 @@ module BraveZealot
     end
     
     def seek_update_path
-      #if (new_path = hq.map.search(@tank, @goal, 0))
-      if (new_path = hq.map.shadow_search(@tank, @goal))
+      if (new_path = hq.map.search(@tank, @goal, 0, true))
         @path = new_path
         @waypoint = nil
       else
