@@ -344,18 +344,17 @@ module BraveZealot
 
 		# state
 		def hunter_capture_flag
-			trace "hunter_capture_flag"
+      $num_capture ||= 0
+      if $num_capture < 2 then
+        $num_capture += 1
+        trace "hunter_capture_flag"
 
-			if @hq.we_have_enemy_flag?
-				goal_home_base
-				@state = :hunter_return_to_base
-				debug "hunter_capture_flag -> hunter_return_to_base"
-			else
-		    move = @group.suggest_move(@tank.x, @tank.y, @tank.angle)
-		    
-		    speed move.speed
-		    angvel move.angvel
-			end
+        push_next_state(:seek_arrived, :seek_home_base)
+        f = hq.enemy_flags.first
+        puts "enemy tanks are dead - transitioning to smart search for flag at #{f.x}, #{f.y}"
+        
+        @state = :seek_enemy_flag
+      end
     end
 
 		def goal_enemy_flag
@@ -496,7 +495,9 @@ module BraveZealot
 		end
 
 		def log_shot()
-			debug "shot fired at: #{@hunter_target.callsign}, #{@hunter_target.status}"
+      unless @hunter_target.nil? then
+        debug "shot fired at: #{@hunter_target.callsign}, #{@hunter_target.status}"
+      end
 		end
 
 		def log_cancelled_shot()

@@ -11,7 +11,11 @@ bzrequire 'lib/agent_states/wild'
 bzrequire 'lib/agent_states/hunting'
 bzrequire 'lib/agent_states/random_search'
 bzrequire 'lib/agent_states/defender'
+<<<<<<< HEAD:lib/agent.rb
 bzrequire 'lib/agent_states/assassin'
+=======
+bzrequire 'lib/agent_states/geurilla'
+>>>>>>> 977a1ba22448644f21d974bea5c2742d6f28fb79:lib/agent.rb
 require 'ruby-debug'
 
 RADIANS_PER_DEGREE = Math::PI/180
@@ -53,6 +57,7 @@ module BraveZealot
     # Tourmanet passoff states
     include DefenderStates
     include AssassinStates
+    include GeurillaStates
     
     # See above for definitions of hq and tank
     def initialize(hq, tank)
