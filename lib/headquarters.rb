@@ -336,6 +336,7 @@ module BraveZealot
         
         # If we're all crowded around our base, move out
         if defense_score(our_flag, @my_color, 50) == ags.size
+          puts "Dispersing agents near home base"
           ags.each do |agent|
             agent.set_state(:disperse)
           end
@@ -343,6 +344,7 @@ module BraveZealot
         
         # If enemy's flag is mostly undefended, send closest 2 agents to grab it
         if defense_score(enemy_flag, enemy_color, 150) <= 1
+          puts "Sending two agents to capture flag"
           agents_nearest(enemy_flag, 2).each do |agent|
             agent.set_state(:capture_flag)
           end
