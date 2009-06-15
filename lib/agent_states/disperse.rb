@@ -4,9 +4,9 @@ module BraveZealot
   module DisperseStates
     def disperse
       @disperse_center ||= Coord.new(@tank.x, @tank.y)
-      @disperse_radius ||= 400
+      @disperse_radius ||= 150
       
-      normal = Rubystats::NormalDistribution.new(@disperse_radius, @disperse_radius/3.0)
+      normal = Rubystats::NormalDistribution.new(@disperse_radius, @disperse_radius/5.0)
       begin
         angle = rand * Math::PI * 2
         distance = normal.rng

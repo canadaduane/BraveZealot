@@ -283,16 +283,11 @@ module BraveZealot
       our_base.contains_point?(our_flag)
     end
     
-    # Returns the number of tanks defending a base
-    def base_defense_score(color, radius = 50)
-      base = get_base(color)
+    # Returns the number of tanks on a team that are defending a specific area
+    def defense_score(coord, color, radius = 50)
       tanks_on_team(color).inject(0) do |sum, tank|
-        sum + (base.center.vector_to(tank).length < radius ? 1 : 0)
+        sum + (coord.vector_to(tank).length < radius ? 1 : 0)
       end
-    end
-    
-    def undefended_enemy_bases(radius = 50)
-      enemy_bases.select{ |b| base_defense_score(b.color, radius) == 0 }
     end
     
     # Return an array of the agents nearest to +coord+, in order of nearest to farthest
@@ -319,9 +314,11 @@ module BraveZealot
     def kill_if_enemy_ahead(agent, enemy_color)
       Proc.new {
         nearby = enemies_nearby(agent.tank, enemy_color, 50)
-        ahead  = enemies_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/4)
+        ahead  = enemies_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/6)
         target = nearby.first || ahead.first
-        agent.set_state(:assassin, :target => target) unless target.nil?
+        if target and @tank.vector_to(target).length < 375
+          agent.set_state(:assassinate, :target_tank => target)
+        end
       }
     end
     
@@ -337,40 +334,31 @@ module BraveZealot
         ags = living_agents
         # puts "HQ: I have #{ags.size} agents"
         
-        if enemies.size > 0
-          puts "Targetting enemy: #{enemies.first.callsign}"
-          ags.first.push_next_state(:assassinate_done, :done)
-          ags.first.push_next_state(:seek_done, :done)
-          ags.first.set_state(:assassinate, :target_tank => enemies.first)
-        else
-          puts "No enemies to target (#{@map.othertanks.inspect})"
+        # If we're all crowded around our base, move out
+        if defense_score(our_flag, @my_color, 50) == ags.size
+          ags.each do |agent|
+            agent.set_state(:disperse)
+          end
         end
         
-        # case ags.size
-        # when 0 then
-        #   puts "Ah! We're dead. No agents left."
-        # when 1 then
-        #   puts "Only one agent left... Kamakaze!!"
-        #   ags[0].set_state(:seek, :goal => enemy_flag)
-        #   ags[0].periodically(0.5) { ags[0].shoot }
-        # when 2 then
-        #   puts "Two agents left... one defense one offense"
-        #   ags = agents_nearest(enemy_flag, 2)
-        #   ags[0].set_state(:seek, :goal => enemy_flag,
-        #                    :abort => kill_if_enemy_ahead(ags[0], enemy_color))
-        #   ags[1].set_state(:seek, :goal => our_flag)
+        # If enemy's flag is mostly undefended, send closest 2 agents to grab it
+        if defense_score(enemy_flag, enemy_color, 150) <= 1
+          agents_nearest(enemy_flag, 2).each do |agent|
+            agent.set_state(:capture_flag)
+          end
+        end
+        
+        # if enemies.size > 0
+        #   puts "Targetting enemy: #{enemies.first.callsign}"
+        #   ags.first.push_next_state(:assassinate_done, :done)
+        #   ags.first.push_next_state(:seek_done, :done)
+        #   ags.first.set_state(:assassinate, :target_tank => enemies.first)
         # else
-        #   puts "I don't know what to do with 3 or more agents right now"
+        #   puts "No enemies to target (#{@map.othertanks.inspect})"
         # end
         
-        # @map.flags.each do |flag|
-        #   score = base_defense_score(flag.color)
-        #   puts "Team: #{flag.color}, defense score: #{score}"
-        # end
       else
         puts "No enemies on map"
-        # @base_target ||= @map.bases.select{ |b| b.color != @my_color }.randomly_pick(1).first
-        # living_agents.each{ |a| a.set_state(:seek, :goal => @base_target.center) }
       end
     end
     

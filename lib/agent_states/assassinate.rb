@@ -1,7 +1,7 @@
 module BraveZealot
   module AssassinateStates
     def assassinate
-      periodically(0.3) do
+      periodically(0.5) do
         shoot
         if @target_tank.status != "normal"
           cancel_timers
