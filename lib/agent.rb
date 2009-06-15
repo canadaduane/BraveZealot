@@ -63,11 +63,16 @@ module BraveZealot
       @proximity = 8
     end
     
+    def funeral
+      @state_loop.cancel
+      cancel_timers
+    end
+    
     def begin_state_loop(initial_state = nil)
       @state = initial_state || :dummy
       puts "\nStarting agent #{@tank.index}: #{@state}"
       # Change state up to every +refresh+ seconds
-      EventMachine::PeriodicTimer.new($options.refresh) do
+      @state_loop = EventMachine::PeriodicTimer.new($options.refresh) do
         # puts "Agent #{@tank.index} entering state #{@state.inspect}"
         send(@state)
       end
@@ -127,6 +132,7 @@ module BraveZealot
         instance_variable_set("@#{k}", v)
       end
       cancel_timers
+      @next_state = {}
       @state = state
     end
     

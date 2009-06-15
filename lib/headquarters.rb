@@ -163,6 +163,11 @@ module BraveZealot
     
     def on_mytanks(r)
       @map.observe_mytanks(r)
+      @agents.each do |a|
+        if a.tank.status != "normal"
+          a.funeral
+        end
+      end
     end
 
     def write_pdf
@@ -286,21 +291,38 @@ module BraveZealot
       end
     end
     
-    def undefended_enemy_bases
-      enemy_bases.select{ |b| base_defense_score(b.color) == 0 }
+    def undefended_enemy_bases(radius = 50)
+      enemy_bases.select{ |b| base_defense_score(b.color, radius) == 0 }
     end
     
     # Return an array of the agents nearest to +coord+, in order of nearest to farthest
-    def agents_nearest(count, coord)
-      if coord.respond_to?(:vector_to)
-        @agents.sort_by{ |a| coord.vector_to(a).length }[0...count]
-      else
-        []
-      end
+    def agents_nearest(coord, count)
+      @agents.sort_by{ |a| coord.vector_to(a.tank).length }[0...count]
+    end
+    
+    # Array of enemy tanks within +radius+ of +coord+
+    def enemies_nearby(coord, enemy_color, radius = 350)
+      tanks_on_team(enemy_color).select{ |t| coord.vector_to(t).length < radius }
+    end
+    
+    # Array of enemy tanks within +radians+ of coord & theta
+    def enemies_ahead(coord, theta, enemy_color, radians = Math::PI/4)
+      direction = Vector.angle(theta)
+      tanks_on_team(enemy_color).select{ |t| direction.angle_diff(coord.vector_to(t)) < radians }
     end
     
     
     # *** The General's Quarters, Strategy, etc. ***
+    
+    def kill_if_enemy_ahead(agent, enemy_color)
+      Proc.new {
+        nearby = enemies_nearby(agent.tank, enemy_color, 50)
+        ahead  = enemies_ahead(agent.tank, agent.tank.angle, enemy_color, Math::PI/4)
+        if nearby.size > 0
+          agent.set_state(:killer, :target => nearby[0])
+        end
+      }
+    end
     
     def strategize
       flags = enemy_flags()
@@ -313,15 +335,23 @@ module BraveZealot
         ags = living_agents
         # puts "HQ: I have #{ags.size} agents"
         
+        enemy_near_me = Proc.new {
+          
+        }
+        
+        
+        
         case ags.size
+        when 0 then
+          puts "Ah! We're dead. No agents left."
         when 1 then
           puts "Only one agent left... Kamakaze!!"
           ags[0].set_state(:seek, :goal => enemy_flag)
           ags[0].periodically(0.5) { ags[0].shoot }
         when 2 then
           puts "Two agents left... one defense one offense"
-          ags = agents_nearest(2, enemy_flag)
-          ags[0].set_state(:seek, :goal => enemy_flag)
+          ags = agents_nearest(enemy_flag, 2)
+          ags[0].set_state(:seek, :goal => enemy_flag, :abort => enemy_near_me(ags[0]))
           ags[1].set_state(:seek, :goal => our_flag)
         else
           puts "I don't know what to do with 3 or more agents right now"

@@ -121,7 +121,8 @@ module BraveZealot
         end
       else
         if @mytanks.size != r.mytanks.size then
-          raise ArgumentError, "list of mytanks from response object is different size #{r.mytanks.size} than my list #{@mytanks.size}"
+          #raise ArgumentError, "list of mytanks from response object is different size #{r.mytanks.size} than my list #{@mytanks.size}"
+          return false
         end
 
         @mytanks.each_with_index do |my, idx|
