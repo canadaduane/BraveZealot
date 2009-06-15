@@ -58,13 +58,13 @@ module BraveZealot
       
       return dx, dy
     end
-
+    
     # suggest a move
     def suggest_move(current_x, current_y, current_angle)
-      dx,dy = suggest_delta(current_x,current_y)
+      dx, dy = suggest_delta(current_x,current_y)
       #print "current angle is #{current_angle}\n"
-      #print "the goal angle is #{ang_g}\n";
       ang_g = Math.atan2(dy,dx)
+      #print "the goal angle is #{ang_g}\n";
       distance = Math.sqrt(dx**2 + dy**2)
 
       #print "dx=#{dx}, dy=#{dy}, goal_angle=#{ang_g}\n"

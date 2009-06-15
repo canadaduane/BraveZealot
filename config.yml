@@ -2,6 +2,7 @@
   :server:        "127.0.0.1"
   :port:          6000
   :initial_state: "smart,dummy"
+  :random_path:   false
   :refresh:       0.1
   :debug:         false
   :abort_on_int:  true

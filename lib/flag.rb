@@ -5,8 +5,15 @@ bzrequire 'lib/coord'
 module BraveZealot
   class Flag < Struct.new(:color, :possession, :x, :y)
     
-    # include Kalman
+    include Kalman
     include XYMethods
+
+    alias :pre_kalman_initialize :kalman_initialize
+    def kalman_initialize(mu = nil, sigma = nil, sigma_x = nil)
+      sigma ||= NMatrix.float(6, 6).diagonal([400, 0.0, 0.0, 400, 0.0, 0.0])
+      sigma_x ||= NMatrix.float(6, 6).diagonal([0.001, 0.0, 0.0, 0.001, 0.0, 0.0])
+      pre_kalman_initialize(mu, sigma, sigma_x)
+    end
     
     def to_pdf(pdf = nil, options = {})
       return if pdf.nil?
