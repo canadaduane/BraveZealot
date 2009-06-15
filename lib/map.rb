@@ -150,15 +150,17 @@ module BraveZealot
           tank.kalman_initialize(ot_mu, my_sigma, my_sigma_x)
         end
       else
-        response.othertanks.each do |src_tank|
+        response.othertanks.each_with_index do |src_tank, i|
           unless (dst_tank = get_othertank(src_tank.callsign)).nil?
-            #puts "Step 1: x=#{dst_tank.x},y=#{dst_tank.y}"
+            # Observe new values
             dst_tank.observed_x = src_tank.observed_x
             dst_tank.observed_y = src_tank.observed_y
-            #puts "Step 2: observed_x=#{src_tank.observed_x},observed_y=#{src_tank.observed_y}"
+            dst_tank.status = src_tank.status
+            dst_tank.flag   = src_tank.flag
+            dst_tank.angle  = src_tank.angle
             dst_tank.kalman_next(response.time)
-            #puts "Step 3: x=#{dst_tank.x},y=#{dst_tank.y}"
-
+            
+            # Record (for our pdf output) what the kalman filter thinks of things
             @kalman_paths ||= {}
             @kalman_paths[src_tank.callsign] ||= []
             @kalman_paths[src_tank.callsign] << [src_tank.observed_x, src_tank.observed_y, dst_tank.x, dst_tank.y]
@@ -184,14 +186,14 @@ module BraveZealot
     end
     
     def observe_flags(response)
-      if @flags.empty?
-        @flags = response.flags
-      else
-        @flags.each_with_index do |dst_flag, i|
-          src_flag = response.flags[i]
+      @flags ||= []
+      response.flags.each do |src_flag|
+        if (dst_flag = @flags.find{ |f| f.color == src_flag.color })
           dst_flag.observed_x = src_flag.observed_x
           dst_flag.observed_y = src_flag.observed_y
           dst_flag.kalman_next(response.time)
+        else
+          @flags << src_flag
         end
       end
     end

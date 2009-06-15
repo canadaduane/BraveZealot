@@ -41,8 +41,8 @@ opts = OptionParser.new do |opts|
     $options.initial_state = i
   end
 
-  opts.on("-n", "--random-path", "(e.g. 'dummy', 'smart')") do
-    $options.random_path = true
+  opts.on("-m", "--macro-strategy", "Use the macro strategy rather than assigning initial states") do
+    $options.strategy = true
   end
 
   opts.on("-r", "--refresh [VALUE]", "Potential field refresh rate (e.g. 0.05)") do |r|

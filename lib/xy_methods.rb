@@ -1,6 +1,3 @@
-bzrequire 'lib/coord'
-bzrequire 'lib/vector'
-
 module BraveZealot
   module XYMethods
     # This will return the vector between this point and the point p

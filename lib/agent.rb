@@ -59,11 +59,11 @@ module BraveZealot
       @timers = []
       # Satisfactory proximity of tank to its destination
       @proximity = 8
-      puts "\nStarting agent #{@tank.index}: #{@state}"
     end
     
     def begin_state_loop(initial_state = nil)
       @state = initial_state || :dummy
+      puts "\nStarting agent #{@tank.index}: #{@state}"
       # Change state up to every +refresh+ seconds
       EventMachine::PeriodicTimer.new($options.refresh) do
         # puts "Agent #{@tank.index} entering state #{@state.inspect}"
@@ -116,6 +116,16 @@ module BraveZealot
       @next_state ||= {}
       @next_state[state] ||= []
       @state = @next_state[state].shift || default
+    end
+    
+    def set_state(state, options = {}, &abort)
+      options[:abort] = abort unless abort.nil?
+      # Set all appropriate instance variables
+      options.each do |k, v|
+        instance_variable_set("@#{k}", v)
+      end
+      cancel_timers
+      @state = state
     end
     
     def refresh(freshness, &block)
